@@ -19,7 +19,9 @@ set_exception_handler([$app, "handleException"]);
 $route = $app->router()->find($requestUri);
 $app->execute($route->params());
 
-if ($app->request()->getFormat() === null) {
+$format = $app->request()->getFormat();
+
+if (in_array($format, [null, "html"])) {
 	echo "\n\n\n";
 	echo "<!-- Total Execution Time .............. ". number_format((microtime(true) - $startTime) * 1000, 2) ." ms -->\n";
 	echo "<!-- Total Memory Usage ................ ". number_format(memory_get_usage()/1024, 2) ." kb -->\n";

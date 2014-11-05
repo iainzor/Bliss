@@ -28,6 +28,6 @@ implements DecoratorProvider, ConfigProvider, RouteProvider
 			"module" => $this->name(),
 			"controller" => "index",
 			"action" => "index"
-		]);
+		], 100);
 	}
 }

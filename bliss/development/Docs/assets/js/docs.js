@@ -1,1 +1,0 @@
-var docs = angular.module("docs", ["ngRoute", "ngResource"]);

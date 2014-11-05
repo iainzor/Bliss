@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html ng-app="blissApp">
+	<head>
+		<base href="<?=BASE_URL?>">
+		<meta charset="utf-8">
+		<meta name="fragment" content="!">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+		<meta name="mobile-web-app-capable" content="yes">
+		
+		<title>Bliss Application Engine</title>
+		
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:500,300,700,400">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+		<link rel="stylesheet" href="./assets/all.css">
+	</head>
+	<body>
+		<nav class="navbar navbar-default navbar-static-top">
+			<div class="container">
+				<div class="navbar-header">
+					<a href="./" class="navbar-brand">Bliss Application Engine</a>
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="./docs">Documentation</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<div class="container">
+			<?php echo $this->contents(); ?>
+		</div>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-route.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-resource.min.js"></script>
+		<script src="./assets/all.js"></script>
+	</body>
+</html>

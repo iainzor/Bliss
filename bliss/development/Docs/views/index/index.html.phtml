@@ -1,0 +1,16 @@
+<header class="page-header">
+	<h1>Application Documentation</h1>
+</header>
+
+<p class="lead">
+	Documentation from all registered modules is automatically compiled and presented here. 
+	You can view each section using the list below.  If you would like to create documentation for your
+	own module, visit the <a href="./docs/docs">Docs</a> module to learn how.
+</p>
+
+<h2>Modules</h2>
+<ul>
+	<li ng-repeat="module in modules">
+		<a href="./{{module.path}}">{{module.label}}</a>
+	</li>
+</ul>

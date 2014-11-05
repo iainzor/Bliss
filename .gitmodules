@@ -1,8 +1,0 @@
-[submodule "bliss.core"]
-	path = bliss/core
-	url = https://github.com/iainzor/bliss.core
-	branch = master
-[submodule "bliss.development"]
-	path = bliss/development
-	url = https://github.com/iainzor/bliss.development
-	branch = master

@@ -1,0 +1,6 @@
+[submodule "bliss/core"]
+	path = bliss/core
+	url = https://github.com/iainzor/bliss.core
+[submodule "bliss/development"]
+	path = bliss/development
+	url = https://github.com/iainzor/bliss.development

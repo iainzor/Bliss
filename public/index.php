@@ -5,6 +5,8 @@ error_reporting(-1);
 ini_set("display_errors", true);
 ini_set("display_startup_errors", true);
 
+date_default_timezone_set("UTC");
+
 $startTime = microtime(true);
 $baseUrl = preg_replace("/^(.*)\/.*\.php$/i", "\\1/", filter_input(INPUT_SERVER, "SCRIPT_NAME"));
 $requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl));

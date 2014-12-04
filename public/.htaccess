@@ -1,3 +1,5 @@
+allow from all
+
 Options -Indexes +FollowSymLinks
 
 SetEnvIf Host "^192|127|localhost" APP_ENV=development

@@ -1,6 +1,10 @@
 <?php
 require_once "../bliss/app.php";
 
+error_reporting(-1);
+ini_set("display_errors", true);
+ini_set("display_startup_errors", true);
+
 $startTime = microtime(true);
 $baseUrl = preg_replace("/^(.*)\/.*\.php$/i", "\\1/", filter_input(INPUT_SERVER, "SCRIPT_NAME"));
 $requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl));
@@ -11,10 +15,8 @@ $app = BlissApp::create();
 $app->modules()->registerModulesDirectory(dirname(__DIR__) ."/app");
 $app->modules()->registerModulesDirectory(dirname(__DIR__) ."/bliss/development");
 
-error_reporting(-1);
 set_error_handler([$app, "handleError"]);
 set_exception_handler([$app, "handleException"]);
-
 
 $route = $app->router()->find($requestUri);
 $app->execute($route->params());

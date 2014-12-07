@@ -15,6 +15,9 @@ require_once "core/Bliss/src/App/Container.php";
  * # Development Modules
  * @method \Docs\Module docs() Docs module
  * @method \Tests\Module tests() Tests module
+ * 
+ * # Authentication Modules
+ * @method \Acl\Module acl() ACL module
  */
 class BlissApp extends \Bliss\App\Container
 {
@@ -26,6 +29,7 @@ class BlissApp extends \Bliss\App\Container
 		$instance = new self();
 		$instance->autoloader()->registerNamespace("Bliss", __DIR__ ."/core/Bliss/src");
 		$instance->modules()->registerModulesDirectory(__DIR__ ."/core");
+		$instance->modules()->registerModulesDirectory(__DIR__ ."/auth");
 		
 		return $instance;
 	}

@@ -4,3 +4,6 @@
 [submodule "bliss/development"]
 	path = bliss/development
 	url = https://github.com/iainzor/bliss.development
+[submodule "bliss/auth"]
+	path = bliss/auth
+	url = https://github.com/iainzor/bliss.auth

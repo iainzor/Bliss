@@ -13,17 +13,22 @@ $requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl)
 
 define("BASE_URL", $baseUrl);
 
-$app = BlissApp::create();
+$app = BlissApp::create("Bliss");
 $app->modules()->registerModulesDirectory(dirname(__DIR__) ."/app");
 $app->modules()->registerModulesDirectory(dirname(__DIR__) ."/bliss/development");
 
 set_error_handler([$app, "handleError"]);
 set_exception_handler([$app, "handleException"]);
 
-$route = $app->router()->find($requestUri);
+$request = $app->request();
+$request->setUri($requestUri);
+
+$router = $app->router();
+$route = $router->find($requestUri);
+
 $app->execute($route->params());
 
-$format = $app->request()->getFormat();
+$format = $request->getFormat();
 
 if (in_array($format, [null, "html"])) {
 	echo "\n\n\n";

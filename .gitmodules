@@ -7,3 +7,6 @@
 [submodule "bliss/auth"]
 	path = bliss/auth
 	url = https://github.com/iainzor/bliss.auth
+[submodule "bliss/web"]
+	path = bliss/web
+	url = https://github.com/iainzor/bliss.web

@@ -22,12 +22,13 @@ require_once "core/Bliss/src/App/Container.php";
 class BlissApp extends \Bliss\App\Container
 {
 	/**
-	 * @param string $name The name of the application
+	 * @param string $name
+	 * @param string $rootPath
 	 * @return \BlissApp
 	 */
-	public static function create($name = null)
+	public static function create($name, $rootPath)
 	{
-		$instance = new self($name);
+		$instance = new self($name, $rootPath);
 		$instance->autoloader()->registerNamespace("Bliss", __DIR__ ."/core/Bliss/src");
 		$instance->modules()->registerModulesDirectory(__DIR__ ."/core");
 		$instance->modules()->registerModulesDirectory(__DIR__ ."/web");

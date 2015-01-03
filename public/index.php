@@ -13,7 +13,7 @@ $requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl)
 
 define("BASE_URL", $baseUrl);
 
-$app = BlissApp::create("Bliss");
+$app = BlissApp::create("Bliss", dirname(__DIR__));
 $app->modules()->registerModulesDirectory(dirname(__DIR__) ."/app");
 $app->modules()->registerModulesDirectory(dirname(__DIR__) ."/bliss/development");
 

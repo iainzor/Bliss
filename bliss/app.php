@@ -6,6 +6,7 @@ require_once "core/Bliss/src/App/Container.php";
  * @method \Assets\Module assets() Assets module
  * @method \Bliss\Module bliss() Bliss module
  * @method \Config\Module config() Config module
+ * @method \Database\Module database()
  * @method \Error\Module error() Error module
  * @method \Request\Module request() Request module
  * @method \Response\Module response() Response module
@@ -36,7 +37,7 @@ class BlissApp extends \Bliss\App\Container
 		$instance->autoloader()->registerNamespace("Bliss", __DIR__ ."/core/Bliss/src");
 		$instance->modules()->registerModulesDirectory(__DIR__ ."/core");
 		$instance->modules()->registerModulesDirectory(__DIR__ ."/web");
-		$instance->modules()->registerModulesDirectory(__DIR__ ."/auth");
+		$instance->modules()->registerModulesDirectory(__DIR__ ."/security");
 		
 		return $instance;
 	}

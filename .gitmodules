@@ -4,9 +4,9 @@
 [submodule "bliss/development"]
 	path = bliss/development
 	url = https://github.com/iainzor/bliss.development
-[submodule "bliss/auth"]
-	path = bliss/auth
-	url = https://github.com/iainzor/bliss.auth
+[submodule "bliss/security"]
+	path = bliss/security
+	url = https://github.com/iainzor/bliss.security
 [submodule "bliss/web"]
 	path = bliss/web
 	url = https://github.com/iainzor/bliss.web

@@ -38,6 +38,9 @@ class BlissApp extends \Bliss\App\Container
 	public static function create($name, $rootPath, $environment = self::ENV_PRODUCTION)
 	{
 		date_default_timezone_set("UTC");
+		error_reporting(-1);
+		ini_set("display_errors", true);
+		ini_set("display_startup_errors", true);
 		
 		if (session_id() === "") {
 			session_start();
@@ -55,10 +58,6 @@ class BlissApp extends \Bliss\App\Container
 			$instance->modules()->registerModulesDirectory(__DIR__ ."/development");
 		}
 		
-		// Setup error handling
-		error_reporting(-1);
-		ini_set("display_errors", true);
-		ini_set("display_startup_errors", true);
 		set_error_handler([$instance, "handleError"]);
 		set_exception_handler([$instance, "handleException"]);
 

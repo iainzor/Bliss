@@ -12,10 +12,15 @@ $baseUrl = preg_replace("/^(.*)\/.*\.php$/i", "\\1/", filter_input(INPUT_SERVER,
 $requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl));
 
 define("BASE_URL", $baseUrl);
+define("APP_ENV", getenv("APP_ENV") ? getenv("APP_ENV") : "development");
 
 $app = BlissApp::create("Bliss", dirname(__DIR__));
+$app->environment(APP_ENV);
 $app->modules()->registerModulesDirectory(dirname(__DIR__) ."/app");
-$app->modules()->registerModulesDirectory(dirname(__DIR__) ."/bliss/development");
+
+if (APP_ENV !== BlissApp::ENV_PRODUCTION) {
+	$app->modules()->registerModulesDirectory(dirname(__DIR__) ."/bliss/development");
+}
 
 set_error_handler([$app, "handleError"]);
 set_exception_handler([$app, "handleException"]);

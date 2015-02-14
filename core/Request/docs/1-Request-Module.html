@@ -1,0 +1,52 @@
+<p class="lead">
+	The Request module holds data about the incoming request by the user.  The only reserved parameters are <code>module</code>, <code>controller</code>,
+	<code>action</code>, and <code>format</code>. Any other parameters can be injected into the Request at any point during the application's
+	execution.
+</p>
+
+<h2>Methods</h2>
+<ul class="methods">
+	<li>
+		<h3><code>setParams(array $params)</code></h3>
+		<p>
+			Merge one or more parameters with the current Request.
+		</p>
+	</li>
+	<li>
+		<h3><code>params()</code></h3>
+		<p>
+			Get all current parameters from the Request
+		</p>
+	</li>
+	<li>
+		<h3><code>param(string $name, mixed $defaultValue = null)</code></h3>
+		<p>
+			Get a single parameter from the Request.  If the parameter cannot be found, the optional
+			<code>$defaultValue</code> will be returned.
+		</p>
+	</li>
+	<li>
+		<h3><code>set(string $name, mixed $value)</code></h3>
+		<p>
+			Set the value of a single parameter in the Request
+		</p>
+	</li>
+	<li>
+		<h3><code>reset()</code></h3>
+		<p>
+			Resets the Request parameters to their default values
+		</p>
+	</li>
+	<li>
+		<h3>Helper Methods</h3>
+		<p>
+			Methods for getting and setting values are provided for the reserved parameters:
+		</p>
+		<ul>
+			<li>module</li>
+			<li>controller</li>
+			<li>action</li>
+			<li>format</li>
+		</ul>
+	</li>
+</ul>

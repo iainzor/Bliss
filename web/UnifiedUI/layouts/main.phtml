@@ -1,0 +1,148 @@
+<?php
+use UnifiedUI\Module as UI,
+	View\Partial\Partial;
+
+/* @var $ui \UnifiedUI\Module */
+$ui = $this->app->unifiedUI();
+
+/* @var $request \Request\Module */
+$request = $this->app->request();
+
+/* @var $router \Router\Module */
+$router = $this->app->router();
+
+/* @var $exception \Exception */
+$exception = $this->get("exception");
+?>
+<!DOCTYPE html>
+<html ng-app="bliss" ng-controller="bliss.AppCtrl" class="{{layout.mode}}">
+	<head>
+		<base href="<?=$request->baseUrl()?>">
+		<meta charset="utf-8">
+		<meta name="fragment" content="!">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+		<meta name="mobile-web-app-capable" content="yes">
+		
+		<title ng-bind="pageTitle()"></title>
+		
+		<link rel="import" href="./polymer/bower_components/polymer/polymer.html">
+		<link rel="import" href="./polymer/bower_components/core-icons/core-icons.html">
+		<link rel="import" href="./polymer/bower_components/core-icons/social-icons.html">
+		<link rel="import" href="./polymer/bower_components/paper-icon-button/paper-icon-button.html">
+		<link rel="import" href="./polymer/bower_components/paper-spinner/paper-spinner.html">
+		
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:500,300,700,400">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="./assets/all.css">
+	</head>
+	<body ng-controller="unifiedUI.LayoutCtrl" ng-class="{ready:app.ready}">
+		<header id="header" class="shadow">
+			<div class="container">
+				<paper-icon-button icon="menu" class="menuToggle" ng-click="toggleMenu()" ng-class="{active:menuOpen, disabled:!layout.menu.enabled}"></paper-icon-button>
+
+				<aside class="widgets">
+					<?=$ui->renderInjectables(UI::AREA_HEADER_WIDGETS)?>
+				</aside>
+
+				<h1 class="brand" title="{{app.name}}">
+					<a href="./" ng-bind="app.name"></a>
+				</h1>
+				<h4 class="page-title" ng-class="{dropdown:page.pages.length}" ng-if="page" dropdown>
+					<a href="./{{page.path}}" ng-bind="page.title"></a>
+					<i class="arrow bottom left north"></i>
+					<ul class="dropdown-menu shadow pull-left" ng-if="page.pages.length">
+						<li ng-repeat="p in page.pages" ng-class="{active:p.active}">
+							<a href="./{{p.path}}">{{p.title}}</a>
+						</li>
+					</ul>
+				</h4>
+			</div>
+		</header>
+		
+		<nav id="menu" class="shadow z2" ng-class="{open:menuOpen, disabled:!layout.menu.enabled}">
+			<?=$ui->renderInjectables(UI::AREA_MENU)?>
+		</nav>
+		<div id="menuOverlay" ng-click="toggleMenu()" ng-class="{visible:menuOpen}" ng-if="layout.menu.enabled"></div>
+		
+		<div id="pageError" class="alert alert-danger shadow" ng-class="{visible:pageError}">
+			<paper-icon-button icon="close" ng-click="clearPageError()"></paper-icon-button>
+			<p>
+				{{pageError.message}}
+				&nbsp;
+			</p>
+		</div>
+		
+<?php if (!$exception): ?>
+		<div id="pageLoading" ng-class="{'visible':app.loading}">
+			<article class="block shadow z2 indicator">
+				<section class="section body">
+					<paper-spinner active></paper-spinner>
+				</section>
+			</article>
+		</div>
+		
+		<div id="content">
+			<div class="container">
+				<div class="row">
+					<div ng-if="resource" class="col-sm-3">
+						<article class="block shadow">
+							<header class="section header" ng-if="resource.label">
+								<h4>{{resource.label}}</h4>
+							</header>
+							<ul class="section nav nav-stacked">
+								<li ng-repeat="child in resource.pages">
+									<a href="./{{child.path}}">{{child.title}}</a>
+								</li>
+							</ul>
+						</article>
+					</div>
+					<div ng-class="{'col-sm-9':resource,'col-sm-12':!resource}">
+						<div ng-view></div>
+					</div>
+				</div>
+			</div>
+		</div>
+<?php else: ?>
+		<article class="block shadow">
+			<section class="section body">
+				<?=$this->contents()?>
+			</section>
+		</article>
+<?php endif; ?>
+		
+		
+		
+<?php
+// Attempt to pre-load the view
+try {
+	$uri = $request->uri();
+	if (!strlen($uri)) {
+		$uri = "index";
+	}
+	$route = $router->find("{$uri}.html");
+	$module = $this->app->module($route->module());
+	$viewPath = $route->module() ."/". $route->controller() ."/". $route->action() .".html";
+	$filename = $module->resolvePath("views/". $route->controller() ."/". $route->action() .".html.phtml");
+	$partial = new Partial($filename);
+	$contents = $partial->render();
+?>
+		<script type="text/ng-template" id="./<?=$viewPath?>"><?=$contents;?></script>
+<?php
+} catch (\Exception $e) {
+	echo "\n<!--\n";
+	echo "Could not pre-load template for '{$uri}.html'\n";
+	echo "Message: ". $e->getMessage() ."\n";
+	echo "-->\n";
+}
+?>
+	
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-route.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-resource.min.js"></script>
+		<script src="./assets/all.js"></script>
+		<script>
+			bliss.app = <?=json_encode($this->app->toArray())?>;
+		</script>
+	</body>
+</html>

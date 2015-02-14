@@ -1,0 +1,57 @@
+<p class="lead">
+	The Docs module provides a way of compiling all available documentation into a single place.
+	All registered modules can provide their own documentation simply by creating a <code>/docs</code>
+	directory and filling it with HTML documents.
+</p>
+
+<h3>How it works</h3>
+<p>
+	Each HTML file within the <code>/docs</code> directory acts as its own page; this also includes
+	all sub-directories.  This directory itself can be treated as its own set of web pages, including any type of
+	<a href="./docs/modules/assets">asset</a>.
+</p>
+<p>
+	In order to access the module's documentation, navigate to <code>/docs/[module-name]</code>.  The navigation for the 
+	module is automatically generated based on the directory structure.
+</p>
+
+<hr>
+
+<h3>File Structure</h3>
+<h4>
+	<code>[<strong>order</strong>-]<strong>title</strong>.html</code>
+</h4>
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th width="1">Parameter</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td nowrap>
+				<strong>order</strong><br>
+				<small>integer</small>
+			</td>
+			<td>
+				<p class="text-muted">* Optional</p>
+				<p>
+					If provided, this will determine the page's order in the navigation
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td nowrap>
+				<strong>title</strong><br>
+				<small>string</small>
+			</td>
+			<td>
+				<p>
+					The title of the page, with words separated by hyphens.
+				</p>
+			</td>
+		</tr>
+	</tbody>
+</table>

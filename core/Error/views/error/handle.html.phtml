@@ -1,0 +1,10 @@
+<?php
+$code = (int) $this->get("code");
+?>
+
+<h1><?=($code === 404) ? "404 Not Found" : "An error has occurred"?></h1>
+<h3><?=$this->get("message", "Unknown")?></h3>
+
+<pre><?php echo $this->get("traceString"); ?></pre>
+
+<pre><?php print_r($this->app->logs()); ?></pre>

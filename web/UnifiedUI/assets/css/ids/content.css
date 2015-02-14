@@ -1,0 +1,14 @@
+#content {
+	transition: all .3s ease-in-out;
+	transition-delay: .2s;
+	opacity: 0;
+	transform: translateY(30px);
+}
+body.ready #content { 
+	opacity: 1; 
+	transform: translateY(0);
+}
+
+@media (min-width: 1480px) {
+	#content { }
+}

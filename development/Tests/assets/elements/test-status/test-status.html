@@ -1,0 +1,78 @@
+<base href="../../../">
+
+<link rel="import" href="./polymer/bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="./polymer/bower_components/core-icons/core-icons.html">
+<link rel="import" href="./polymer/bower_components/core-icon/core-icon.html">
+<link rel="import" href="./polymer/bower_components/core-tooltip/core-tooltip.html">
+<link rel="import" href="./polymer/bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="./polymer/bower_components/paper-icon-button/paper-icon-button.html">
+
+<polymer-element name="test-status">
+	<template>
+		<style>
+			paper-spinner::shadow .circle {
+				border-color: #fff;
+			}
+			
+			.status {
+				position: relative;
+				width: 40px;
+				height: 40px;
+				padding: 0;
+				margin: 0;
+				list-style: none;
+			}
+				.status > li {
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					margin: 0;
+					padding: 0;
+				}
+			.in, .out {
+				transition: all .5s ease-out;
+			}
+			.in { opacity: 1; transform: scale(1,1); }
+			.out { opacity: 0; transform: scale(0,0); }
+			
+			.status .spinner { margin-left: -16px; margin-top: -16px; }
+			.status .icon { margin-left: -14px; margin-top: -20px; }
+		</style>
+		<core-ajax auto url="./tests.json" handleAs="json" on-core-response="{{update}}"></core-ajax>
+		<ul class="status">
+			<li class="spinner">
+				<paper-spinner id="spinner" class="in" active></paper-spinner>
+			</li>
+			<li class="icon">
+				<core-tooltip position="left">
+					<div tip>
+						{{test.summary}}
+					</div>
+					<paper-icon-button id="icon" class="out" icon="{{icon}}"></paper-icon-button>
+				</core-tooltip>
+			</li>
+		</ul>
+		
+	</template>
+	<script>
+		Polymer("test-status", {
+			icon: "error",
+			test: {},
+			update: function(e, ajax) {
+				this.$.icon.className = "in";
+				this.$.spinner.className = "out";
+				
+				var response = this.test = ajax.response;
+				
+				switch (response.result) {
+					case "error":
+						this.icon = "error";
+						break;
+					case "success":
+						this.icon = "check";
+						break;
+				}
+			}
+		});
+	</script>
+</polymer-element>

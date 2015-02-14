@@ -1,0 +1,16 @@
+<ul class="nav nav-stacked" ng-controller="unifiedUI.NavigationCtrl">
+	<li ng-repeat="page in pages | filter:{visible:true}" ng-class="{active:page.active}">
+		<a href="./{{page.path}}" ng-click="intercept($event, page)">{{page.title}}</a>
+		<ul ng-if="resource">
+			<li ng-if="resource.label" class="nav-header">{{resource.label}}</li>
+			<li ng-repeat="child in resource.pages">
+				<a href="./{{child.path}}">{{child.title}}</a>
+			</li>
+		</ul>
+		<ul ng-if="page.pages.length">
+			<li ng-repeat="child in page.pages" ng-class="{active:child.active}">
+				<a href="./{{child.path}}">{{child.title}}</a>
+			</li>
+		</ul>
+	</li>
+</ul>

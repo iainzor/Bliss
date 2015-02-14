@@ -1,0 +1,122 @@
+<p class="lead">
+	The Bliss Application Engine is designed to be very modular.  The Bliss module itself holds only
+	the basic functionality required to get an application going.  The rest of the application is made up
+	of independent modules, grouped by purpose.
+</p>
+
+<hr>
+
+<h2>Installation</h2>
+<h3>Clone it from GitHub</h3>
+<p class="lead">
+	<code>git clone --recursive https://github.com/iainzor/bliss [app-name]</code>
+</p>
+
+<h3>Navigate to</h3>
+<p class="lead">
+	<code>http://127.0.0.1/[app-name]/public</code>
+</p>
+<p>
+	<em>* This assumes you have a web server running on your local machine</em>
+</p>
+
+<hr>
+
+<h2>Modules</h2>
+<p>
+	A module can be as simple or as complex as you want.  A single module can be an entire application or just a simple
+	website.  The only thing needed for a module to function is the class <code>Module</code> defined in 
+	<code>/MyModule/src/Module.php</code>.  This registers the module with the application and points the autoloader
+	to the <code>/MyModule/src</code> directory for that namespace.
+</p>
+<p>
+	All modules must implement <code>Bliss\Module\ModuleInterface</code>. The abstract class 
+	<code>Bliss\Module\AbstractModule</code> can be extended as well.  This class implements all necessary methods, meaning
+	<code>MyModule\Module</code> can be as simple as <code>class Module extends \Bliss\Module\AbstractModule {}</code>.
+</p>
+<p>
+	By using the central application container <code>\Bliss\App\Container</code> you can retrieve other modules 
+	using either the method <code>$app->module('my-module')</code> or the magic method of <code>$app->myModule()</code>.
+	The most common places to work with other modules are inside controllers or other module instances.
+</p>
+
+<hr>
+
+<h2>Controllers</h2>
+<p>
+	Controllers allow modules to provide data and functionality to the application.  All controllers must be under the namespace
+	<code>MyModule\Controller</code> and either implement <code>Bliss\Controller\ControllerInterface</code> or extend
+	<code>Bliss\Controller\AbstractController</code>.
+</p>
+<p>
+	If a controller extends <code>Bliss\Controller\AbstractController</code> it will be treated as a multi-action controller.  Using 
+	the <a href="./docs/modules/request">Request</a> module, the controller determines what method to execute based on the <code>action</code>
+	parameter.  Action methods must be formatted as <code>[actionName]Action</code>. If no action is in the Request, it will default 
+	to <code>index</code>.
+</p>
+
+<h3>Executing Controllers</h3>
+<p>
+	Any available controller or action can be executed by calling <code>$app->execute(array $params)</code> with the following parameters.
+	Any additional parameters that the controller needs access to can also be passed to this method.  All values should follow the
+	<a href="./docs/modules/bliss/Notes#hyphenating">hyphenated syntax</a>.
+</p>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th width="1">Parameter</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<strong>module</strong><br>
+				<small>string</small>
+			</td>
+			<td>
+				<p>
+					The name of a module to execute
+				</p>
+				<p>
+					<small class="label label-danger">Required</small>
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>controller</strong><br>
+				<small>string</small>
+			</td>
+			<td>
+				<p>
+					The name of a controller to execute.  Defaults to <code>index</code>.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>action</strong><br>
+				<small>string</small>
+			</td>
+			<td>
+				<p>
+					The controller action to execute. Defaults to <code>index</code>.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>format</strong><br>
+				<small>string</small>
+			</td>
+			<td>
+				<p>
+					The method used to format the response.  See the <a href="./docs/modules/response">Response Module</a> for
+					more information on formats.
+				</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+

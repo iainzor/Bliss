@@ -1,0 +1,51 @@
+<link rel="import" href="./polymer/bower_components/core-icons/core-icons.html">
+<link rel="import" href="./polymer/bower_components/core-icon/core-icon.html">
+
+<div class="block shadow">
+	<div class="section alert alert-info">
+		<i class="glyphicon glyphicon-warning-sign" style="font-size: 16px; margin-right: 10px;"></i>
+		Please be aware that this documentation, as well as the code itself, is very much a work in progress and
+		subject to change at any time.
+	</div>
+</div>
+
+<aside id="toc">
+	<article class="block" ng-init="expanded=false;" ng-class="{shadow:expanded}">
+		<header class="section header" ng-click="expanded=!expanded" style="cursor: pointer;">
+			<div class="pull-right">
+				<core-icon icon="menu" ng-if="!expanded"></core-icon>
+				<core-icon icon="close" ng-if="expanded"></core-icon>
+			</div>
+			<span ng-if="expanded">Table of Contents</span>
+			&nbsp;
+		</header>
+		<section class="section body" ng-if="expanded">
+			<ul class="list-unstyled">
+				<li ng-repeat="module in modules">
+					<h4>
+						<a href="./{{module.path}}">{{module.label}}</a>
+					</h4>
+					<ul ng-if="module.pages.length">
+						<li ng-repeat="page in module.pages">
+							<a href="./{{page.path}}">{{page.label}}</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</section>
+	</article>
+</aside>
+
+<article class="block shadow">
+	<section class="section header">
+		<h4>
+			<a href="./docs">Documentation</a> /
+			<a href="./{{module.path}}">{{module.label}}</a>
+		</h4>
+		<h1>{{module.page.label || module.label + " Module"}}</h1>
+	</section>
+	
+	<section id="docs" class="section body">
+		<?=$this->get("contents")?>
+	</section>
+</article>

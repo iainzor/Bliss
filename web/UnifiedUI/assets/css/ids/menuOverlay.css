@@ -1,0 +1,17 @@
+#menuOverlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	opacity: 0;
+	z-index: 900;
+	visibility: hidden;
+	background-color: rgba(0,0,0,.25);
+	transition: opacity .3s ease-in-out, visibility .3s ease-in-out;
+}
+#menuOverlay.visible { visibility: visible; opacity: 1; }
+
+@media (min-width: 1480px) {
+	html:not(.thin) #menuOverlay { display: none; }
+}

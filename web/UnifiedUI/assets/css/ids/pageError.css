@@ -1,0 +1,29 @@
+#pageError {
+	position: fixed;
+	top: 60px;
+	left: 0;
+	width: 100%;
+	border-radius: 0;
+	margin: 0;
+	z-index: 500;
+	transition: all .3s ease-in-out;
+	transition-delay: .3s;
+	transform: translateY(-100%);
+	opacity: 0;
+}
+body.ready #pageError.visible {
+	transform: translatey(0);
+	opacity: 1;
+}
+
+	#pageError > paper-icon-button {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+	}
+	
+@media (min-width: 1480px) {
+	#pageError {
+		padding-left: 270px;
+	}
+}

@@ -1,0 +1,30 @@
+#userMenuWidget {
+	height: 150px;
+	background-color: #eee;
+	position: relative;
+	padding: 20px;
+}
+	#userMenuWidget .account {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		padding: 15px 20px;
+		width: 100%;
+	}
+		#userMenuWidget .account > .display-name,
+		#userMenuWidget .account > .email {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			margin: 0;
+		}
+		
+		#userMenuWidget .account > .display-name { 
+			font-size: 16px; 
+			font-weight: bold; 
+		}
+		#userMenuWidget .account > .email { 
+			font-size: 14px; 
+		}
+	
+	#userMenuWidget a { color: inherit; }

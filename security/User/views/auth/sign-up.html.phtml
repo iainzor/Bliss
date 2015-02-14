@@ -1,0 +1,35 @@
+<article class="block shadow" shrink="!errors.length">
+	<section class="section alert alert-danger">
+		<h3>Oops, something happened...</h3>
+		<ul>
+			<li ng-repeat="error in errors">{{error}}</li>
+		</ul>
+	</section>
+</article>
+
+<form class="block shadow" ng-submit="submit()">
+	<header class="section header">
+		<h1>Create an Account</h1>
+	</header>
+	<section class="section body">
+		<div class="form-group">
+			<label>Email Address</label>
+			<input type="text" class="form-control input-lg" ng-model="user.email" required>
+		</div>
+		<div class="form-group">
+			<label>Display Name</label>
+			<input type="text" class="form-control input-lg" ng-model="user.displayName" required>
+		</div>
+		<div class="form-group">
+			<label>Password</label>
+			<input type="password" class="form-control input-lg" ng-model="user.password" required>
+		</div>
+		<div class="form-group">
+			<label>Confirm Password</label>
+			<input type="password" class="form-control input-lg" ng-model="user.passwordConfirm" required>
+		</div>
+		<p class="text-right">
+			<input type="submit" class="btn btn-primary" value="Create Account">
+		</p>
+	</section>
+</form>

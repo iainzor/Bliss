@@ -1,0 +1,20 @@
+<div id="userMenuWidget" ng-controller="user.MenuWidgetCtrl">
+	<nav ng-if="!user.isActive">
+		<a href="./sign-in">Sign In</a> |
+		<a href="./sign-up">Sign Up</a>
+	</nav>
+	
+	<nav ng-if="user.isActive">
+		<a href="javascript:void(0)" ng-click="signOut()">Sign Out</a>
+	</nav>
+	
+	<div class="account">
+		<h4 class="display-name" title="{{user.displayName}}" ng-if="user.isActive">
+			<a href="./my/account">{{user.displayName}}</a>
+		</h4>
+		<p class="email">
+			{{user.email}}
+		</p>
+	</div>
+	
+</div>

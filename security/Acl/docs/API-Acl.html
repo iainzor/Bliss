@@ -1,0 +1,182 @@
+<h4>
+	<span class="label label-success">Namespace: Acl</span>
+</h4>
+<h1>
+	<small>class</small>
+	Acl
+</h1>
+
+<hr>
+
+<h2>Methods</h2>
+
+<div class="class-method">
+	<h3>
+		<small>public function</small>
+		set
+		<small>($resourceName, $action, $resourceId, $isAllowed)</small>
+	</h3>
+	<div class="indent">
+		<p>
+			Sets whether an action is allowed on a resource.  The only required parameter is <code>$resourceName</code>, see below.
+		</p>
+	</div>
+</div>
+
+<div class="class-method">
+	<h3>
+		<small>public function</small>
+		allow
+		<small>($resourceName, $action, $resourceId)</small>
+	</h3>
+	<div class="indent">
+		<p>
+			Shorthand for <code>set()</code> with <code>$isAllowed = true</code>
+		</p>
+	</div>
+</div>
+
+
+
+<div class="class-method">
+	<h3>
+		<small>public function</small>
+		deny
+		<small>($resourceName, $action, $resourceId)</small>
+	</h3>
+	<div class="indent">
+		<p>
+			Shorthand for <code>deny()</code> with <code>$isAllowed = false</code>
+		</p>
+	</div>
+</div>
+
+<div class="class-method">
+	<h3>
+		<small>public function</small>
+		isAllowed
+		<small>($resourceName, $action, $resourceId)</small>
+	</h3>
+	<div class="indent">
+		<p>
+			Check if the ACL is allowed to perform an action on a resource. 
+		</p>
+	</div>
+</div>
+
+<ul>
+	<li>
+		<p>
+			In the case of <code>set()</code>, <code>allow()</code> and <code>deny()</code>, if only a <code>$resourceName</code> parameter is provided,
+			every action on every resource with that name will be targeted.
+		</p>
+	</li>
+	<li>
+		<p>
+			In the case of <code>isAllowed()</code>, a single parameter of <code>$resourceName</code> will check if the ACL is allowed access to any 
+			action on any resource.
+		</p>
+	</li>
+	<li>
+		<p>
+			The parameters <code>$action</code> and <code>$resourceId</code> are both optional in all methods.  You can end up with three options:
+		</p>
+		<ol>
+			<li>
+				Set both to target a single action on a single unique resource
+			</li>
+			<li>
+				Set <code>$action</code> only to target a single action on any resource
+			</li>
+			<li>
+				Set <code>$resourceId</code> only to target any action on a single resource
+			</li>
+		</ol>
+	</li>
+</ul>
+
+<hr>
+
+<h2>Parameters</h2>
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Parameter</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				$resourceName<br>
+				<small>string</small>
+			</td>
+			<td>
+				<p>
+					<span class="label label-danger">Required</span>
+				</p>
+				<p>
+					The name of the resource being controlled.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				$action<br>
+				<small>string</small>
+			</td>
+			<td>
+				<p>
+					The name of an action performed against the resource
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				$resourceId<br>
+				<small>int</small>
+			</td>
+			<td>
+				<p>
+					A single resource's unique ID
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				$isAllowed<br>
+				<small>boolean</small>
+			</td>
+			<td>
+				<p>
+					Only used in <code>set()</code> to determine if a permission is allowed or not. 
+				</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<hr>
+
+<h2>Example</h2>
+<pre>
+&lt;?php
+# Create a new ACL instance and grant complete access to 'my-resource'
+$acl = new \Acl\Acl();
+$acl->allow("my-resource");
+
+# Check if the ACL can read from the resource
+# Returns TRUE
+$acl->isAllowed("my-resource", "read");
+
+# Check if the ACL can delete an instance of 'my-resource' with an ID of '1'
+# Returns TRUE
+$acl->isAllowed("my-resource", "delete", 1);
+
+# Revoke delete permission for the resource
+$acl->deny("my-resource", "delete", 1);
+
+# isAllowed() will now return false
+$acl->isAllowed("my-resource", "delete", 1);
+</pre>

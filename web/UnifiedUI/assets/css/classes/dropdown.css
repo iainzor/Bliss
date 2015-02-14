@@ -1,0 +1,37 @@
+.dropdown > .arrow {
+	opacity: .5;
+	border-color: #fff;
+	transition: opacity .1s ease-in-out;
+	z-index: 1001;
+}
+.dropdown.open > .arrow {
+	opacity: 1;
+}
+
+.dropdown.right-justified {
+	padding-right: 10px;
+}
+.dropdown.left-justified {
+	padding-left: 10px;
+}
+
+.dropdown a:hover {
+	text-decoration: none;
+}
+
+.dropdown > .dropdown-menu {
+	overflow: hidden;
+	transform: scale(0,0);
+	transform-origin: top left;
+	transition: all .1s ease-in-out;
+	opacity: 0;
+	visibility: hidden;
+}
+.dropdown > .dropdown-menu.pull-right {
+	transform-origin: top right;
+}
+.dropdown.open > .dropdown-menu {
+	transform: scale(1,1);
+	opacity: 1;
+	visibility: visible;
+}

@@ -241,10 +241,10 @@ class Container extends \Bliss\Component
 		$this->config = $this->module("config")->get();
 		
 		$files = [
-			"config/app.php", 
-			"config/app-". $this->environment .".php",
-			"config/private/app.php",
-			"config/private/app-". $this->environment .".php"
+			"config.php", 
+			"config-". $this->environment .".php",
+			"private/config.php",
+			"private/config-". $this->environment .".php"
 		];
 		foreach ($files as $file) {
 			$path = $this->resolvePath($file);

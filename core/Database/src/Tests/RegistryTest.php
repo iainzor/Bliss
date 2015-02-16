@@ -5,15 +5,10 @@ use Database\Registry;
 
 class RegistryTest extends \PHPUnit_Framework_TestCase
 {
-	public function tearDown() 
-	{
-		unlink(__DIR__ ."/test.db");
-	}
-	
 	public function testAddServer()
 	{
 		$registry = new Registry();
-		$registry->addServer("sqlite:". __DIR__ ."/test.db");
+		$registry->addServer("sqlite:memory");
 		
 		$this->assertEquals(1, $registry->totalServers());
 		$this->assertInstanceOf("\PDO", $registry->generateConnection());

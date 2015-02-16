@@ -33,7 +33,7 @@ class Manager
 	public function __construct(DbTable $sessionDbTable, UserDbTable $userDbTable, HasherInterface $hasher = null)
 	{
 		if ($hasher === null) {
-			$hasher = new Blowfish();
+			$hasher = User::passwordHasher();
 		}
 		
 		$this->sessionDbTable = $sessionDbTable;

@@ -33,6 +33,17 @@ class Config
 	}
 	
 	/**
+	 * Check if the config has the provided name
+	 * 
+	 * @param string $name
+	 * @return boolean
+	 */
+	public function has($name)
+	{
+		return isset($this->data[$name]);
+	}
+	
+	/**
 	 * Set the data of the config
 	 * 
 	 * @param array $data
@@ -76,7 +87,7 @@ class Config
 	 * @param mixed $defaultValue
 	 * @return mixed
 	 */
-	public function get($name, $defaultValue = [])
+	public function get($name, $defaultValue = null)
 	{
 		$value = isset($this->data[$name]) ? $this->data[$name] : $defaultValue;
 		

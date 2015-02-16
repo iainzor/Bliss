@@ -40,7 +40,6 @@ class Page extends Component implements PageInterface
 	 */
 	public function __construct() 
 	{
-		$this->id = substr(md5(uniqid()), 0, 10);
 		$this->pages = new Container();
 	}
 	
@@ -55,6 +54,9 @@ class Page extends Component implements PageInterface
 		if ($id !== null) {
 			$this->id = $id;
 		}
+		if ($this->id === null) {
+			$this->id = substr(md5(uniqid()), 0, 10);
+		}
 		return $this->id;
 	}
 	
@@ -68,6 +70,10 @@ class Page extends Component implements PageInterface
 	{
 		if ($path !== null) {
 			$this->path = $path;
+			
+			if ($this->id === null) {
+				$this->id = substr(md5($path), 0, 10);
+			}
 		}
 		return $this->path;
 	}

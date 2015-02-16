@@ -47,7 +47,7 @@ class Registry
 	{
 		if ($this->totalServers() === 0 && $defaultConnection === null) {
 			throw new \Exception("No database connections have been registered");
-		} else if ($defaultConnection !== null) {
+		} else if ($this->totalServers() === 0) {
 			$config = $defaultConnection->toArray();
 		} else {
 			$config = $this->servers[array_rand($this->servers)];
@@ -56,6 +56,15 @@ class Registry
 		$options = array_replace([
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 		], isset($config[Config::CONF_OPTIONS]) ? $config[Config::CONF_OPTIONS] : []);
+		
+		$config = array_merge([
+			Config::CONF_USER	=> null,
+			Config::CONF_PASSWORD => null
+		], $config);
+		
+		if (!isset($config[Config::CONF_DSN])) {
+			throw new \Exception("No DSN (". Config::CONF_DSN .") value provided in connection configuration");
+		}
 		
 		return new PDO($config[Config::CONF_DSN], $config[Config::CONF_USER], $config[Config::CONF_PASSWORD], $options);
 	}

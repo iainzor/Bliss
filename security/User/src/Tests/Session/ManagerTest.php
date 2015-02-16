@@ -2,7 +2,9 @@
 namespace User\Tests\Session;
 
 use User\Session\Manager,
-	User\DbTable,
+	User\DbTable as UserDbTable,
+	User\Session\DbTable as SessionDbTable,
+	User\User,
 	Database\PDO;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase
@@ -22,17 +24,20 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
 		]);
 		$db->exec("
-			CREATE TABLE IF NOT EXISTS `users` (
+			CREATE TABLE `users` (
 				`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ,
 				`email` VARCHAR(32) NOT NULL UNIQUE,
 				`password` VARCHAR(64) NOT NULL,
 				`displayName` VARCHAR(32) NOT NULL
 			)
 		");
-		$db->exec("INSERT INTO `users` VALUES (null, 'iainedminster@gmail.com', '123abc', 'iain.zor')");
-		$dbTable = new DbTable($db);
+		$userDbTable = new UserDbTable($db);
+		$sessionDbTable = new SessionDbTable($db);
 		
-		$this->manager = new Manager($dbTable);
+		$password = User::passwordHasher()->hash("123abc");
+		$db->exec("INSERT INTO `users` VALUES (null, 'iainedminster@gmail.com', '{$password}', 'iain.zor')");
+		
+		$this->manager = new Manager($sessionDbTable, $userDbTable);
 	}
 	
 	public function testBadCredentials()

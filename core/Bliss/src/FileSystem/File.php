@@ -58,7 +58,7 @@ class File extends Component
 	 * @param int $mode
 	 * @throws Exception
 	 */
-	public function write($contents = null, $mode = 0666)
+	public function write($contents = null, $mode = 0777)
 	{
 		$dir = dirname($this->filename);
 		if (!is_dir($dir)) {

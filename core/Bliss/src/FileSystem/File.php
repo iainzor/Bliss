@@ -62,7 +62,7 @@ class File extends Component
 	{
 		$dir = dirname($this->filename);
 		if (!is_dir($dir)) {
-			if (!mkdir($dir, $mode, true)) {
+			if (!@mkdir($dir, $mode, true)) {
 				throw new Exception("Could not create directory: {$dir}");
 			}
 		}

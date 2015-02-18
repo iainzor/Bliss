@@ -1,7 +1,8 @@
 <?php
 namespace Bliss\Module;
 
-use Bliss\App\Container as App;
+use Bliss\App\Container as App,
+	Bliss\FileSystem\File;
 
 class Registry implements \Iterator
 {
@@ -26,6 +27,11 @@ class Registry implements \Iterator
 	private $isCache = false;
 	
 	/**
+	 * @var \FileSystem\File
+	 */
+	private $cache;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param \Bliss\App\Container $app
@@ -33,7 +39,11 @@ class Registry implements \Iterator
 	public function __construct(App $app)
 	{
 		$this->app = $app;
-		$this->_loadCache();
+		$this->cache = new File(
+			$app->resolvePath("/files/cache/bliss.modules")
+		);
+		
+		$this->_initCache();
 	}
 	
 	public function __destruct() 
@@ -139,13 +149,14 @@ class Registry implements \Iterator
 		public function valid() { $key = key($this->modules); return $key !== null && $key !== false; }
 	
 	/**
-	 * Attempt to load the cached registry
+	 * Initialize the
 	 */
-	private function _loadCache()
+	private function _initCache()
 	{
-		$file = $this->app->resolvePath("/cache/bliss.modules");
-		if (is_file($file)) {
-			$data = unserialize(file_get_contents($file));
+		if ($this->cache->exists()) {
+			$this->cache->delete();
+			
+			$data = unserialize($this->cache->contents());
 			
 			if (is_array($data) && !empty($data)) {
 				$this->dirs = $data["dirs"];
@@ -178,6 +189,6 @@ class Registry implements \Iterator
 		}
 		$data["modules"] = $modules;
 		
-		file_put_contents($this->app->resolvePath("/cache/bliss.modules"), serialize($data));
+		$this->cache->write(serialize($data));
 	}
 }

@@ -61,6 +61,8 @@ class Result extends \Bliss\Component
 		
 		if ($this->counts["failures"] > 0) {
 			$parts[] = $this->counts["failures"] ." failures";
+		} else {
+			$parts[] = "0 failures";
 		}
 		
 		return implode(", ", $parts);

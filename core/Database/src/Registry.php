@@ -63,7 +63,7 @@ class Registry
 		], $config);
 		
 		if (!isset($config[Config::CONF_DSN])) {
-			throw new \Exception("No DSN (". Config::CONF_DSN .") value provided in connection configuration");
+			throw new \Exception("No DSN value provided in connection configuration");
 		}
 		
 		return new PDO($config[Config::CONF_DSN], $config[Config::CONF_USER], $config[Config::CONF_PASSWORD], $options);

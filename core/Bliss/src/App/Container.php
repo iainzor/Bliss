@@ -8,6 +8,7 @@ use Bliss\AutoLoader,
 require_once dirname(__DIR__) ."/AutoLoader.php";
 require_once dirname(__DIR__) ."/Module/Registry.php";
 require_once dirname(__DIR__) ."/Component.php";
+require_once dirname(__DIR__) ."/String.php";
 require_once dirname(__DIR__) ."/FileSystem/File.php";
 require_once dirname(__DIR__) ."/FileSystem/Exception.php";
 
@@ -64,6 +65,10 @@ class Container extends \Bliss\Component
 		$this->rootPath = $rootPath;
 		$this->autoloader = new AutoLoader();
 		$this->modules = new ModuleRegistry($this);
+		
+		if (!is_dir($this->resolvePath("files"))) {
+			die("Please create the following directory: ". $this->resolvePath("files"));
+		}
 	}
 	
 	/**

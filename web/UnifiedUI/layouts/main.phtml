@@ -85,25 +85,7 @@ $exception = $this->get("exception");
 		</div>
 		
 		<div id="content">
-			<div class="container">
-				<div class="row">
-					<div ng-if="resource" class="col-sm-3">
-						<article class="block shadow">
-							<header class="section header" ng-if="resource.label">
-								<h4>{{resource.label}}</h4>
-							</header>
-							<ul class="section nav nav-stacked">
-								<li ng-repeat="child in resource.pages">
-									<a href="./{{child.path}}">{{child.title}}</a>
-								</li>
-							</ul>
-						</article>
-					</div>
-					<div ng-class="{'col-sm-9':resource,'col-sm-12':!resource}">
-						<div ng-view></div>
-					</div>
-				</div>
-			</div>
+			<div ng-view></div>
 		</div>
 <?php else: ?>
 		<article class="block shadow">

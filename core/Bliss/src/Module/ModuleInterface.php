@@ -11,6 +11,12 @@ interface ModuleInterface
 	public function name();
 	
 	/**
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function enabled($flag = null);
+	
+	/**
 	 * @param \Request\Module $request
 	 */
 	public function execute(\Request\Module $request);

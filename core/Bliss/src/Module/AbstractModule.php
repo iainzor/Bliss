@@ -32,6 +32,11 @@ abstract class AbstractModule implements ModuleInterface
 	private $name;
 	
 	/**
+	 * @var boolean
+	 */
+	private $enabled = true;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param \Bliss\App\Container $app
@@ -58,6 +63,20 @@ abstract class AbstractModule implements ModuleInterface
 	public function name()
 	{
 		return $this->name;
+	}
+	
+	/**
+	 * Get or set whether the module is enabled
+	 * 
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function enabled($flag = null) 
+	{
+		if ($flag !== null) {
+			$this->enabled = (boolean) $flag;
+		}
+		return $this->enabled;
 	}
 	
 	/**

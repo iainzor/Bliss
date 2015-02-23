@@ -34,7 +34,8 @@ class Module extends AbstractModule implements RouteProvider, InjectorInterface,
 	{
 		$root->add([
 			"title" => "Tests",
-			"path" => "tests"
+			"path" => "tests",
+			"visible" => false
 		]);
 	}
 }

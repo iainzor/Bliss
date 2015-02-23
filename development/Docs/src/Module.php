@@ -35,7 +35,8 @@ implements RouteProvider, PageProvider
 	{
 		$root->add([
 			"title" => "Documentation",
-			"path" => "docs"
+			"path" => "docs",
+			"visible" => false
 		]);
 	}
 }

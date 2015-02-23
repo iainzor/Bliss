@@ -3,7 +3,7 @@ namespace View\Partial;
 
 use Bliss\App\Container as App;
 
-class Partial
+class Partial implements PartialInterface
 {
 	/**
 	 * @var \Bliss\App\Container

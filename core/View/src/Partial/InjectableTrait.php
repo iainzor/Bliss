@@ -12,10 +12,10 @@ trait InjectableTrait
 	 * Add a view partial to an injectable area
 	 * 
 	 * @param string $area The name of the area
-	 * @param \View\Partial The view partial to render
+	 * @param \View\Partial\PartialInterface The view partial to render
 	 * @param int $order The order in which the partial should be rendered
 	 */
-	public function inject($area, Partial $partial, $order = 0)
+	public function inject($area, PartialInterface $partial, $order = 0)
 	{
 		if (!isset($this->areas[$area])) {
 			$this->areas[$area] = [];

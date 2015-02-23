@@ -40,13 +40,10 @@ $exception = $this->get("exception");
 			<div class="container">
 				<paper-icon-button icon="menu" class="menuToggle" ng-click="toggleMenu()" ng-class="{active:menuOpen, disabled:!layout.menu.enabled}"></paper-icon-button>
 
-				<aside class="widgets">
-					<?=$ui->renderInjectables(UI::AREA_HEADER_WIDGETS)?>
-				</aside>
-
 				<h1 class="brand" title="{{app.name}}">
 					<a href="./" ng-bind="app.name"></a>
 				</h1>
+				
 				<h4 class="page-title" ng-class="{dropdown:page.pages.length}" ng-if="page" dropdown>
 					<a href="./{{page.path}}" ng-bind="page.title"></a>
 					<i class="arrow bottom left north"></i>
@@ -56,6 +53,10 @@ $exception = $this->get("exception");
 						</li>
 					</ul>
 				</h4>
+				
+				<aside class="widgets">
+					<?=$ui->renderInjectables(UI::AREA_HEADER_WIDGETS)?>
+				</aside>
 			</div>
 		</header>
 		

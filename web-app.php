@@ -50,12 +50,12 @@ class BlissWebApp extends \Bliss\App\Container
 		$instance = new self($name, $rootPath);
 		$instance->environment($environment);
 		$instance->autoloader()->registerNamespace("Bliss", __DIR__ ."/core/Bliss/src");
-		$instance->modules()->registerModulesDirectory(__DIR__ ."/core");
-		$instance->modules()->registerModulesDirectory(__DIR__ ."/web");
-		$instance->modules()->registerModulesDirectory(__DIR__ ."/security");
+		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/core");
+		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/web");
+		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/security");
 		
 		if ($environment !== self::ENV_PRODUCTION) {
-			$instance->modules()->registerModulesDirectory(__DIR__ ."/development");
+			$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/development");
 		}
 		
 		set_error_handler([$instance, "handleError"]);

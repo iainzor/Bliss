@@ -44,15 +44,17 @@ $exception = $this->get("exception");
 					<a href="./" ng-bind="app.name"></a>
 				</h1>
 				
-				<h4 class="page-title" ng-class="{dropdown:page.pages.length}" ng-if="page" dropdown>
-					<a href="./{{page.path}}" ng-bind="page.title"></a>
-					<i class="arrow bottom left north"></i>
-					<ul class="dropdown-menu shadow pull-left" ng-if="page.pages.length">
-						<li ng-repeat="p in page.pages" ng-class="{active:p.active}">
-							<a href="./{{p.path}}">{{p.title}}</a>
-						</li>
-					</ul>
-				</h4>
+				<nav class="page">
+					<h4 class="title" ng-class="{dropdown:page.pages.length}" ng-if="page" dropdown>
+						<a href="./{{page.path}}" ng-bind="page.title"></a>
+						<i class="arrow bottom left north"></i>
+						<ul class="dropdown-menu shadow pull-left" ng-if="page.pages.length">
+							<li ng-repeat="p in page.pages" ng-class="{active:p.active}">
+								<a href="./{{p.path}}">{{p.title}}</a>
+							</li>
+						</ul>
+					</h4>
+				</nav>
 				
 				<aside class="widgets">
 					<?=$ui->renderInjectables(UI::AREA_HEADER_WIDGETS)?>

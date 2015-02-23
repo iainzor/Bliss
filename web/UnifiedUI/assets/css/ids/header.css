@@ -18,7 +18,7 @@ body.ready #header {
 	#header a { text-decoration: none; color: #fff; }
 	
 	#header .container { display: flex; }
-		#header .container > * { display: inline-block; margin: 0 10px; }
+		#header .container > * { margin: 0 10px; }
 	
 	#header .brand { 
 		position: relative; 
@@ -28,42 +28,45 @@ body.ready #header {
 		line-height: 40px; 
 		margin: 0; 
 	}
-		#header > .brand > a { display: block; }
+		#header .brand > a { display: block; }
 	
-	#header .page-title { 
-		margin-top: 10px;
-		padding-left: 10px;
-		color: rgba(255,255,255,.9); 
-		border-left: 1px solid rgba(255,255,255,.25);
-		line-height: 25px; 
-		font-weight: 300; 
-		font-size: 18px; 
-		transition: padding .3s ease-in-out;
+	#header .page {
 		flex: 1;
+		margin-top: 10px;
 	}
-	#header .page-title.dropdown { padding-left: 15px; }
-	
-		#header .page-title > a {
-			display: block;
-			height: 25px;
-			width: 100%;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-		#header .page-title > .dropdown-menu a { color: #000; }
-		#header .page-title > .arrow {
-			border-width: 6px;
-			margin-left: 5px;
-			visibility: hidden;
-		}
-		#header .page-title.dropdown > .arrow {
-			visibility: visible;
-		}
-		#header .page-title > .dropdown-menu {
-			margin-left: 5px;
-		}
 		
+		#header .page > .title { 
+			padding-left: 10px;
+			color: rgba(255,255,255,.9); 
+			border-left: 1px solid rgba(255,255,255,.25);
+			line-height: 25px; 
+			font-weight: 300; 
+			font-size: 18px; 
+			transition: padding .3s ease-in-out;
+		}
+		#header .page > .title.dropdown { padding-left: 15px; }
+
+			#header .page > .title > a {
+				display: block;
+				height: 25px;
+				width: 100%;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			#header .page > .title > .dropdown-menu a { color: #000; }
+			#header .page > .title > .arrow {
+				border-width: 6px;
+				margin-left: 5px;
+				visibility: hidden;
+			}
+			#header .page > .title.dropdown > .arrow {
+				visibility: visible;
+			}
+			#header .page > .title > .dropdown-menu {
+				margin-left: 5px;
+			}
+
 	#header .menuToggle { 
 		float: left;
 		margin-left: 0; 

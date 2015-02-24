@@ -1,9 +1,6 @@
-bliss.controller("user.SignInCtrl", ["$scope", "$location", "user.Account", "unifiedUI.Layout", "unifiedUI.Navigation", function($scope, $location, Account, Layout, Nav) {
+bliss.controller("user.SignInCtrl", ["$scope", "$location", "bliss.App", "user.Account", "unifiedUI.Layout", "unifiedUI.Navigation", function($scope, $location, App, Account, Layout, Nav) {
 	Layout.shrink();
 	Layout.menu.disable();
-	
-	console.log(Nav.page());
-	console.log(Nav.pages());
 	
 	$scope.user = {
 		email: null,
@@ -34,6 +31,7 @@ bliss.controller("user.SignInCtrl", ["$scope", "$location", "user.Account", "uni
 				$scope.error.open = true;
 			} else {
 				Account.user(response.user);
+				App.reload();
 				$location.path("/");
 			}
 		});

@@ -6,7 +6,7 @@ bliss.controller("user.MenuWidgetCtrl", ["$scope", "$location", "user.Account", 
 	$scope.signOut = function() {
 		User.signOut({}, function(response) {
 			Account.clear();
-			$location.path("/");
+			window.location.reload();
 		}, function(error) {
 			console.error(error.data);
 		});

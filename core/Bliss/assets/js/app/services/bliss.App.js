@@ -17,6 +17,12 @@ bliss.service("bliss.App", ["$resource", function($resource) {
 		}
 	};
 	
+	App.reload = function() {
+		App.get({}, function(response) {
+			angular.extend(_config, response);
+		});
+	};
+	
 	App.config = function(config) {
 		if (typeof(config) !== "undefined") {
 			angular.extend(_config, config);
@@ -29,7 +35,7 @@ bliss.service("bliss.App", ["$resource", function($resource) {
 			_page = page;
 		}
 		return _page;
-	}
+	};
 	
 	return App;
 }]);

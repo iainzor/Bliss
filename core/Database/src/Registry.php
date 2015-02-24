@@ -43,12 +43,12 @@ class Registry
 	 * @return \Database\PDO
 	 * @throws \Exception
 	 */
-	public function generateConnection(\Config\Config $defaultConnection = null)
+	public function generateConnection(array $defaultConnection = null)
 	{
 		if ($this->totalServers() === 0 && $defaultConnection === null) {
 			throw new \Exception("No database connections have been registered");
 		} else if ($this->totalServers() === 0) {
-			$config = $defaultConnection->toArray();
+			$config = $defaultConnection;
 		} else {
 			$config = $this->servers[array_rand($this->servers)];
 		}

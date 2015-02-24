@@ -11,6 +11,11 @@ class Module extends AbstractModule
 	private $connection;
 	
 	/**
+	 * @var array
+	 */
+	private $defaultConnection = [];
+	
+	/**
 	 * Get a connection to the database
 	 * 
 	 * @return \PDO
@@ -22,11 +27,25 @@ class Module extends AbstractModule
 		if (!isset($this->connection)) {
 			$registry = $this->_generateRegistry();
 			$this->connection = $registry->generateConnection(
-				$this->config(Config::SECTION_DEFAULT_CONNECTION)
+				$this->defaultConnection
 			);
 		}
 		
 		return $this->connection;
+	}
+	
+	/**
+	 * Get or set the default database connection configuration
+	 * 
+	 * @param array $config
+	 * @return array
+	 */
+	public function defaultConnection(array $config = null)
+	{
+		if ($config !== null) {
+			$this->defaultConnection = $config;
+		}
+		return $this->defaultConnection;
 	}
 	
 	/**

@@ -1,21 +1,21 @@
 <?php
 namespace View\Decorator;
 
-use View\Partial\Partial;
+use View\Partial\PartialInterface;
 
 class PartialWrapper implements DecoratorInterface
 {
 	/**
-	 * @var \View\Partial
+	 * @var \View\Partial\PartialInterface
 	 */
 	private $partial;
 	
 	/**
 	 * Constructor
 	 * 
-	 * @param \View\Partial $partial
+	 * @param \View\Partial\PartialInterface $partial
 	 */
-	public function __construct(Partial $partial)
+	public function __construct(PartialInterface $partial)
 	{
 		$this->partial = $partial;
 	}

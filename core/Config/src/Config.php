@@ -29,7 +29,7 @@ class Config
 		if ($data !== null) {
 			$this->setData($data);
 		}
-		return $this->data;
+		return $this->toArray();
 	}
 	
 	/**

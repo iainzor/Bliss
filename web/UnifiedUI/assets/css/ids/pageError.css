@@ -1,13 +1,12 @@
 #pageError {
 	position: fixed;
-	top: 60px;
+	top: 0;
 	left: 0;
 	width: 100%;
 	border-radius: 0;
 	margin: 0;
-	z-index: 500;
+	z-index: 900;
 	transition: all .3s ease-in-out;
-	transition-delay: .3s;
 	transform: translateY(-100%);
 	opacity: 0;
 }
@@ -22,8 +21,3 @@ body.ready #pageError.visible {
 		right: 5px;
 	}
 	
-@media (min-width: 1480px) {
-	#pageError {
-		padding-left: 270px;
-	}
-}

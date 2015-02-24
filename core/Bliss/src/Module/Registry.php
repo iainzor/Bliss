@@ -4,7 +4,7 @@ namespace Bliss\Module;
 use Bliss\App\Container as App,
 	Bliss\FileSystem\File;
 
-class Registry implements \Iterator
+class Registry
 {
 	/**
 	 * @var \Bliss\App\Container
@@ -140,13 +140,18 @@ class Registry implements \Iterator
 	}
 	
 	/**
-	 * Implementation of \Iterator
+	 * Get all registered modules
+	 * 
+	 * @return \Bliss\Module\ModuleInterface[]
 	 */
-		public function current() { $name = key($this->modules); return $this->get($name); }
-		public function key() { return key($this->modules); }
-		public function next() { return next($this->modules); }
-		public function rewind() { return reset($this->modules); }
-		public function valid() { $key = key($this->modules); return $key !== null && $key !== false; }
+	public function all()
+	{
+		$modules = [];
+		foreach ($this->modules as $alias => $data) {
+			$modules[] = $this->get($alias);
+		}
+		return $modules;
+	}
 	
 	/**
 	 * Initialize the

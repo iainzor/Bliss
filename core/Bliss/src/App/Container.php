@@ -3,6 +3,7 @@ namespace Bliss\App;
 
 use Bliss\AutoLoader,
 	Bliss\Module\Registry as ModuleRegistry,
+	Bliss\Module\ModuleInterface,
 	Bliss\String;
 
 require_once dirname(__DIR__) ."/AutoLoader.php";
@@ -27,7 +28,7 @@ class Container extends \Bliss\Component
 	/**
 	 * @var \Bliss\Module\Registry
 	 */
-	private $modules;
+	private $moduleRegistry;
 	
 	/**
 	 * @var array
@@ -64,7 +65,7 @@ class Container extends \Bliss\Component
 		$this->name = $name;
 		$this->rootPath = $rootPath;
 		$this->autoloader = new AutoLoader();
-		$this->modules = new ModuleRegistry($this);
+		$this->moduleRegistry = new ModuleRegistry($this);
 		
 		if (!is_dir($this->resolvePath("files"))) {
 			die("Please create the following directory: ". $this->resolvePath("files"));
@@ -107,13 +108,24 @@ class Container extends \Bliss\Component
 	}
 	
 	/**
+	 * 
+	 * @return type
+	 */
+	public function moduleRegistry()
+	{
+		return $this->moduleRegistry;
+	}
+	
+	/**
 	 * Get the application's module registry
 	 * 
 	 * @return \Bliss\Module\ModuleInterface[]
 	 */
 	public function modules()
 	{
-		return $this->modules;
+		return array_filter($this->moduleRegistry->all(), function(ModuleInterface $module) {
+			return $module->enabled();
+		});
 	}
 	
 	/**
@@ -125,7 +137,7 @@ class Container extends \Bliss\Component
 	 */
 	public function module($moduleName)
 	{
-		$module = $this->modules->get($moduleName);
+		$module = $this->moduleRegistry->get($moduleName);
 		
 		return $module;
 	}
@@ -261,6 +273,14 @@ class Container extends \Bliss\Component
 				$this->config->merge($data);
 			}
 		}
+		
+		foreach ($this->config->data() as $name => $data) {
+			$module = $this->module($name);
+			
+			foreach ($data as $key => $value) {
+				call_user_func([$module, $key], $value);
+			}
+		}
 	}
 	
 	/**
@@ -293,7 +313,7 @@ class Container extends \Bliss\Component
 	public function toArray() 
 	{
 		$data = parent::toArray();
-		$modules = clone $this->modules();
+		$modules = $this->modules();
 		
 		foreach ($modules as $module) {
 			if ($module instanceof \Config\PublicConfigInterface) {

@@ -54,9 +54,15 @@ class Page extends Component implements PageInterface
 		if ($id !== null) {
 			$this->id = $id;
 		}
+		
 		if ($this->id === null) {
-			$this->id = substr(md5(uniqid()), 0, 10);
+			if ($this->path && $this->title) {
+				$this->id = substr(md5($this->path . $this->title), 0, 10);
+			} else {
+				$this->id = substr(md5(uniqid()), 0, 10);
+			}
 		}
+		
 		return $this->id;
 	}
 	
@@ -70,10 +76,6 @@ class Page extends Component implements PageInterface
 	{
 		if ($path !== null) {
 			$this->path = $path;
-			
-			if ($this->id === null) {
-				$this->id = substr(md5($path), 0, 10);
-			}
 		}
 		return $this->path;
 	}

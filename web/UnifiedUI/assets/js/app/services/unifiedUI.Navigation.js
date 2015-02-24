@@ -15,9 +15,8 @@ bliss.service("unifiedUI.Navigation", ["$location", "bliss.App", "pages.Page", f
 			return App.page(page);
 		};
 		
-		this.find = function(path) {
-			var page = Page.activate(this.pages(), path);
-			return page;
+		this.find = function(path, firstMatch) {
+			return Page.find(_pages, path, firstMatch);
 		};
 		
 		this.findById = function(id, pages) {
@@ -38,22 +37,33 @@ bliss.service("unifiedUI.Navigation", ["$location", "bliss.App", "pages.Page", f
 		};
 		
 		this.activate = function(page) {
+			if (typeof(page) === "string") {
+				page = this.find(page);
+			}
+			
 			if (!page) {
 				return;
 			}
 			
-			var matcher = new RegExp($location.path() +"$", "i");
-			if (page.path && matcher.test(page.path)) {
-				page.active = true;
+			var parent = Page.findParent(page, _pages);
+			var found;
+
+			while (parent !== null) {
+				parent.active = true;
+				found = Page.findParent(parent, _pages);
+
+				if (!found) {
+					break;
+				} else {
+					parent = found;
+				}
 			}
-			if (page.pages) {
-				var self = this;
-				angular.forEach(page.pages, function(page) { self.activate(page); });
-			}
+			
+			page.active = true;
 		};
 		
 		this.reset = function() {
-			Page.reset(this.pages(), true);
+			Page.reset(_pages, true);
 		};
 	};
 	

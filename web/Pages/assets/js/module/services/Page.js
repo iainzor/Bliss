@@ -10,34 +10,31 @@ bliss.service("pages.Page", function() {
 			});
 		};
 		
-		this.activate = function(pages, path) {
+		this.find = function(pages, path, firstMatch) {
 			var found = null;
 			var self = this;
 		
 			angular.forEach(pages, function(page) {
-				page.active = false;
-
-				var r = new RegExp("^\/"+ page.path +"$", "i");
+				var r = new RegExp("^/?"+ page.path +"$", "i");
 				if (r.test(path)) {
 					found = page;
 				}
+				
+				if (firstMatch && found) {
+					return;
+				}
 
-				var foundSub = self.activate(page.pages, path);
+				var foundSub = self.find(page.pages, path);
 				if (foundSub !== null) {
-					page.active = true;
 					found = foundSub;
 				}
 			});
-
-			if (found) {
-				found.active = true;
-			}
 
 			return found;
 		};
 		
 		this.findParent = function(target, pages, previous) {
-			var parent;
+			var parent = null;
 			var self = this;
 			
 			angular.forEach(pages, function(p) {

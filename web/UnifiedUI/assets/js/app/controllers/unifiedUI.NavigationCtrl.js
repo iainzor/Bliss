@@ -4,7 +4,8 @@ bliss.controller("unifiedUI.NavigationCtrl", ["$scope", "$location", "bliss.App"
 		
 		var found = Nav.find(path);
 		if (found) {
-			Nav.page(found);
+			App.page(found);
+			Nav.activate(found);
 		}
 	};
 		

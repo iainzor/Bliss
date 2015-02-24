@@ -33,7 +33,9 @@ body.ready #header {
 	#header .page {
 		flex: 1;
 		margin-top: 10px;
+		visibility: hidden;
 	}
+	body.ready #header .page { visibility: visible; }
 		
 		#header .page > .title { 
 			padding-left: 10px;

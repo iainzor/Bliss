@@ -5,5 +5,6 @@ return [
 	"css" => "text/css",
 	"js" => "application/javascript",
 	"jpg" => "image/jpeg",
-	"jpeg" => "image/jpeg"
+	"jpeg" => "image/jpeg",
+	"png" => "image/png"
 ];

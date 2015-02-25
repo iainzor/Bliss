@@ -6,7 +6,12 @@ class ErrorController extends \Bliss\Controller\AbstractController
 	public function handleAction()
 	{
 		$request = $this->app->request();
+		$response = $this->app->response();
 		$e = $request->param("exception");
+		
+		if ($e) {
+			$response->header("X-Exception: {$e->getMessage()}");
+		};
 		
 		return [
 			"result" => "error",

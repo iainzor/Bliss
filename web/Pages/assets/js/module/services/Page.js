@@ -11,17 +11,18 @@ bliss.service("pages.Page", function() {
 		};
 		
 		this.find = function(pages, path, firstMatch) {
+			path = path.replace(/^\//, "");
+			
 			var found = null;
 			var self = this;
 		
 			angular.forEach(pages, function(page) {
-				var r = new RegExp("^/?"+ page.path +"$", "i");
+				if (firstMatch && found) { return; }
+				if (page.path !== null && path.length > 0 && page.path.length === 0) { return; }
+
+				var r = new RegExp("^"+ page.path, "i");
 				if (r.test(path)) {
 					found = page;
-				}
-				
-				if (firstMatch && found) {
-					return;
 				}
 
 				var foundSub = self.find(page.pages, path);

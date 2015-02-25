@@ -15,6 +15,27 @@ bliss.service("unifiedUI.Navigation", ["$location", "bliss.App", "pages.Page", f
 			return App.page(page);
 		};
 		
+		/**
+		 * Set the resource for the page.  This includes the title of the resource and
+		 * any sub-pages used for the navigation
+		 * 
+		 * @param string title Used as the page's title
+		 * @param Object resource A resource object
+		 */
+		this.resource = function(title, resource) {
+			var pages = resource.pages || [];
+			var activePage = Page.find(pages, $location.path());
+			var activePath = activePage ? activePage.path : resource.path || null;
+			
+			this.activate(activePath);
+			this.activate(activePage);
+			
+			return App.page({
+				title: title,
+				pages: resource.pages || []
+			});
+		};
+		
 		this.find = function(path, firstMatch) {
 			return Page.find(_pages, path, firstMatch);
 		};

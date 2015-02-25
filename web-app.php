@@ -84,7 +84,7 @@ class BlissWebApp extends \Bliss\App\Container
 		try {
 			$format = $this->request()->getFormat();
 
-			if (in_array($format, [null, "html"])) {
+			if ($this->debug() && in_array($format, [null, "html"])) {
 				echo "\n\n\n";
 				echo "<!-- Total Execution Time .............. ". number_format((microtime(true) - $this->startTime) * 1000, 2) ." ms -->\n";
 				echo "<!-- Total Memory Usage ................ ". number_format(memory_get_usage()/1024, 2) ." kb -->\n";

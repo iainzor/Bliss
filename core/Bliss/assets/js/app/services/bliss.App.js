@@ -2,6 +2,7 @@ bliss.service("bliss.App", ["$resource", function($resource) {
 	var App = $resource("./app.json");
 	var _config;
 	var _page;
+	var _error;
 	
 	App.init = function() {
 		if (bliss.app) {
@@ -36,6 +37,13 @@ bliss.service("bliss.App", ["$resource", function($resource) {
 		}
 		return _page;
 	};
+	
+	App.error = function(error) {
+		if (typeof(error) !== "undefined") {
+			_error = error;
+		}
+		return _error;
+	}
 	
 	return App;
 }]);

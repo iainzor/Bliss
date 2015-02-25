@@ -22,8 +22,10 @@ bliss.controller("bliss.AppCtrl", ["$rootScope", "bliss.App", function($scope, A
 		return $scope.app.loading;
 	};
 	
+	$scope.$watch(function() { return App.error(); }, function(error) { $scope.pageError = error; });
+	
 	$scope.$on("$locationChangeStart", function() {
-		$scope.pageError = false;
+		App.error(false);
 		$scope.app.loading = true;
 	});
 	$scope.$on("$routeChangeSuccess", function() {
@@ -31,8 +33,11 @@ bliss.controller("bliss.AppCtrl", ["$rootScope", "bliss.App", function($scope, A
 	});
 	$scope.$on("$routeChangeError", function() {
 		$scope.app.loading = false;
-		$scope.pageError = {
-			message: "An error occurred while loading the page"
-		};
+		
+		if (!App.error()) {
+			App.error({
+				message: "An error occurred while loading the page"
+			});
+		}
 	});
 }]);

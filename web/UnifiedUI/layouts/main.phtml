@@ -71,10 +71,9 @@ $exception = $this->get("exception");
 		
 		<div id="pageError" class="alert alert-danger shadow" ng-class="{visible:pageError}">
 			<paper-icon-button icon="close" ng-click="clearPageError()"></paper-icon-button>
-			<p>
+			<div class="container">
 				{{pageError.message}}
-				&nbsp;
-			</p>
+			</div>
 		</div>
 		
 <?php if (!$exception): ?>

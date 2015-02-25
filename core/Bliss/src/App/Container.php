@@ -56,6 +56,11 @@ class Container extends \Bliss\Component
 	private $config;
 	
 	/**
+	 * @var boolean
+	 */
+	private $debug = false;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param string $name The name of the application
@@ -275,12 +280,30 @@ class Container extends \Bliss\Component
 		}
 		
 		foreach ($this->config->data() as $name => $data) {
-			$module = $this->module($name);
-			
-			foreach ($data as $key => $value) {
-				call_user_func([$module, $key], $value);
+			if (method_exists($this, $name)) {
+				call_user_func([$this, $name], $data);
+			} else {
+				$module = $this->module($name);
+
+				foreach ($data as $key => $value) {
+					call_user_func([$module, $key], $value);
+				}
 			}
 		}
+	}
+	
+	/**
+	 * Get or set whether the application is in debug mode
+	 * 
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function debug($flag = null)
+	{
+		if ($flag !== null) {
+			$this->debug = (boolean) $flag;
+		}
+		return $this->debug;
 	}
 	
 	/**

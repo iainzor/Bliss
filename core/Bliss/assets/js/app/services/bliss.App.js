@@ -3,6 +3,7 @@ bliss.service("bliss.App", ["$resource", function($resource) {
 	var _config;
 	var _page;
 	var _error;
+	var _loading;
 	
 	App.init = function() {
 		if (bliss.app) {
@@ -20,7 +21,9 @@ bliss.service("bliss.App", ["$resource", function($resource) {
 	
 	App.reload = function() {
 		App.get({}, function(response) {
-			angular.extend(_config, response);
+			_config = angular.extend(response, {
+				ready: true
+			});
 		});
 	};
 	
@@ -43,7 +46,14 @@ bliss.service("bliss.App", ["$resource", function($resource) {
 			_error = error;
 		}
 		return _error;
-	}
+	};
+	
+	App.loading = function(loading) {
+		if (typeof(loading) !== "undefined") {
+			_loading = loading;
+		};
+		return _loading;
+	};
 	
 	return App;
 }]);

@@ -1,8 +1,9 @@
 bliss.controller("bliss.AppCtrl", ["$rootScope", "bliss.App", function($scope, App) {
 	App.init();
 	
-	$scope.app = App.config();
+	$scope.app = App;
 	$scope.pageError = false;
+	$scope.pageLoading = true;
 	$scope.pageTitle = function() { 
 		var title = App.config().name;
 		var pageTitle = App.page() ? App.page().title : false;
@@ -17,26 +18,31 @@ bliss.controller("bliss.AppCtrl", ["$rootScope", "bliss.App", function($scope, A
 	
 	$scope.loading = function(flag) {
 		if (typeof(flag) !== "undefined") {
-			$scope.app.loading = flag ? true : false;
+			App.loading(flag ? true : false);
 		}
-		return $scope.app.loading;
+		return App.loading();
 	};
 	
-	$scope.$watch(function() { return App.error(); }, function(error) { $scope.pageError = error; });
+	$scope.$watch(function() { return App.error(); }, function(error) { 
+		$scope.pageError = error; 
+	});
+	$scope.$watch(function() { return App.config(); }, function(config) {
+		$scope.$broadcast("bliss.AppUpdated", config);
+	});
 	
 	$scope.$on("$locationChangeStart", function() {
 		App.error(false);
-		$scope.app.loading = true;
+		App.loading(true);
 	});
 	$scope.$on("$routeChangeSuccess", function() {
-		$scope.app.loading = false;
+		App.loading(false);
 	});
 	$scope.$on("$routeChangeError", function() {
-		$scope.app.loading = false;
+		App.loading(true);
 		
 		if (!App.error()) {
 			App.error({
-				message: "An error occurred while loading the page"
+				message: "An unknown error occurred while loading the page, check the error console for details."
 			});
 		}
 	});

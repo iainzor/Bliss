@@ -96,6 +96,9 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 				"title" => "Sign In",
 				"path" => "sign-in"
 			], [
+				"title" => "Signing Out",
+				"path" => "sign-out"
+			], [
 				"title" => "Create an Account",
 				"path" => "sign-up"
 			], [

@@ -1,4 +1,4 @@
-bliss.controller("user.SignUpCtrl", ["$scope", "$location", "bliss.App", "unifiedUI.Layout", "user.User", function($scope, $location, App, Layout, User) {
+bliss.controller("user.SignUpCtrl", ["$scope", "$window", "bliss.App", "unifiedUI.Layout", "user.User", function($scope, $window, App, Layout, User) {
 	Layout.shrink();
 	
 	$scope.user = {};
@@ -17,7 +17,7 @@ bliss.controller("user.SignUpCtrl", ["$scope", "$location", "bliss.App", "unifie
 				$scope.errors = response.errors;
 			} else {
 				App.reload();
-				$location.path("/");
+				$window.history.back()
 			}
 		}, function(error) {
 			$scope.loading(false);

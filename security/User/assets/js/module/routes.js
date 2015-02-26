@@ -5,5 +5,8 @@ bliss.config(["$routeProvider", function($routeProvider) {
 	}).when("/sign-up", {
 		templateUrl: "./user/auth/sign-up.html",
 		controller: "user.SignUpCtrl"
+	}).when("/sign-out", {
+		templateUrl: "./user/auth/sign-out.html",
+		controller: "user.SignOutCtrl"
 	});
 }]);

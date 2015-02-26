@@ -1,4 +1,4 @@
-bliss.controller("user.SignInCtrl", ["$scope", "$location", "bliss.App", "user.Account", "unifiedUI.Layout", "unifiedUI.Navigation", function($scope, $location, App, Account, Layout, Nav) {
+bliss.controller("user.SignInCtrl", ["$scope", "$window", "bliss.App", "user.Account", "unifiedUI.Layout", "unifiedUI.Navigation", function($scope, $window, App, Account, Layout, Nav) {
 	Layout.shrink();
 	Layout.menu.disable();
 	
@@ -32,7 +32,7 @@ bliss.controller("user.SignInCtrl", ["$scope", "$location", "bliss.App", "user.A
 			} else {
 				Account.user(response.user);
 				App.reload();
-				$location.path("/");
+				$window.history.back();
 			}
 		});
 	};

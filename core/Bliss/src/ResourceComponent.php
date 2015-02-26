@@ -106,4 +106,17 @@ abstract class ResourceComponent extends Component implements Resource\ResourceI
 		}
 		return $this->updated;
 	}
+	
+	/**
+	 * Override the default method to remove additional data
+	 * 
+	 * @return array
+	 */
+	public function toBasicArray()
+	{
+		$data = parent::toBasicArray();
+		unset($data["RESOURCE_NAME"]);
+		
+		return $data;
+	}
 }

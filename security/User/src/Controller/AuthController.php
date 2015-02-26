@@ -34,7 +34,8 @@ class AuthController extends AbstractController
 			$form = new SignUpForm(
 				new UserDbTable($this->database())
 			);
-			$user = $form->create($this->param("user", []));
+			$userData = $this->param("user", []);
+			$user = $form->create($userData);
 			
 			if ($user === false) {
 				return [
@@ -42,6 +43,10 @@ class AuthController extends AbstractController
 					"errors" => $form->errors()
 				];
 			} else {
+				$manager = $this->module->sessionManager();
+				$session = $manager->createSession($user->email(), $userData["password"]);
+				$manager->save($session);
+				
 				return $user->toArray();
 			}
 		}

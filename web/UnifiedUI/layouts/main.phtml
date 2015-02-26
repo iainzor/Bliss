@@ -42,8 +42,8 @@ $exception = $this->get("exception");
 			<div class="container">
 				<paper-icon-button icon="menu" class="menuToggle" ng-click="toggleMenu()" ng-class="{active:menuOpen, disabled:!layout.menu.enabled}"></paper-icon-button>
 
-				<h1 class="brand" title="{{app.name}}">
-					<a href="./" ng-bind="app.name"></a>
+				<h1 class="brand" title="{{app.config().name}}">
+					<a href="./" ng-bind="app.config().name"></a>
 				</h1>
 				
 				<nav class="page">

@@ -1,7 +1,5 @@
 bliss.controller("unifiedUI.NavigationCtrl", ["$scope", "$location", "bliss.App", "pages.Page", "unifiedUI.Navigation", function($scope, $location, App, Page, Nav) {
 	var activate = function(path) {
-		Nav.reset();
-		
 		var found = Nav.find(path);
 		if (found) {
 			App.page(found);
@@ -32,12 +30,16 @@ bliss.controller("unifiedUI.NavigationCtrl", ["$scope", "$location", "bliss.App"
 		}
 	}, true);
 	
-	$scope.$on("$locationChangeStart", function() {
+	$scope.$on("$locationChangeStart", function(e) {
+		Nav.reset();
 		activate($location.path());
 	});
 	$scope.$on("$routeChangeSuccess", function(e) {
 		if ($scope.intercepted) {
 			e.stopPropagation();
 		}
+	});
+	$scope.$on("bliss.AppUpdated", function() {
+		activate($location.path());
 	});
 }]);

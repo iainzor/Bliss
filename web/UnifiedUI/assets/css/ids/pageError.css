@@ -1,23 +1,26 @@
 #pageError {
 	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	border-radius: 0;
-	margin: 0;
-	z-index: 900;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	padding: 20px;
+	border-radius: 3px;
+	margin: -50px 20px 0 -200px;
+	z-index: 1100;
 	transition: all .3s ease-in-out;
-	transform: translateY(-100%);
+	transform: scale(0);
 	opacity: 0;
+	overflow: hidden;
+	text-align: center;
 }
 body.ready #pageError.visible {
-	transform: translatey(0);
 	opacity: 1;
+	transform: scale(1);
 }
 
 	#pageError > paper-icon-button {
 		position: absolute;
-		top: 5px;
-		right: 5px;
+		top: 0;
+		right: 0;
 	}
 	

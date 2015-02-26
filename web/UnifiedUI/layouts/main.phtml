@@ -37,7 +37,7 @@ $exception = $this->get("exception");
 		<link rel="stylesheet" href="./assets/all.css">
 		<?=$ui->renderInjectables(UI::AREA_CSS)?>
 	</head>
-	<body ng-controller="unifiedUI.LayoutCtrl" ng-class="{ready:app.ready}">
+	<body ng-controller="unifiedUI.LayoutCtrl" ng-class="{ready:app.config().ready}">
 		<header id="header" class="shadow">
 			<div class="container">
 				<paper-icon-button icon="menu" class="menuToggle" ng-click="toggleMenu()" ng-class="{active:menuOpen, disabled:!layout.menu.enabled}"></paper-icon-button>
@@ -77,7 +77,7 @@ $exception = $this->get("exception");
 		</div>
 		
 <?php if (!$exception): ?>
-		<div id="pageLoading" ng-class="{'visible':app.loading}">
+		<div id="pageLoading" ng-class="{'visible':app.loading()}">
 			<article class="block shadow z2 indicator">
 				<section class="section body">
 					<paper-spinner active></paper-spinner>

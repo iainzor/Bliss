@@ -96,8 +96,9 @@ $exception = $this->get("exception");
 		</article>
 <?php endif; ?>
 		
-		
-		
+		<footer id="footer">
+			<?=$ui->renderInjectables(UI::AREA_FOOTER)?>
+		</footer>
 <?php
 // Attempt to pre-load the view
 try {

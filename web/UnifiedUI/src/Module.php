@@ -16,6 +16,7 @@ class Module extends AbstractModule implements DecoratorProvider, InjectorInterf
 	
 	const AREA_HEADER_WIDGETS = "area.header.widgets";
 	const AREA_MENU = "area.menu";
+	const AREA_FOOTER = "area.footer";
 	const AREA_CSS = "area.css";
 	const AREA_JS = "area.js";
 	

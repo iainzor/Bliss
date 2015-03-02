@@ -46,6 +46,7 @@ body.ready #header {
 			font-weight: 300; 
 			font-size: 18px; 
 			transition: padding .3s ease-in-out;
+			position: relative;
 		}
 		#header .page > .title.dropdown { padding-left: 15px; }
 

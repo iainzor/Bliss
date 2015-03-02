@@ -4,12 +4,14 @@ namespace Bliss\App;
 use Bliss\AutoLoader,
 	Bliss\Module\Registry as ModuleRegistry,
 	Bliss\Module\ModuleInterface,
-	Bliss\String;
+	Bliss\String,
+	Bliss\Config;
 
 require_once dirname(__DIR__) ."/AutoLoader.php";
 require_once dirname(__DIR__) ."/Module/Registry.php";
 require_once dirname(__DIR__) ."/Component.php";
 require_once dirname(__DIR__) ."/String.php";
+require_once dirname(__DIR__) ."/Config.php";
 require_once dirname(__DIR__) ."/FileSystem/File.php";
 require_once dirname(__DIR__) ."/FileSystem/Exception.php";
 
@@ -73,7 +75,7 @@ class Container extends \Bliss\Component
 		$this->moduleRegistry = new ModuleRegistry($this);
 		
 		if (!is_dir($this->resolvePath("files"))) {
-			die("Please create the following directory: ". $this->resolvePath("files"));
+			die("Directory could not be found: ". $this->resolvePath("files"));
 		}
 	}
 	
@@ -193,7 +195,7 @@ class Container extends \Bliss\Component
 	 */
 	public function execute(array $params = [])
 	{
-		$this->loadConfig();
+		$this->initConfig();
 		
 		$this->log("Executing parameters: ". json_encode($params));
 		
@@ -251,7 +253,7 @@ class Container extends \Bliss\Component
 	public function config() 
 	{
 		if (!isset($this->config)) {
-			$this->loadConfig();
+			$this->initConfig();
 		}
 		return $this->config;
 	}
@@ -260,9 +262,9 @@ class Container extends \Bliss\Component
 	 * Load all available configuration files into the current application's 
 	 * config object
 	 */
-	public function loadConfig()
+	private function initConfig()
 	{
-		$this->config = $this->module("config")->get();
+		$this->config = new Config();
 		
 		$files = [
 			"config.php", 
@@ -283,11 +285,13 @@ class Container extends \Bliss\Component
 			if (method_exists($this, $name)) {
 				call_user_func([$this, $name], $data);
 			} else {
+				/*
 				$module = $this->module($name);
 
 				foreach ($data as $key => $value) {
 					call_user_func([$module, $key], $value);
 				}
+				*/
 			}
 		}
 	}

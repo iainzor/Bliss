@@ -33,8 +33,15 @@ class Module extends \Bliss\Module\AbstractModule
 	 */
 	private $baseUrl;
 	
+	/**
+	 * @var boolean
+	 */
+	private $forceSSL = false;
+	
 	public function init()
 	{
+		$this->initSSL();
+		
 		$input = file_get_contents("php://input");
 		if (strlen($input)) {
 			$dataArray = json_decode($input, true);
@@ -184,4 +191,28 @@ class Module extends \Bliss\Module\AbstractModule
 	
 	public function getFormat() { return $this->param(self::PARAM_FORMAT); }
 	public function setFormat($format) { $this->set(self::PARAM_FORMAT, $format); }
+	
+	
+	/**
+	 * Get or set whether to force an SSL connection
+	 * 
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function forceSSL($flag = null)
+	{
+		if ($flag !== null) {
+			$this->forceSSL = (boolean) $flag;
+		}
+		return $this->forceSSL;
+	}
+	
+	private function initSSL()
+	{
+		if ($this->forceSSL === true) {
+			echo "<pre>";
+			print_r($_SERVER);
+			exit;
+		}
+	}
 }

@@ -2,7 +2,8 @@
 namespace Bliss\Module;
 
 use Bliss\App\Container as App,
-	Bliss\Controller\Registry as ControllerRegistry;
+	Bliss\Controller\Registry as ControllerRegistry,
+	Bliss\Config;
 
 abstract class AbstractModule implements ModuleInterface
 {
@@ -22,7 +23,7 @@ abstract class AbstractModule implements ModuleInterface
 	private $controllers;
 	
 	/**
-	 * @var \Config\Config
+	 * @var \Bliss\Config
 	 */
 	private $config;
 	
@@ -47,6 +48,28 @@ abstract class AbstractModule implements ModuleInterface
 		$this->rootPath = $rootPath;
 		$this->name = $name;
 		$this->controllers = new ControllerRegistry($this);
+		$this->config = $app->config()->get($name);
+		
+		if ($this->config) {
+			$this->applyConfig($this->config);
+		}
+	}
+	
+	/**
+	 * Apply a configuration file to the module
+	 * 
+	 * @param Config $config
+	 * @throws \InvalidArgumentException
+	 */
+	public function applyConfig(Config $config = null)
+	{
+		foreach ($config->data() as $name => $data) {
+			if (method_exists($this, $name)) {
+				call_user_func([$this, $name], $data);
+			} else {
+				throw new \InvalidArgumentException("Invalid configuration key: {$name}");
+			}
+		}
 	}
 	
 	/**

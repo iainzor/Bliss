@@ -1,7 +1,7 @@
 <?php
 namespace Assets\Compiler;
 
-use Config\Config;
+use Bliss\Config;
 
 class Container 
 {

@@ -51,7 +51,7 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 			$this->session = null;
 		}
 		if (!isset($this->sessionManager)) {
-			$db = $this->database();
+			$db = $this->database->connection();
 			$this->sessionManager = new Session\Manager(
 				new Session\DbTable($db),
 				new DbTable($db),

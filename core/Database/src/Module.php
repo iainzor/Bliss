@@ -20,7 +20,7 @@ class Module extends AbstractModule
 	 * 
 	 * @return \PDO
 	 */
-	public function database()
+	public function connection()
 	{
 		$this->app->log("Getting database connection");
 		

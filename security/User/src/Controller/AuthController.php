@@ -28,11 +28,11 @@ class AuthController extends AbstractController
 		}
 	}
 	
-	public function signUpAction()
+	public function signUpAction(\Database\Module $db)
 	{
 		if ($this->request()->isPost()) {
 			$form = new SignUpForm(
-				new UserDbTable($this->database())
+				new UserDbTable($db->connection())
 			);
 			$userData = $this->param("user", []);
 			$user = $form->create($userData);

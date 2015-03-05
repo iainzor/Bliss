@@ -53,6 +53,7 @@ class BlissWebApp extends \Bliss\App\Container
 		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/core");
 		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/web");
 		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/security");
+		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/vendors");
 		
 		if ($environment !== self::ENV_PRODUCTION) {
 			$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/development");

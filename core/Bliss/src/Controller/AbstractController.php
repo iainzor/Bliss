@@ -51,7 +51,20 @@ abstract class AbstractController implements ControllerInterface
 			throw new \Exception("Invalid action: {$actionName}");
 		}
 		
-		return call_user_func([$this, $methodName]);
+		$ref = new \ReflectionMethod($this, $methodName);
+		$refParams = $ref->getParameters();
+		$args = [];
+		
+		foreach ($refParams as $refParam) {
+			$className = $refParam->getClass()->getName();
+			if (preg_match("/^([a-z0-9]+).module$/i", $className, $matches)) {
+				$args[] = $this->app->module($matches[1]);
+			} else {
+				throw new \InvalidArgumentException("Could not inject parameter '\${$refParam->getName()}' into '{$methodName}'");
+			}
+		}
+		
+		return call_user_func_array([$this, $methodName], $args);
 	}
 	
 	/**

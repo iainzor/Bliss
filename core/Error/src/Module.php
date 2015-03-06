@@ -1,7 +1,8 @@
 <?php
 namespace Error;
 
-use Response\Format\InvalidFormatException;
+use Response\Format\InvalidFormatException,
+	Response\Format\GenericFormat;
 
 class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterface
 {
@@ -30,12 +31,19 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 			$request->setFormat(null);
 		}
 		
+		$ext = $request->getFormat();
+		$format = $response->format($ext);
+		if ($format instanceof GenericFormat) {
+			$ext = null;
+		}
+		
 		$this->app->execute([
 			"module" => "error",
 			"controller" => "error",
 			"action" => "handle",
-			"format" => $request->getFormat(),
+			"format" => $ext,
 			"exception" => $e
 		]);
+		
 	}
 }

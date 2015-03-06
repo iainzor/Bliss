@@ -3,9 +3,10 @@ namespace Pages;
 
 use Bliss\Module\AbstractModule,
 	Config\Config,
-	Config\PublicConfigInterface;
+	Config\PublicConfigInterface,
+	Router\ProviderInterface as RouteProvider;
 
-class Module extends AbstractModule implements PublicConfigInterface
+class Module extends AbstractModule implements PublicConfigInterface, RouteProvider
 {
 	/**
 	 * @var \Pages\Container
@@ -17,6 +18,21 @@ class Module extends AbstractModule implements PublicConfigInterface
 	 */
 	private $compiled = false;
 	
+	public function initRouter(\Router\Module $router) 
+	{
+		$router->when("/^sitemap\.xml$/i", [], [
+			"module" => "pages",
+			"controller" => "sitemap",
+			"action" => "render",
+			"format" => "xml"
+		]);
+	}
+	
+	/**
+	 * Get the root page container
+	 * 
+	 * @return \Pages\Container
+	 */
 	public function pages()
 	{
 		if (!$this->compiled) {

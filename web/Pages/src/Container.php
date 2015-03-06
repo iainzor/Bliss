@@ -1,19 +1,16 @@
 <?php
 namespace Pages;
 
-class Container
+use Bliss\AbstractIterator;
+
+class Container extends AbstractIterator
 {
-	/**
-	 * @var \Pages\Page[]
-	 */
-	protected $pages = [];
-	
 	/**
 	 * Clear all pages in the container
 	 */
 	public function clear()
 	{
-		$this->pages = [];
+		$this->clearItems();
 	}
 	
 	/**
@@ -41,7 +38,7 @@ class Container
 		
 		foreach ($pages as $data) {
 			$page  = Page::factory($data);
-			$this->pages[] = $page;
+			$this->addItem($page);
 		}
 	}
 	
@@ -53,7 +50,7 @@ class Container
 	public function toArray()
 	{
 		$data = [];
-		foreach ($this->pages as $page) {
+		foreach ($this->allItems() as $page) {
 			$data[] = $page->toArray();
 		}
 		return $data;

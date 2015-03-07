@@ -60,7 +60,7 @@ class Container extends \Bliss\Component
 	/**
 	 * @var boolean
 	 */
-	private $debug = false;
+	private $debugMode = false;
 	
 	/**
 	 * Constructor
@@ -284,14 +284,6 @@ class Container extends \Bliss\Component
 		foreach ($this->config->data() as $name => $data) {
 			if (method_exists($this, $name)) {
 				call_user_func([$this, $name], $data);
-			} else {
-				/*
-				$module = $this->module($name);
-
-				foreach ($data as $key => $value) {
-					call_user_func([$module, $key], $value);
-				}
-				*/
 			}
 		}
 	}
@@ -302,12 +294,12 @@ class Container extends \Bliss\Component
 	 * @param boolean $flag
 	 * @return boolean
 	 */
-	public function debug($flag = null)
+	public function debugMode($flag = null)
 	{
 		if ($flag !== null) {
-			$this->debug = (boolean) $flag;
+			$this->debugMode = (boolean) $flag;
 		}
-		return $this->debug;
+		return $this->debugMode;
 	}
 	
 	/**

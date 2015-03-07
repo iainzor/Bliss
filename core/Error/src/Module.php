@@ -6,6 +6,12 @@ use Response\Format\InvalidFormatException,
 
 class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterface
 {
+	public function init() 
+	{
+		set_error_handler([$this, "handleError"]);
+		set_exception_handler([$this, "handleException"]);
+	}
+	
 	public function handleError($number, $string, $file, $line)
 	{
 		throw new \Exception("Error '{$string}' in file '{$file}' on line '{$line}'", $number);

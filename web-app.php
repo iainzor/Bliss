@@ -33,7 +33,7 @@ class BlissWebApp extends \Bliss\App\Container
 	/**
 	 * @param string $name
 	 * @param string $rootPath
-	 * @return \BlissApp
+	 * @return BlissWebApp
 	 */
 	public static function create($name, $rootPath, $environment = self::ENV_PRODUCTION)
 	{
@@ -59,25 +59,48 @@ class BlissWebApp extends \Bliss\App\Container
 			$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/development");
 		}
 		
-		set_error_handler([$instance, "handleError"]);
-		set_exception_handler([$instance, "handleException"]);
-
 		return $instance;
 	}
 	
 	public function run()
 	{
-		// Setup the request
-		$baseUrl = preg_replace("/^(.*)\/.*\.php$/i", "\\1/", filter_input(INPUT_SERVER, "SCRIPT_NAME"));
-		$requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl));
-		$request = $this->request();
-		$request->setUri($requestUri);
-		$request->baseUrl($baseUrl);
-		
-		$router = $this->router();
-		$route = $router->find($requestUri);
+		try {
+			// Setup the request
+			$baseUrl = preg_replace("/^(.*)\/.*\.php$/i", "\\1/", filter_input(INPUT_SERVER, "SCRIPT_NAME"));
+			$requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl));
+			$request = $this->request();
+			$request->setUri($requestUri);
+			$request->baseUrl($baseUrl);
 
-		$this->execute($route->params());
+			$router = $this->router();
+			$route = $router->find($requestUri);
+
+			$this->execute($route->params());
+		} catch (\Exception $e) {
+			echo "<h1>Startup Error!</h1>";
+			echo "<h3>". $e->getMessage() ."</h3>";
+			
+			if ($this->debugMode()) {
+				echo "<h4>Error Trace</h4>";
+				echo "<pre>". $e->getTraceAsString() ."</pre>";
+				
+				echo "<h4>Execution Log</h4>";
+				echo "<pre>";
+				foreach ($this->logs() as $i => $log) {
+					$date = new \DateTime();
+					$date->setTimestamp($log["time"]);
+					
+					printf("#%d\t%s\t%s\t(%s:%s)\n", 
+						$i+1, 
+						$date->format("Y-m-d H:i:s") .".". preg_replace("/^[0-9]+\.([0-9]+)$/", "\\1", $log["time"]), 
+						$log["message"], 
+						$log["file"], 
+						$log["line"]
+					);
+				}
+				echo "</pre>";
+			}
+		}
 	}
 	
 	public function __destruct() 
@@ -85,7 +108,7 @@ class BlissWebApp extends \Bliss\App\Container
 		try {
 			$format = $this->request()->getFormat();
 
-			if ($this->debug() && in_array($format, [null, "html"])) {
+			if ($this->debugMode() && in_array($format, [null, "html"])) {
 				echo "\n\n\n";
 				echo "<!-- Total Execution Time .............. ". number_format((microtime(true) - $this->startTime) * 1000, 2) ." ms -->\n";
 				echo "<!-- Total Memory Usage ................ ". number_format(memory_get_usage()/1024, 2) ." kb -->\n";

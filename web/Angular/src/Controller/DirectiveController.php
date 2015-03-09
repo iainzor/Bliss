@@ -16,7 +16,7 @@ class DirectiveController extends AbstractController
 			throw new \Exception("Could not find directive: {$filename}");
 		}
 		
-		$this->app->debug(false);
+		$this->app->debugMode(false);
 		
 		return file_get_contents($filepath);
 	}

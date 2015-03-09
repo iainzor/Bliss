@@ -6,6 +6,9 @@ use Response\Format\InvalidFormatException,
 
 class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterface
 {
+	private $showTrace = false;
+	private $showConsole = false;
+	
 	public function init() 
 	{
 		set_error_handler([$this, "handleError"]);
@@ -14,7 +17,9 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 	
 	public function handleError($number, $string, $file, $line)
 	{
-		throw new \Exception("Error '{$string}' in file '{$file}' on line '{$line}'", $number);
+		$this->handleException(
+			new \Exception("Error '{$string}' in file '{$file}' on line '{$line}'", $number)
+		);
 	}
 
 	public function handleException(\Exception $e) 
@@ -50,6 +55,33 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 			"format" => $ext,
 			"exception" => $e
 		]);
-		
+	}
+	
+	/**
+	 * Get or set whether to show the error trace on error pages
+	 * 
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function showTrace($flag = null)
+	{
+		if ($flag !== null) {
+			$this->showTrace = (boolean) $flag;
+		}
+		return $this->showTrace;
+	}
+	
+	/**
+	 * Get or set whether to show the console log on error pages
+	 * 
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function showConsole($flag = null)
+	{
+		if ($flag !== null) {
+			$this->showConsole = (boolean) $flag;
+		}
+		return $this->showConsole;
 	}
 }

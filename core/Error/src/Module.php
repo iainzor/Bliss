@@ -9,10 +9,12 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 	private $showTrace = false;
 	private $showConsole = false;
 	
+	private $prevExceptionHandler;
+	
 	public function init() 
 	{
 		set_error_handler([$this, "handleError"]);
-		set_exception_handler([$this, "handleException"]);
+		$this->prevExceptionHandler = set_exception_handler([$this, "handleException"]);
 	}
 	
 	public function handleError($number, $string, $file, $line)
@@ -48,13 +50,21 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 			$ext = null;
 		}
 		
-		$this->app->execute([
-			"module" => "error",
-			"controller" => "error",
-			"action" => "handle",
-			"format" => $ext,
-			"exception" => $e
-		]);
+		try {
+			$this->app->execute([
+				"module" => "error",
+				"controller" => "error",
+				"action" => "handle",
+				"format" => $ext,
+				"exception" => $e
+			]);
+		} catch (\Exception $e) {
+			if ($this->prevExceptionHandler) {
+				call_user_func($this->prevExceptionHandler, $e);
+			} else {
+				throw $e;
+			}
+		}
 	}
 	
 	/**

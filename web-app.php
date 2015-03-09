@@ -29,6 +29,8 @@ class BlissWebApp extends \Bliss\App\Container
 		parent::__construct($name, $rootPath);
 		
 		$this->startTime = microtime(true);
+		
+		set_exception_handler([$this, "startupExceptionHandler"]);
 	}
 	/**
 	 * @param string $name
@@ -64,42 +66,52 @@ class BlissWebApp extends \Bliss\App\Container
 	
 	public function run()
 	{
-		try {
-			// Setup the request
-			$baseUrl = preg_replace("/^(.*)\/.*\.php$/i", "\\1/", filter_input(INPUT_SERVER, "SCRIPT_NAME"));
-			$requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl));
-			$request = $this->request();
-			$request->setUri($requestUri);
-			$request->baseUrl($baseUrl);
+		// Setup the request
+		$baseUrl = preg_replace("/^(.*)\/.*\.php$/i", "\\1/", filter_input(INPUT_SERVER, "SCRIPT_NAME"));
+		$requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl));
+		$request = $this->request();
+		$request->setUri($requestUri);
+		$request->baseUrl($baseUrl);
 
-			$router = $this->router();
-			$route = $router->find($requestUri);
+		$router = $this->router();
+		$route = $router->find($requestUri);
 
-			$this->execute($route->params());
-		} catch (\Exception $e) {
-			echo "<h1>Startup Error!</h1>";
-			echo "<h3>". $e->getMessage() ."</h3>";
+		$this->execute($route->params());
+	}
+	
+	/**
+	 * Handle exceptions that may happen when starting the application
+	 * 
+	 * @param \Exception $e
+	 */
+	public function startupExceptionHandler(\Exception $e)
+	{
+		ob_end_clean();
 			
-			if ($this->debugMode()) {
-				echo "<h4>Error Trace</h4>";
-				echo "<pre>". $e->getTraceAsString() ."</pre>";
-				
-				echo "<h4>Execution Log</h4>";
-				echo "<pre>";
-				foreach ($this->logs() as $i => $log) {
-					$date = new \DateTime();
-					$date->setTimestamp($log["time"]);
-					
-					printf("#%d\t%s\t%s\t(%s:%s)\n", 
-						$i+1, 
-						$date->format("Y-m-d H:i:s") .".". preg_replace("/^[0-9]+\.([0-9]+)$/", "\\1", $log["time"]), 
-						$log["message"], 
-						$log["file"], 
-						$log["line"]
-					);
-				}
-				echo "</pre>";
+		header("HTTP/1.1 500");
+
+		echo "<h1>Startup Error!</h1>";
+		echo "<h3>". $e->getMessage() ."</h3>";
+
+		if ($this->debugMode()) {
+			echo "<h4>Error Trace</h4>";
+			echo "<pre>". $e->getTraceAsString() ."</pre>";
+
+			echo "<h4>Execution Log</h4>";
+			echo "<pre>";
+			foreach ($this->logs() as $i => $log) {
+				$date = new \DateTime();
+				$date->setTimestamp($log["time"]);
+
+				printf("#%d\t%s\t%s\t(%s:%s)\n", 
+					$i+1, 
+					$date->format("Y-m-d H:i:s") .".". preg_replace("/^[0-9]+\.([0-9]+)$/", "\\1", $log["time"]), 
+					$log["message"], 
+					$log["file"], 
+					$log["line"]
+				);
 			}
+			echo "</pre>";
 		}
 	}
 	

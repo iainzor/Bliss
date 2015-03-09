@@ -89,11 +89,15 @@ $exception = $this->get("exception");
 			<div class="container" ng-view></div>
 		</div>
 <?php else: ?>
-		<article class="block shadow">
-			<section class="section body">
-				<?=$this->contents()?>
-			</section>
-		</article>
+		<div id="exception">
+			<div class="container">
+				<article class="block shadow">
+					<section class="section body">
+						<?=$this->contents()?>
+					</section>
+				</article>
+			</div>
+		</div>
 <?php endif; ?>
 		
 		<footer id="footer">

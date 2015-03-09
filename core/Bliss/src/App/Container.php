@@ -69,13 +69,15 @@ class Container extends \Bliss\Component
 	 */
 	public function __construct($name, $rootPath) 
 	{
+		ob_start();
+		
 		$this->name = $name;
 		$this->rootPath = $rootPath;
 		$this->autoloader = new AutoLoader();
 		$this->moduleRegistry = new ModuleRegistry($this);
 		
 		if (!is_dir($this->resolvePath("files"))) {
-			die("Directory could not be found: ". $this->resolvePath("files"));
+			throw new \Exception("Directory could not be found: ". $this->resolvePath("files"));
 		}
 	}
 	
@@ -218,31 +220,6 @@ class Container extends \Bliss\Component
 		}
 
 		$response->send($request);
-	}
-	
-	/**
-	 * Handle a system error
-	 * 
-	 * @param int $number
-	 * @param string $string
-	 * @param string $file
-	 * @param int $line
-	 */
-	public function handleError($number, $string, $file, $line) 
-	{
-		$this->log("ERROR: {$string}");
-		$this->error()->handleError($number, $string, $file, $line);
-	}
-	
-	/**
-	 * Handle an exception
-	 * 
-	 * @param \Exception $e
-	 */
-	public function handleException(\Exception $e)
-	{
-		$this->log("EXCEPTION: {$e->getMessage()}");
-		$this->error()->handleException($e);
 	}
 	
 	/**

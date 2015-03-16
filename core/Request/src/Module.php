@@ -209,9 +209,12 @@ class Module extends \Bliss\Module\AbstractModule
 	
 	private function initSSL()
 	{
-		if ($this->forceSSL === true) {
-			echo "<pre>";
-			print_r($_SERVER);
+		$https = filter_input(INPUT_SERVER, "HTTPS");
+		$uri = filter_input(INPUT_SERVER, "REQUEST_URI");
+		$host = filter_input(INPUT_SERVER, "HTTP_HOST");
+		
+		if ($this->forceSSL === true && empty($https)) {
+			header("Location: https://{$host}{$uri}");
 			exit;
 		}
 	}

@@ -53,6 +53,7 @@ class String
 		}
 		
 		$compiled = trim($compiled, "-");
+		$compiled = preg_replace("/". preg_quote($separator) ."+/i", $separator, $compiled);
 		
 		return $compiled;
 	}

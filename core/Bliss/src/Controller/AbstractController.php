@@ -28,10 +28,17 @@ abstract class AbstractController implements ControllerInterface
 	}
 	
 	/**
-	 * Blank method to make initialization optional
+	 * Used to run any initialization methods - Any method matching init*()
 	 */
 	public function init()
-	{}
+	{
+		$refClass = new \ReflectionClass($this);
+		foreach ($refClass->getMethods() as $refMethod) {
+			if (preg_match("/^init(.+)$/i", $refMethod->name)) {
+				$this->app->call($this, $refMethod->name);
+			}
+		}
+	}
 	
 	/**
 	 * Attempt to executed an action and return its response
@@ -51,20 +58,7 @@ abstract class AbstractController implements ControllerInterface
 			throw new \Exception("Invalid action: {$actionName}");
 		}
 		
-		$ref = new \ReflectionMethod($this, $methodName);
-		$refParams = $ref->getParameters();
-		$args = [];
-		
-		foreach ($refParams as $refParam) {
-			$className = $refParam->getClass()->getName();
-			if (preg_match("/^([a-z0-9]+).module$/i", $className, $matches)) {
-				$args[] = $this->app->module($matches[1]);
-			} else {
-				throw new \InvalidArgumentException("Could not inject parameter '\${$refParam->getName()}' into '{$methodName}'");
-			}
-		}
-		
-		return call_user_func_array([$this, $methodName], $args);
+		return $this->app->call($this, $methodName);
 	}
 	
 	/**
@@ -76,18 +70,6 @@ abstract class AbstractController implements ControllerInterface
 	 */
 	public function param($name, $defaultValue = null)
 	{
-		return $this->request()->param($name, $defaultValue);
-	}
-	
-	/**
-	 * Forward magic methods to parent module
-	 * 
-	 * @param string $name
-	 * @param array $arguments
-	 * @return \Bliss\Module\AbstractModule
-	 */
-	public function __call($name, array $arguments) 
-	{
-		return call_user_func_array([$this->module, $name], $arguments);
+		return $this->app->request()->param($name, $defaultValue);
 	}
 }

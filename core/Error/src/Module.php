@@ -26,7 +26,9 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 
 	public function handleException(\Exception $e) 
 	{
-		ob_end_clean();
+		if (ob_get_level() > 0) {
+			//ob_end_clean();
+		}
 		
 		$response = $this->app->response();
 		$request = $this->app->request();

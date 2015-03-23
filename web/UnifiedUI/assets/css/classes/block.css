@@ -5,11 +5,19 @@
 	color: #333;
 	transition: all .2s ease-in-out;
 }
+.block.plain {
+	background-color: transparent;
+	color: inherit;
+}
+
 	.block > .section { 
 		padding: 20px; 
 		margin: 0;
 		border-bottom: 1px solid rgba(0,0,0,.05);
 	}
+	
+	.block > .section.compact { padding: 10px; }
+	
 	.block > .section.media { padding: 0; }
 		.block > .section.media img { width: 100%; }
 	

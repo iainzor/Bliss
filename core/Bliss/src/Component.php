@@ -21,12 +21,6 @@ class Component
 			$data[$name] = $this->_parse($name, $value);
 		}
 		
-		/*
-		foreach ($refClass->getConstants() as $name => $value) {
-			$data["_constants"][$name] = $value;
-		}
-		*/
-		
 		return $data;
 	}
 	
@@ -53,6 +47,26 @@ class Component
 		}
 		
 		return $data;
+	}
+	
+	/**
+	 * Get or set a property of the component
+	 * If the value IS NULL is provided the method acts as a getter and returns the current value
+	 * If the value IS NOT NULL the method first sets the property and then returns the new value
+	 * 
+	 * @param string $property
+	 * @param mixed $value
+	 */
+	protected function getSet($property, $value = null)
+	{
+		if (property_exists($this, $property)) {
+			if ($value !== null) {
+				$this->{$property} = $value;
+			}
+			return $this->{$property};
+		} else {
+			throw new \InvalidArgumentException("Invalid property name: {$property}");
+		}
 	}
 	
 	/**

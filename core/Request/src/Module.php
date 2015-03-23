@@ -38,9 +38,19 @@ class Module extends \Bliss\Module\AbstractModule
 	 */
 	private $forceSSL = false;
 	
-	public function init()
+	
+	public function init() 
 	{
+		$this->initParams();
 		$this->initSSL();
+	}
+	
+	public function initParams()
+	{
+		$getVars = filter_input_array(INPUT_GET);
+		if ($getVars) {
+			$this->_defaultParams += $getVars;
+		}
 		
 		$input = file_get_contents("php://input");
 		if (strlen($input)) {
@@ -56,6 +66,18 @@ class Module extends \Bliss\Module\AbstractModule
 			if ($postVars) {
 				$this->_defaultParams += $postVars;
 			}
+		}
+	}
+	
+	public function initSSL()
+	{
+		$https = filter_input(INPUT_SERVER, "HTTPS");
+		$uri = filter_input(INPUT_SERVER, "REQUEST_URI");
+		$host = filter_input(INPUT_SERVER, "HTTP_HOST");
+		
+		if ($this->forceSSL === true && empty($https)) {
+			header("Location: https://{$host}{$uri}");
+			exit;
 		}
 	}
 	
@@ -112,8 +134,10 @@ class Module extends \Bliss\Module\AbstractModule
 	 */
 	public function param($name, $defaultValue = null)
 	{
-		return isset($this->params[$name])
-			? $this->params[$name]
+		$all = $this->params;
+		
+		return isset($all[$name])
+			? $all[$name]
 			: $defaultValue;
 	}
 	
@@ -205,17 +229,5 @@ class Module extends \Bliss\Module\AbstractModule
 			$this->forceSSL = (boolean) $flag;
 		}
 		return $this->forceSSL;
-	}
-	
-	private function initSSL()
-	{
-		$https = filter_input(INPUT_SERVER, "HTTPS");
-		$uri = filter_input(INPUT_SERVER, "REQUEST_URI");
-		$host = filter_input(INPUT_SERVER, "HTTP_HOST");
-		
-		if ($this->forceSSL === true && empty($https)) {
-			header("Location: https://{$host}{$uri}");
-			exit;
-		}
 	}
 }

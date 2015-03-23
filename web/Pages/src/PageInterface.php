@@ -33,10 +33,4 @@ interface PageInterface
 	 * @return \Pages\PageInterface
 	 */
 	public function pages(array $pages = null, $merge = false);
-	
-	/**
-	 * @param array $resources
-	 * @return array 
-	 */
-	public function resources(array $resources = null);
 }

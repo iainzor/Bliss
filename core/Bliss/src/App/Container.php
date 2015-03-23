@@ -167,7 +167,7 @@ class Container extends \Bliss\Component
 	 * @param string $message
 	 */
 	public function log($message)
-	{
+	{	
 		$trace = debug_backtrace();
 		$caller = array_shift($trace);
 		
@@ -210,6 +210,10 @@ class Container extends \Bliss\Component
 		$module = $this->module($moduleName);
 		$this->log("Executing module: {$moduleName}");
 		$result = $module->execute($request);
+		
+		if (is_object($result) && method_exists($result, "toArray")) {
+			$result = $result->toArray();
+		}
 
 		if (is_string($result)) {
 			$response->setBody($result);
@@ -277,6 +281,30 @@ class Container extends \Bliss\Component
 			$this->debugMode = (boolean) $flag;
 		}
 		return $this->debugMode;
+	}
+	
+	/**
+	 * Call a method with all depencies injected
+	 * 
+	 * @param Object $object
+	 * @param string $method
+	 */
+	public function call($object, $method)
+	{
+		$ref = new \ReflectionMethod($object, $method);
+		$refParams = $ref->getParameters();
+		$args = [];
+		
+		foreach ($refParams as $refParam) {
+			$className = $refParam->getClass()->getName();
+			if (preg_match("/^([a-z0-9]+).module$/i", $className, $matches)) {
+				$args[] = $this->module($matches[1]);
+			} else {
+				throw new \InvalidArgumentException("Could not inject parameter '\${$refParam->getName()}' into '{$method}'");
+			}
+		}
+		
+		return call_user_func_array([$object, $method], $args);
 	}
 	
 	/**

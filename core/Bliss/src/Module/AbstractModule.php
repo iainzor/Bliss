@@ -3,9 +3,10 @@ namespace Bliss\Module;
 
 use Bliss\App\Container as App,
 	Bliss\Controller\Registry as ControllerRegistry,
-	Bliss\Config;
+	Bliss\Config,
+	Bliss\Component;
 
-abstract class AbstractModule implements ModuleInterface
+abstract class AbstractModule extends Component implements ModuleInterface
 {
 	/**
 	 * @var \Bliss\App\Container
@@ -175,17 +176,5 @@ abstract class AbstractModule implements ModuleInterface
 		} else {
 			return $this->config;
 		}
-	}
-	
-	/**
-	 * Forward unknown calls to the application
-	 * 
-	 * @param string $name
-	 * @param array $arguments
-	 * @return AbstractModule
-	 */
-	public function __call($name, array $arguments) 
-	{
-		return call_user_func_array([$this->app, $name], $arguments);
 	}
 }

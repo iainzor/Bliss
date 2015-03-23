@@ -31,11 +31,6 @@ class Page extends Component implements PageInterface
 	protected $pages;
 	
 	/**
-	 * @var array
-	 */
-	protected $resources = [];
-	
-	/**
 	 * Constructor
 	 */
 	public function __construct() 
@@ -129,19 +124,4 @@ class Page extends Component implements PageInterface
 		}
 		return $this->pages;
 	}
-	
-	/**
-	 * Get or set the resources for the page
-	 * 
-	 * @param array $resources
-	 * @return array
-	 */
-	public function resources(array $resources = null)
-	{
-		if ($resources !== null) {
-			$this->resources = $resources;
-		}
-		return $this->resources;
-	}
-
 }

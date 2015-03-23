@@ -68,7 +68,9 @@ class BlissWebApp extends \Bliss\App\Container
 	{
 		// Setup the request
 		$baseUrl = preg_replace("/^(.*)\/.*\.php$/i", "\\1/", filter_input(INPUT_SERVER, "SCRIPT_NAME"));
-		$requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl));
+		$requestUri = preg_replace("/([^\?]+)\?(.*)$/i", "\\1", 
+				substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl))
+		);
 		$request = $this->request();
 		$request->setUri($requestUri);
 		$request->baseUrl($baseUrl);

@@ -2,19 +2,18 @@
 namespace User\Controller;
 
 use Bliss\Controller\AbstractController,
-	User\User,
 	User\DbTable as UserDbTable,
 	User\Form\SignUpForm;
 
 class AuthController extends AbstractController
 {
-	public function signInAction()
+	public function signInAction(\Request\Module $request, \User\Module $user)
 	{
-		if ($this->request()->isPost()) {
+		if ($request->isPost()) {
 			$email = $this->param("email");
 			$password = $this->param("password");
 			$remember = (boolean) $this->param("remember", 0);
-			$manager = $this->module->sessionManager();
+			$manager = $user->sessionManager();
 			$session = $manager->createSession($email, $password);
 			
 			if (!$session->isValid()) {
@@ -28,9 +27,9 @@ class AuthController extends AbstractController
 		}
 	}
 	
-	public function signUpAction(\Database\Module $db)
+	public function signUpAction(\Database\Module $db, \Request\Module $request, \User\Module $user)
 	{
-		if ($this->request()->isPost()) {
+		if ($request->isPost()) {
 			$form = new SignUpForm(
 				new UserDbTable($db->connection())
 			);
@@ -43,7 +42,7 @@ class AuthController extends AbstractController
 					"errors" => $form->errors()
 				];
 			} else {
-				$manager = $this->module->sessionManager();
+				$manager = $user->sessionManager();
 				$session = $manager->createSession($user->email(), $userData["password"]);
 				$manager->save($session);
 				
@@ -52,10 +51,10 @@ class AuthController extends AbstractController
 		}
 	}
 	
-	public function signOutAction() 
+	public function signOutAction(\Request\Module $request, \User\Module $user) 
 	{
-		if ($this->request()->isPost()) {
-			$session = $this->module->session();
+		if ($request->isPost()) {
+			$session = $user->session();
 			$session->delete();
 			
 			return [

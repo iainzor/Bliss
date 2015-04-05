@@ -124,14 +124,28 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	}
 	
 	/**
+	 * Enable or disable response caching headers
+	 * 
+	 * @param boolean $flag
+	 */
+	public function cache($flag = true)
+	{
+		if ($flag === true) {
+			$this->header("Cache-Control: public");
+		} else {
+			$this->header("Cache-Control: no-store, no-cache, must-revalidate");
+		}
+	}
+	
+	/**
 	 * Set when the response content was last modified
 	 * 
-	 * @param int $lastModified
+	 * @param \DateTime $dateTime
 	 */
-	public function setLastModified($lastModified)
+	public function lastModified(\DateTime $dateTime)
 	{
-		$this->lastModified = (int) $lastModified;
-		$this->header("Last-Modified: ". gmdate("D, d M Y H:i:s", $lastModified) ." GMT");
+		$this->lastModified = $dateTime->getTimestamp();
+		$this->header("Last-Modified: ". gmdate("D, d M Y H:i:s", $this->lastModified) ." GMT");
 	}
 	
 	/**

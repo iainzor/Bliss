@@ -1,12 +1,12 @@
 <?php
 namespace Assets\Controller;
 
+use Bliss\DateTime;
+
 class AssetController extends \Bliss\Controller\AbstractController
 {
-	public function renderAction()
+	public function renderAction(\Request\Module $request, \Response\Module $response)
 	{
-		$request = $this->app->request();
-		$response = $this->app->response();
 		$path = $request->param("path");
 		$moduleName = $request->param("moduleName");
 		$module = $this->app->module($moduleName);
@@ -36,8 +36,9 @@ class AssetController extends \Bliss\Controller\AbstractController
 			throw new \Exception("File could not be found: {$path}", 404);
 		}
 		
-		$modifiedTime = filemtime($filename);
-		$response->setLastModified($modifiedTime);
+		$modifiedTime = DateTime::fromTimestamp(filemtime($filename));
+		$response->lastModified($modifiedTime);
+		$response->cache();
 		
 		if ($response->isExpired()) {
 			$contents = file_get_contents($filename);
@@ -52,10 +53,8 @@ class AssetController extends \Bliss\Controller\AbstractController
 	 * Action used to compile and render all assets from all registered modules 
 	 * of a single format
 	 */
-	public function renderAllAction()
+	public function renderAllAction(\Request\Module $request, \Response\Module $response)
 	{
-		$request = $this->app->request();
-		$response = $this->app->response();
 		$formatName = $request->getFormat();
 		$filename = $this->app->resolvePath("cache/assets/compiled/all.{$formatName}");
 		$compiler = $this->module->compiler();
@@ -77,8 +76,9 @@ class AssetController extends \Bliss\Controller\AbstractController
 			$file->save($filename);
 		}
 		
-		$modifiedTime = filemtime($filename);
-		$response->setLastModified($modifiedTime);
+		$modifiedTime = DateTime::fromTimestamp(filemtime($filename));
+		$response->lastModified($modifiedTime);
+		$response->cache();
 		
 		if ($response->isExpired()) {
 			return file_get_contents($filename);

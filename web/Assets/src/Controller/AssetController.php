@@ -38,7 +38,7 @@ class AssetController extends \Bliss\Controller\AbstractController
 		
 		$modifiedTime = DateTime::fromTimestamp(filemtime($filename));
 		$response->lastModified($modifiedTime);
-		$response->cache();
+		$response->cache(true);
 		
 		if ($response->isExpired()) {
 			$contents = file_get_contents($filename);
@@ -78,7 +78,7 @@ class AssetController extends \Bliss\Controller\AbstractController
 		
 		$modifiedTime = DateTime::fromTimestamp(filemtime($filename));
 		$response->lastModified($modifiedTime);
-		$response->cache();
+		$response->cache(true);
 		
 		if ($response->isExpired()) {
 			return file_get_contents($filename);

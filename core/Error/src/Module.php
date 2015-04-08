@@ -19,16 +19,12 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 	
 	public function handleError($number, $string, $file, $line)
 	{
-		$this->handleException(
-			new \Exception("Error '{$string}' in file '{$file}' on line '{$line}'", $number)
-		);
+		die("Error '{$string}' in file '{$file}' on line '{$line}'");
 	}
 
 	public function handleException(\Exception $e) 
 	{
-		if (ob_get_level() > 0) {
-			//ob_end_clean();
-		}
+		
 		
 		$response = $this->app->response();
 		$request = $this->app->request();

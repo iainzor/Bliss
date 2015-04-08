@@ -3,7 +3,7 @@ namespace Cache\Storage;
 
 interface StorageInterface
 {
-	public function get($hash);
+	public function get($hash, \DateTime $expires = null);
 	
 	public function delete($hash);
 	

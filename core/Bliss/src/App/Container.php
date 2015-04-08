@@ -223,7 +223,7 @@ class Container extends \Bliss\Component
 			throw new \Exception("Action must either return a string or array");
 		}
 
-		$response->send($request);
+		$response->send($request, $this->view());
 	}
 	
 	/**

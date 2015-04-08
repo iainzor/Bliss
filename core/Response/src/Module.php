@@ -1,6 +1,9 @@
 <?php
 namespace Response;
 
+use Cache\Storage\StorageInterface as CacheStorage,
+	Cache\Storage\FileStorage;
+
 class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInterface
 {
 	/**
@@ -27,6 +30,19 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	 * @var int
 	 */
 	private $lastModified;
+	
+	/**
+	 * @var boolean
+	 */
+	private $cache = false;
+	
+	/**
+	 * @var \Cache\Storage\StorageInterface
+	 */
+	private $cacheStorage;
+	
+	public function init()
+	{}
 	
 	/**
 	 * Add default formats to the response
@@ -127,14 +143,90 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	 * Enable or disable response caching headers
 	 * 
 	 * @param boolean $flag
+	 * @return boolean
 	 */
-	public function cache($flag = true)
+	public function cache($flag = null)
 	{
-		if ($flag === true) {
-			$this->header("Cache-Control: public");
+		$this->cache = (boolean) $flag;
+		
+		if ($this->cache === true) {
+			$this->header("Cache-Control: public, max-age=7200");
+			$this->header("Pragma: cache");
+			
+			if (!$this->isExpired()) {
+				$this->notModified();
+			} else {
+				$this->checkCache($this->app->request());
+			}
 		} else {
 			$this->header("Cache-Control: no-store, no-cache, must-revalidate");
 		}
+		
+		return $this->cache;
+	}
+	
+	/**
+	 * Check if a request can be returned from cache 
+	 * 
+	 * @param \Request\Module $request
+	 */
+	private function checkCache(\Request\Module $request)
+	{
+		if ($this->cache === true && $this->lastModified) {
+			$storage = $this->cacheStorage();
+			$hash = $this->cacheId($request->params());
+			$expires = new \DateTime(date("Y-m-d H:i:s", $this->lastModified));
+			$cache = $storage->get($hash, $expires);
+			
+			if ($cache) {
+				$this->_send($cache, $request);
+				exit;
+			}
+		}
+	}
+	
+	/**
+	 * Save contents of a request to the response's cache
+	 * If caching is disabled, nothing will happen
+	 * 
+	 * @param string $contents
+	 * @param \Request\Module $request
+	 */
+	private function saveCache($contents, \Request\Module $request)
+	{
+		if ($this->cache === true) {
+			$storage = $this->cacheStorage();
+			$hash = $this->cacheId($request->params());
+			$storage->put($hash, $contents);
+		}
+	}
+	
+	/**
+	 * Generate a cache ID using a set of parameters
+	 * 
+	 * @param array $params
+	 * @return string
+	 */
+	private function cacheId(array $params)
+	{
+		return md5(json_encode($params));
+	}
+	
+	/**
+	 * Get or set the storage used for caching requests
+	 * 
+	 * @param CacheStorage $storage
+	 * @return CacheStorage
+	 */
+	public function cacheStorage(CacheStorage $storage = null)
+	{
+		if ($storage !== null) {
+			$this->cacheStorage = $storage;
+		}
+		if (!isset($this->cacheStorage)) {
+			$this->cacheStorage = new FileStorage($this->app->resolvePath("files/response"));
+		}
+		return $this->cacheStorage;
 	}
 	
 	/**
@@ -180,13 +272,10 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	 * If the body is empty, attempt to generate it
 	 * 
 	 * @param \Request\Module $request
-	 * @return void
 	 */
-	public function send(\Request\Module $request)
+	public function send(\Request\Module $request, \View\Module $view)
 	{
 		$format = $this->format($request->getFormat());
-		$view = $this->app->view();
-		$protocol = filter_input(INPUT_SERVER, "SERVER_PROTOCOL");
 		
 		if (!isset($this->body)) {
 			$this->body = $this->render($request);
@@ -202,12 +291,27 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 				  . "</pre>";
 		}
 		
+		$this->_send($body, $request);
+	}
+	
+	/**
+	 * Set headers for a request and output the contents
+	 * 
+	 * @param string $contents
+	 * @param \Request\Module $request
+	 */
+	private function _send($contents, \Request\Module $request)
+	{
 		$this->app->log("Sending response");
+		$this->saveCache($contents, $request);
+		
+		$protocol = filter_input(INPUT_SERVER, "SERVER_PROTOCOL");
+		$format = $this->format($request->getFormat());
 		
 		header("Content-type: ". $format->mime());
 		header("{$protocol} {$this->code}");
 		
-		echo $body;
+		echo $contents;
 	}
 	
 	/**

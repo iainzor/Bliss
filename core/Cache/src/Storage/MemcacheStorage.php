@@ -30,9 +30,10 @@ class MemcacheStorage implements StorageInterface
 	 * Attempt to get cache from the memcached server
 	 * 
 	 * @param string $hash
+	 * @param \DataTime $expires Optional time of when the content expires
 	 * @return mixed
 	 */
-	public function get($hash) 
+	public function get($hash, \DateTime $expires = null) 
 	{
 		return $this->memcache->get($hash);
 	}

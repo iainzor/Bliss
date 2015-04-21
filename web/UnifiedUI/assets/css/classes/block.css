@@ -18,8 +18,9 @@
 	
 	.block > .section.compact { padding: 10px; }
 	
-	.block > .section.media { padding: 0; }
-		.block > .section.media img { width: 100%; }
+	.block > .section.media { 
+		padding: 0;
+	}
 	
 	.block > .section:first-child,
 	.block > .section.media:first-child img { border-top-left-radius: 2px; border-top-right-radius: 2px; }
@@ -28,7 +29,7 @@
 	.block > .section.media:last-child img { border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; border-bottom: none; }
 	
 		.block > .section > :last-child { margin-bottom: 0; }
-		
+			
 @media (min-width: 1480px) {
 	.block {
 		margin-bottom: 30px;

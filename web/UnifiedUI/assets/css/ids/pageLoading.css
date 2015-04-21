@@ -24,6 +24,3 @@
 			left: 50%;
 			margin: -14px 0 0 -14px;
 		}
-		#pageLoading .indicator paper-spinner::shadow .circle {
-			border-color: #666;
-		}

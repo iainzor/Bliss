@@ -17,7 +17,7 @@ class ViewRendererController extends AbstractController
 			throw new \Exception("Could not find directive: {$filename}");
 		}
 		
-		$response->lastModified(new \DateTime(date("Y-m-d H:i:s", filectime($filepath))));
+		$response->lastModified(new \DateTime(date("Y-m-d H:i:s", filemtime($filepath))));
 		$response->cache(true);
 		
 		$this->app->debugMode(false);

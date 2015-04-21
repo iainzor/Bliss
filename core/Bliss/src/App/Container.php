@@ -103,6 +103,16 @@ class Container extends \Bliss\Component
 	}
 	
 	/**
+	 * Get the application's title
+	 * 
+	 * @return string
+	 */
+	public function getTitle()
+	{
+		return $this->name;
+	}
+	
+	/**
 	 * Get or set the application's environment
 	 * 
 	 * @param string $env

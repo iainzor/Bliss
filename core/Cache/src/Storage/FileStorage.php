@@ -46,16 +46,16 @@ class FileStorage implements StorageInterface
 	 * Attempt to load a cached file
 	 * 
 	 * @param string $hash
-	 * @param \DateTime $expires An optional expiration time of the time
+	 * @param \DateTime $expires An optional expiration time of the file
 	 * @return mixed Returns FALSE if the file does not exist or is expired, otherwise it returns the file's contents
 	 */
 	public function get($hash, \DateTime $expires = null) 
 	{
 		$path = $this->path($hash);
 		if (is_file($path)) {
-			$modified = (int) filectime($path);
+			$modified = (int) filemtime($path);
 			
-			if (isset($expires) && $modified < $expires->getTimestamp()) {
+			if (!isset($expires) || $modified < $expires->getTimestamp()) {
 				return file_get_contents($path);
 			}
 		}

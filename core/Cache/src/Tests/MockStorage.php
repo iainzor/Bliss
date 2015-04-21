@@ -7,7 +7,7 @@ class MockStorage implements StorageInterface
 {
 	private $cache = [];
 	
-	public function get($hash) 
+	public function get($hash, \DateTime $expires = null) 
 	{
 		$cache = array_key_exists($hash, $this->cache) ? $this->cache[$hash] : false;
 		

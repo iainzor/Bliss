@@ -32,6 +32,11 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	private $lastModified;
 	
 	/**
+	 * @var \DateTime
+	 */
+	private $expires;
+	
+	/**
 	 * @var boolean
 	 */
 	private $cache = false;
@@ -172,11 +177,10 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	 */
 	private function checkCache(\Request\Module $request)
 	{
-		if ($this->cache === true && $this->lastModified) {
+		if ($this->cache === true && isset($this->expires)) {
 			$storage = $this->cacheStorage();
 			$hash = $this->cacheId($request->params());
-			$expires = new \DateTime(date("Y-m-d H:i:s", $this->lastModified));
-			$cache = $storage->get($hash, $expires);
+			$cache = $storage->get($hash, $this->expires);
 			
 			if ($cache) {
 				$this->_send($cache, $request);
@@ -238,6 +242,17 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	{
 		$this->lastModified = $dateTime->getTimestamp();
 		$this->header("Last-Modified: ". gmdate("D, d M Y H:i:s", $this->lastModified) ." GMT");
+	}
+	
+	/**
+	 * Set when the response expires
+	 * 
+	 * @param \DateTime $dateTime
+	 */
+	public function expires(\DateTime $dateTime)
+	{
+		$this->expires = $dateTime;
+		$this->header("Expires: ". gmdate("D, d M Y H:i:s", $dateTime->getTimestamp()) ." GMT");
 	}
 	
 	/**

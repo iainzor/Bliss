@@ -37,6 +37,9 @@ bliss.controller("bliss.AppCtrl", ["$rootScope", "bliss.App", function($scope, A
 	$scope.$on("$routeChangeSuccess", function() {
 		App.loading(false);
 	});
+	$scope.$on("$routeUpdate", function() {
+		App.loading(false);
+	});
 	$scope.$on("$routeChangeError", function() {
 		App.loading(false);
 		

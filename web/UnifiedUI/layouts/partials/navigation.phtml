@@ -7,8 +7,8 @@
 				<a href="./{{child.path}}">{{child.title}}</a>
 			</li>
 		</ul>
-		<ul ng-if="page.pages.length">
-			<li ng-repeat="child in page.pages" ng-class="{active:child.active}">
+		<ul ng-if="(page.pages | filter:{visible:true}).length">
+			<li ng-repeat="child in page.pages | filter:{visible:true}" ng-class="{active:child.active}">
 				<a href="./{{child.path}}">{{child.title}}</a>
 			</li>
 		</ul>

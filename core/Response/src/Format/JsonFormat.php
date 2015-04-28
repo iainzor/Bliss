@@ -9,6 +9,26 @@ class JsonFormat implements FormatInterface
 	
 	public function transform(\Response\Module $response) 
 	{
-		return json_encode($response->params());
+		$params = [];
+		foreach ($response->params() as $name => $value) {
+			$params[$name] = $this->_transform($value);
+		}
+		
+		return json_encode($params);
+	}
+	
+	private function _transform($value)
+	{
+		if (is_array($value)) {
+			foreach ($value as $k => $v) {
+				$value[$k] = $this->_transform($v);
+			}
+			return $value;
+		} else {
+			if (is_object($value) && method_exists($value, "toArray")) {
+				return $value->toArray();
+			}
+			return $value;
+		}
 	}
 }

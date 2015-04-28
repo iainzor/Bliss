@@ -17,6 +17,7 @@ class Module extends AbstractModule implements DecoratorProvider, InjectorInterf
 	const AREA_HEADER_WIDGETS = "area.header.widgets";
 	const AREA_MENU = "area.menu";
 	const AREA_FOOTER = "area.footer";
+	const AREA_HEAD = "area.head";
 	const AREA_CSS = "area.css";
 	const AREA_JS = "area.js";
 	
@@ -41,7 +42,8 @@ class Module extends AbstractModule implements DecoratorProvider, InjectorInterf
 	
 	public function initPartialInjector(InjectableInterface $injectable) 
 	{
-		$injectable->inject(self::AREA_MENU, new Partial($this->resolvePath("layouts/partials/navigation.phtml")));
+		$injectable->inject(self::AREA_MENU, new Partial($this->resolvePath("layouts/partials/navigation.phtml"), $this->app));
+		$injectable->inject(self::AREA_HEAD, new Partial($this->resolvePath("layouts/partials/css.phtml"), $this->app));
 	}
 	
 	public function initRouter(\Router\Module $router) 

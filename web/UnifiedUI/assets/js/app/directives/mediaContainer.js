@@ -11,7 +11,9 @@ bliss.directive("mediaContainer", [function() {
 	};
 	
 	var load = function($scope, el, spinner, image) {
-		el.loading = true;
+		var oldClassname = el.className;
+		el.className += " loading";
+		
 		spinner.active = true;
 		
 		var height = el.clientHeight;
@@ -21,12 +23,14 @@ bliss.directive("mediaContainer", [function() {
 		image.style.marginTop = "-100%";
 		image.onload = function() {
 			spinner.active = false;
-			el.loading = false;
+			el.className = oldClassname;
 			
 			var newHeight = image.clientHeight;
 			
 			image.style.marginTop = 0;
 			image.style.opacity = 1;
+			
+			$scope.$apply();
 		};
 	};
 	

@@ -158,6 +158,10 @@ class Container extends \Bliss\Component
 	{
 		$module = $this->moduleRegistry->get($moduleName);
 		
+		if (!$module->enabled()) {
+			throw new \Exception("Inactive module: {$moduleName}");
+		}
+		
 		return $module;
 	}
 	

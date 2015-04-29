@@ -15,6 +15,10 @@
 body.ready #header {
 	transform: translateY(0);
 }
+body.ready #header.hidden {
+	display: block !important;
+	transform: translateY(-100%);
+}
 	#header a { text-decoration: none; color: #fff; }
 	
 	#header .container { display: flex; }

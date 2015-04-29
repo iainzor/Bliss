@@ -1,0 +1,18 @@
+.block.inverted > .section {
+	background-color: #212121;
+	border-color: rgba(255,255,255,.05);
+	color: #fff;
+}
+
+.block.inverted > .section.extra { background-color: #252525; }
+
+.block.inverted > .section.clickable {}
+.block.inverted > .section.clickable:hover { background-color: #282828; }
+
+.block.inverted a { color: #4cf; }
+
+.block.inverted > .nav > li > a:hover,
+.block.inverted > .nav > li > a:focus {
+	background-color: rgba(255,255,255,.1);
+	color: #fff;
+}

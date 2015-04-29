@@ -28,20 +28,11 @@ $exception = $this->get("exception");
 		
 		<title ng-bind="pageTitle()"><?=$app->getTitle()?></title>
 		
-		<script data-cfasync="false" src="./polymer/bower_components/webcomponentsjs/webcomponents.min.js"></script>
-		<link rel="import" href="./polymer/bower_components/polymer/polymer.html">
-		<link rel="import" href="./polymer/bower_components/core-icons/core-icons.html">
-		<link rel="import" href="./polymer/bower_components/core-icons/social-icons.html">
-		<link rel="import" href="./polymer/bower_components/paper-icon-button/paper-icon-button.html">
-		<link rel="import" href="./polymer/bower_components/paper-spinner/paper-spinner.html">
-		
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:500,300,700,400">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-		<link rel="stylesheet" href="./assets/all.css">
+		<?=$ui->renderInjectables(UI::AREA_HEAD)?>
 		<?=$ui->renderInjectables(UI::AREA_CSS)?>
 	</head>
-	<body ng-controller="unifiedUI.LayoutCtrl" ng-class="{ready:app.config().ready}">
-		<header id="header" class="shadow">
+	<body ng-controller="unifiedUI.LayoutCtrl" ng-class="{ready:app.config().ready, 'header-hidden':!layout.header.isVisible()}">
+		<header id="header" class="shadow" ng-class="{hidden:!layout.header.isVisible()}">
 			<div class="container">
 				<paper-icon-button icon="menu" class="menuToggle" ng-click="toggleMenu()" ng-class="{active:menuOpen, disabled:!layout.menu.enabled}"></paper-icon-button>
 
@@ -81,11 +72,7 @@ $exception = $this->get("exception");
 		
 <?php if (!$exception): ?>
 		<div id="pageLoading" ng-class="{'visible':app.loading()}">
-			<article class="block shadow z2 indicator">
-				<section class="section body">
-					<paper-spinner active></paper-spinner>
-				</section>
-			</article>
+			<paper-spinner class="indicator spinner" active></paper-spinner>
 		</div>
 		
 		<div id="content">

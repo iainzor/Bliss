@@ -6,6 +6,9 @@ body {
 	transition: all .3s ease-in-out;
 	color: #333;
 }
+body.header-hidden {
+	padding-top: 30px !important;
+}
 
 @media (min-width: 1480px) {
 	body {

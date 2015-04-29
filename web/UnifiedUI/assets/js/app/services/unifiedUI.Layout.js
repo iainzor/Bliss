@@ -1,7 +1,8 @@
-bliss.service("unifiedUI.Layout", ["unifiedUI.Menu", function(Menu) {
+bliss.service("unifiedUI.Layout", ["unifiedUI.Menu", "unifiedUI.Header", function(Menu, Header) {
 	var Layout = function() {
 		this.mode = "fluid";
 		this.menu = Menu();
+		this.header = Header;
 		
 		/**
 		 * @param Object config

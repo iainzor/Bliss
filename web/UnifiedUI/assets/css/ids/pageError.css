@@ -24,3 +24,7 @@ body.ready #pageError.visible {
 		right: 0;
 	}
 	
+	#pageError  > .container {
+		width: auto;
+	}
+	

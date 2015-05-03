@@ -279,7 +279,7 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	{
 		$protocol = filter_input(INPUT_SERVER, "SERVER_PROTOCOL");
 		$this->header($protocol ." 304 Not Modified");
-		exit;
+		$this->app->quit();
 	}
 	
 	/**

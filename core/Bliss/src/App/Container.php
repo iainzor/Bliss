@@ -63,6 +63,11 @@ class Container extends \Bliss\Component
 	private $debugMode = false;
 	
 	/**
+	 * @var boolean
+	 */
+	private $hasQuit = false;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param string $name The name of the application
@@ -319,6 +324,25 @@ class Container extends \Bliss\Component
 		}
 		
 		return call_user_func_array([$object, $method], $args);
+	}
+	
+	/**
+	 * Quit the application
+	 */
+	public function quit()
+	{
+		$this->hasQuit = true;
+		exit;
+	}
+	
+	/**
+	 * Check if the application has quit
+	 * 
+	 * @return boolean
+	 */
+	public function hasQuit()
+	{
+		return $this->hasQuit;
 	}
 	
 	/**

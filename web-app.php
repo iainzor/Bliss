@@ -119,24 +119,26 @@ class BlissWebApp extends \Bliss\App\Container
 	
 	public function __destruct() 
 	{
-		try {
-			$format = $this->request()->getFormat();
+		if (!$this->hasQuit()) {
+			try {
+				$format = $this->request()->getFormat();
 
-			if ($this->debugMode() && in_array($format, [null, "html"])) {
-				echo "\n\n\n";
-				echo "<!-- Total Execution Time .............. ". number_format((microtime(true) - $this->startTime) * 1000, 2) ." ms -->\n";
-				echo "<!-- Total Memory Usage ................ ". number_format(memory_get_usage()/1024, 2) ." kb -->\n";
+				if ($this->debugMode() && in_array($format, [null, "html"])) {
+					echo "\n\n\n";
+					echo "<!-- Total Execution Time .............. ". number_format((microtime(true) - $this->startTime) * 1000, 2) ." ms -->\n";
+					echo "<!-- Total Memory Usage ................ ". number_format(memory_get_usage()/1024, 2) ." kb -->\n";
 
-				echo "\n\n";
-				echo "<!------------------------------>\n";
-				echo "<!--           Log            -->\n";
-				echo "<!------------------------------>\n";
-				echo "<!--\n\n";
-				foreach ($this->logs() as $log) {
-					echo "\t{$log["message"]}\n";
+					echo "\n\n";
+					echo "<!------------------------------>\n";
+					echo "<!--           Log            -->\n";
+					echo "<!------------------------------>\n";
+					echo "<!--\n\n";
+					foreach ($this->logs() as $log) {
+						echo "\t{$log["message"]}\n";
+					}
+					echo "-->";
 				}
-				echo "-->";
-			}
-		} catch (\Exception $e) {}
+			} catch (\Exception $e) {}
+		}
 	}
 }

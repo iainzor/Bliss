@@ -9,13 +9,12 @@
 	z-index: 1000;
 	font-size: 16px;
 	overflow: auto;
-	color: #000;
 }
 
 #menu:not(.open) {	
 	transform: translateX(-100%);
+	-webkit-transform: translateX(-100%);
 }
-
 	#menu a { text-decoration: none; transition: all .2s ease-in-out; }
 	#menu li { transition: all .2s ease-in-out; }
 	

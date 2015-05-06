@@ -9,6 +9,7 @@
 	z-index: 1000;
 	font-size: 16px;
 	overflow: auto;
+	color: #000;
 }
 
 #menu:not(.open) {	

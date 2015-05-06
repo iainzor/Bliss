@@ -17,6 +17,7 @@
 		background-color: #fff;
 	}
 	
+	.block > .section.alternate { background-color: whitesmoke; }
 	.block > .section.compact { padding: 10px; }
 	.block > .section.short { padding-top: 10px; padding-bottom: 10px; }
 	

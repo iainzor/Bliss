@@ -3,6 +3,8 @@ namespace Bliss;
 
 class Component
 {
+	private $_properties = [];
+	
 	/**
 	 * Convert the component's properties to an array
 	 *
@@ -10,18 +12,7 @@ class Component
 	 */
 	public function toArray()
 	{
-		$refClass = new \ReflectionClass($this);
-		$props = $refClass->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PUBLIC);
-		$data = [];
-
-		foreach ($props as $refProp) {
-			$name = $refProp->getName();
-			$value = $this->{$name};
-			
-			$data[$name] = $this->_parse($name, $value);
-		}
-		
-		return $data;
+		return $this->_toArray();
 	}
 	
 	/**
@@ -31,6 +22,15 @@ class Component
 	 */
 	public function toBasicArray()
 	{
+		return $this->_toArray(true);
+	}
+	
+	/**
+	 * @param boolean $basic
+	 * @return array
+	 */
+	private function _toArray($basic = false)
+	{
 		$refClass = new \ReflectionClass($this);
 		$props = $refClass->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PUBLIC);
 		$data = [];
@@ -39,14 +39,16 @@ class Component
 			$name = $refProp->getName();
 			$value = $this->{$name};
 			
-			if ($value instanceof Component) {
+			if ($basic === true && $value instanceof Component) {
 				continue;
 			}
 			
 			$data[$name] = $this->_parse($name, $value);
 		}
 		
-		return $data;
+		$diff = array_diff_assoc($this->_properties, $data);
+		
+		return array_merge($data, $diff);
 	}
 	
 	/**
@@ -59,14 +61,22 @@ class Component
 	 */
 	protected function getSet($property, $value = null)
 	{
-		if (property_exists($this, $property)) {
-			if ($value !== null) {
+		$exists = $property != "_properties" ? property_exists($this, $property) : false;
+		
+		if ($exists && $value !== null) {
+			$ref = new \ReflectionProperty($this, $property);
+			if (!$ref->isPrivate()) {
 				$this->{$property} = $value;
 			}
+		} elseif ($value !== null) {
+			$this->_properties[$property] = $value;
+		} elseif (isset($this->_properties[$property])) {
+			return $this->_properties[$property];
+		} elseif (isset($this->{$property})) {
 			return $this->{$property};
-		} else {
-			throw new \InvalidArgumentException("Invalid property name: {$property}");
 		}
+		
+		return null;
 	}
 	
 	/**
@@ -123,7 +133,7 @@ class Component
 	final public static function populate(Component $component, array $properties)
 	{
 		foreach ($properties as $name => $value) {
-			call_user_func([$component, $name], $value);
+			$component->getSet($name, $value);
 		}
 		
 		return $component;

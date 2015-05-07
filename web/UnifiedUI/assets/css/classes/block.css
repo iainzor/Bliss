@@ -42,7 +42,7 @@
 	.block > .section:last-child,
 	.block > .section.media:last-child img { border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; border-bottom: none; }
 	
-	.block > .alert { padding: 20px; }
+	.block > .alert { padding: 20px; margin-bottom: 0; }
 	.block > .alert:first-child { border-top-left-radius: 2px; border-top-right-radius: 2px; }
 	.block > .alert:last-child { border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; }
 	

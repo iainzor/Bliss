@@ -21,6 +21,11 @@ class Page extends Component implements PageInterface
 	protected $title;
 	
 	/**
+	 * @var string
+	 */
+	protected $target;
+	
+	/**
 	 * @var boolean
 	 */
 	protected $visible = true;
@@ -87,6 +92,17 @@ class Page extends Component implements PageInterface
 			$this->title = $title;
 		}
 		return $this->title;
+	}
+	
+	/**
+	 * Get or set the page's target
+	 * 
+	 * @param string $target
+	 * @return string
+	 */
+	public function target($target = null) 
+	{
+		return $this->getSet("target", $target);
 	}
 	
 	/**

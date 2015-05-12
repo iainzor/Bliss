@@ -22,6 +22,12 @@ interface PageInterface
 	public function path($path = null);
 	
 	/**
+	 * @param string $target
+	 * @return string
+	 */
+	public function target($target = null);
+	
+	/**
 	 * @param boolean $flag
 	 * @return boolean
 	 */

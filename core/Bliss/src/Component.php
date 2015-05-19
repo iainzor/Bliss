@@ -67,6 +67,8 @@ class Component
 			$ref = new \ReflectionProperty($this, $property);
 			if (!$ref->isPrivate()) {
 				$this->{$property} = $value;
+			} else if (method_exists($this, $property)) {
+				call_user_func([$this, $property], $value);
 			}
 		} elseif ($value !== null) {
 			$this->_properties[$property] = $value;
@@ -74,6 +76,8 @@ class Component
 			return $this->_properties[$property];
 		} elseif (isset($this->{$property})) {
 			return $this->{$property};
+		} elseif (method_exists($this, $property)) {
+			return call_user_func([$this, $property]);
 		}
 		
 		return null;

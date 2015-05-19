@@ -129,9 +129,9 @@ class BlissWebApp extends \Bliss\App\Container
 					echo "<!-- Total Memory Usage ................ ". number_format(memory_get_usage()/1024, 2) ." kb -->\n";
 
 					echo "\n\n";
-					echo "<!------------------------------>\n";
+					echo "<!--                          -->\n";
 					echo "<!--           Log            -->\n";
-					echo "<!------------------------------>\n";
+					echo "<!--                          -->\n";
 					echo "<!--\n\n";
 					foreach ($this->logs() as $log) {
 						echo "\t{$log["message"]}\n";

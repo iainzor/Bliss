@@ -33,7 +33,7 @@ class Module extends AbstractModule implements DecoratorProvider, InjectorInterf
 
 		foreach ($this->app->modules() as $module) {
 			if ($module instanceof InjectorInterface) {
-				$this->app->log("----Initializing injector for module '". $module->name() ."'");
+				$this->app->log("....Initializing injector for module '". $module->name() ."'");
 
 				$module->initPartialInjector($this);
 			}

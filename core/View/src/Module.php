@@ -89,7 +89,7 @@ class Module extends \Bliss\Module\AbstractModule
 		
 		foreach ($this->app->modules() as $module) {
 			if ($module instanceof Decorator\ProviderInterface) {
-				$this->app->log("----Initializing decorators from module '{$module->name()}'");
+				$this->app->log("....Initializing decorators from module '{$module->name()}'");
 				$module->initViewDecorator($this->decorators);
 			}
 		}

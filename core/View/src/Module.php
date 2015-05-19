@@ -76,7 +76,6 @@ class Module extends \Bliss\Module\AbstractModule
 			$this->app->log("Running decorator: ". get_class($decorator));
 			$contents = $decorator->decorate($contents, $params);
 		}
-		
 		return $contents;
 	}
 	

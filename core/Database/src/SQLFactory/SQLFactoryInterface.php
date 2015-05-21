@@ -1,7 +1,7 @@
 <?php
 namespace Database\SQLFactory;
 
-use Database\Query;
+use Database\Query\Query;
 
 interface SQLFactoryInterface
 {
@@ -12,4 +12,10 @@ interface SQLFactoryInterface
 	public function generateInsertSQL(Query $query);
 	
 	public function generateDeleteSQL(Query $query);
+	
+	public function generateJoinClause($tableName, $expr, $type = Query::JOIN_DEFAULT);
+	
+	public function generateWhereClause(array $exprs);
+	
+	public function generateOrderClause(array $exprs);
 }

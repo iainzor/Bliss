@@ -1,7 +1,7 @@
 <?php
 namespace Database\SQLFactory;
 
-use Database\Query;
+use Database\Query\Query;
 
 class MySQLFactory implements SQLFactoryInterface
 {
@@ -28,21 +28,45 @@ class MySQLFactory implements SQLFactoryInterface
 		
 	}
 	
-	private function _generateWhereClause(Query $query)
+	/**
+	 * Generate a JOIN clause
+	 * 
+	 * @param string $tableName
+	 * @param string|Expr $expr
+	 * @param string $type
+	 * @return string
+	 */
+	public function generateJoinClause($tableName, $expr, $type = Query::JOIN_DEFAULT) 
 	{
-		$params = $query->params();
-		$clause = null;
-		if (count($params["where"])) {
-			$parts = [];
-			foreach ($params["where"] as $name => $value) {
-				$parts[] = "{$name} = ". $value;
-			}
-			
-			
-			$clause = "WHERE ". implode(" AND ", $parts);
+		switch ($type) {
+			case Query::JOIN_LEFT:
+				return "LEFT JOIN {$tableName} ON {$expr}";
+			case Query::JOIN_DEFAULT:
+			default:
+				return "JOIN {$tableName} ON {$expr}";
 		}
-		
-		return $clause;
+	}
+	
+	/**
+	 * Generate the WHERE portion of a SQL statement
+	 * 
+	 * @param array $exprs
+	 * @return string
+	 */
+	public function generateWhereClause(array $exprs) 
+	{
+		return "WHERE ". implode(" ", $exprs);
+	}
+	
+	/**
+	 * Generate the ORDER clause of a SQL statement
+	 * 
+	 * @param array $exprs
+	 * @return string
+	 */
+	public function generateOrderClause(array $exprs) 
+	{
+		return count($exprs) ? "ORDER BY ". implode(", ", $exprs) : null;
 	}
 
 }

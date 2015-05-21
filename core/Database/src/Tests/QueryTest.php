@@ -1,36 +1,27 @@
 <?php
 namespace Database\Tests;
 
-use Database\Query,
-	Database\SelectQuery;
+use Database\Query;
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
 	public function testQuery() 
 	{
-		$query = new Query();
-		$query->selectFrom("A", "id, foo")
-			  ->leftJoin("B ON A.baz = B.baz", [
-				  "bazBlah" => "fooBar"
-			  ])
-			  ->where("`foo` = 'bar'");
-		$sql = $query->generateSelectSql();
+		$query = new Query\SelectQuery("A", ["id","foo"]);
+		$query->leftJoin("B", "A.baz = B.baz", [
+				"B.bazBlah AS fooBar"
+			])
+			->where("`foo` = 'bar'")
+			->orderBy("A.id DESC");
 		
-		
+		$sql = $query->sql();
 		
 		$this->assertEquals(
 			"SELECT `A`.`id`, `A`.`foo`, `B`.`bazBlah` AS `fooBar` " . 
-			"FROM `my_table` " .
-			"JOIN `B` ON `A`.`baz` = `B`.`baz` " .
-			"WHERE `A`.`foo` = 'bar'", 
+			"FROM `A` " .
+			"LEFT JOIN `B` ON A.baz = B.baz " .
+			"WHERE `foo` = 'bar' " .
+			"ORDER BY A.id DESC", 
 		$sql);
-	}
-	
-	public function _testSelectQuery()
-	{
-		$query = new SelectQuery("my_table");
-		$sql = $query->generateSql();
-		
-		$this->assertEquals("SELECT * FROM `my_table`", $sql);
 	}
 }

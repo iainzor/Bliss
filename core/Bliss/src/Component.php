@@ -132,7 +132,11 @@ class Component
 	final public static function populate(Component $component, array $properties)
 	{
 		foreach ($properties as $name => $value) {
-			$component->getSet($name, $value);
+			if (method_exists($component, $name)) {
+				call_user_func([$component, $name], $value);
+			} else {
+				$component->getSet($name, $value);
+			}
 		}
 		
 		return $component;

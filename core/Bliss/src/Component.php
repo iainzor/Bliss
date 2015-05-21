@@ -37,7 +37,12 @@ class Component
 
 		foreach ($props as $refProp) {
 			$name = $refProp->getName();
-			$value = $this->{$name};
+			
+			if (method_exists($this, $name)) {
+				$value = call_user_func([$this, $name]);
+			} else {
+				$value = $this->{$name};
+			}
 			
 			if ($basic === true && $value instanceof Component) {
 				continue;
@@ -90,7 +95,11 @@ class Component
 	{
 		$newValue = null;
 		
-		if (is_object($value) && method_exists($value, "toArray") ) {
+		if (is_array($newValue)) {
+			foreach ($newValue as $n => $v) {
+				$newValue[$n] = $this->_parse($n, $v);
+			}
+		} else if (is_object($value) && method_exists($value, "toArray") ) {
 			$newValue = $value->toArray();
 		} else if ($value instanceOf \DateTime) {
 			$newValue = $value->getTimestamp();
@@ -100,11 +109,7 @@ class Component
 			$newValue = $value;
 		}
 		
-		if (is_array($newValue)) {
-			foreach ($newValue as $n => $v) {
-				$newValue[$n] = $this->_parse($n, $v);
-			}
-		}
+		
 		
 		return $newValue;
 	}

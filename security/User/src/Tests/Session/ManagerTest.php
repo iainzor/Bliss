@@ -12,9 +12,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @var Manager
 	 */
-	private $manager;
+	private static $manager;
 	
-	public function setUp()
+	public static function setUpBeforeClass()
 	{
 		//ob_start();
 		//session_start();
@@ -25,7 +25,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 		]);
 		$db->exec("
 			CREATE TABLE `users` (
-				`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ,
+				`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 				`email` VARCHAR(32) NOT NULL UNIQUE,
 				`password` VARCHAR(64) NOT NULL,
 				`displayName` VARCHAR(32) NOT NULL
@@ -33,29 +33,31 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 		");
 		$userDbTable = new UserDbTable($db);
 		$sessionDbTable = new SessionDbTable($db);
+		$hasher = User::passwordHasher();
 		
-		$password = User::passwordHasher()->hash("123abc");
+		$password = $hasher->hash("123abc");
+		
 		$db->exec("INSERT INTO `users` VALUES (null, 'iainedminster@gmail.com', '{$password}', 'iain.zor')");
 		
-		$this->manager = new Manager($sessionDbTable, $userDbTable);
+		self::$manager = new Manager($sessionDbTable, $userDbTable, $hasher);
 	}
 	
 	public function testBadCredentials()
 	{
-		$valid = $this->manager->isValid("foo@bar.com", "abc123");
+		$valid = self::$manager->isValid("foo@bar.com", "abc123");
 		$this->assertFalse($valid);
 	}
 	
 	public function testGoodCredentials()
 	{
-		$valid = $this->manager->isValid("iainedminster@gmail.com", "123abc");
+		$valid = self::$manager->isValid("iainedminster@gmail.com", "123abc");
 		
 		$this->assertTrue($valid);
 	}
 	
 	public function testCreateSession()
 	{
-		$session = $this->manager->createSession("iainedminster@gmail.com", "123abc");
+		$session = self::$manager->createSession("iainedminster@gmail.com", "123abc");
 		
 		$this->assertInstanceOf("\\User\\Session\\Session", $session);
 	}

@@ -2,27 +2,41 @@ bliss.directive("shrink", ["$timeout", function($timeout) {
 		
 	var shrink = function($element) {
 		$element.css({
-			transform: "scaleY(0)",
+			transform: "scale(0)",
 			opacity: 0,
 			margin: 0,
-			height: 0
+			padding: 0,
+			height: 0,
+			width: 0,
+			overflow: "hidden"
 		});
 	};
 	
 	var grow = function($element) {
 		var el = $element[0];
 		var currentHeight = el.clientHeight;
+		var currentWidth = el.clientWidth;
 		
-		$element.css("height", "auto");
+		$element.css({
+			height: "auto",
+			width: "auto",
+			padding: null,
+			margin: null,
+			overflow: null
+		});
 		
 		var newHeight = el.clientHeight;
+		var newWidth = el.clientWidth;
 		
-		$element.css("height", currentHeight +"px");
 		$element.css({
-			transform: "scaleY(1)",
+			height: currentHeight +"px",
+			width: currentWidth +"px"
+		});
+		$element.css({
+			transform: "scale(1)",
 			opacity: 1,
-			margin: null,
-			height: newHeight +"px"
+			height: newHeight +"px",
+			width: newWidth +"px"
 		});
 	};
 	
@@ -37,7 +51,8 @@ bliss.directive("shrink", ["$timeout", function($timeout) {
 			var close = {x:0, y:0};
 			
 			$element.css({
-				height: open.y
+				height: open.y +"px",
+				width: open.x +"px"
 			});
 			$scope.$watch("shrink", function(flag) {
 				$timeout(function() {

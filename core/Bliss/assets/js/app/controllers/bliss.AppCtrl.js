@@ -1,6 +1,4 @@
 bliss.controller("bliss.AppCtrl", ["$rootScope", "bliss.App", function($scope, App) {
-	App.init();
-	
 	$scope.app = App;
 	$scope.pageError = false;
 	$scope.pageLoading = true;

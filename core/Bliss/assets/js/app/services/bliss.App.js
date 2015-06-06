@@ -5,19 +5,17 @@ bliss.service("bliss.App", ["$resource", function($resource) {
 	var _error;
 	var _loading;
 	
-	App.init = function() {
-		if (bliss.app) {
-			_config = angular.extend(bliss.app, {
-				ready: true
-			});
-		} else {
-			_config = App.get({}, function(response) {
-				response.ready = true;
-			}, function(error) {
-				console.error(error.data);
-			});
-		}
-	};
+	if (bliss.app) {
+		_config = angular.extend(bliss.app, {
+			ready: true
+		});
+	} else {
+		_config = App.get({}, function(response) {
+			response.ready = true;
+		}, function(error) {
+			console.error(error.data);
+		});
+	}
 	
 	App.reload = function() {
 		App.get({}, function(response) {

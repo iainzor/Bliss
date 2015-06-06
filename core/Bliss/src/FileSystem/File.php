@@ -48,7 +48,21 @@ class File extends Component
 		if ($contents !== null) {
 			$this->contents = $contents;
 		}
-		return $contents;
+		return $this->contents;
+	}
+	
+	/**
+	 * Attempt to load the contents of the file
+	 * 
+	 * @return \Bliss\FileSystem\File
+	 */
+	public function load()
+	{
+		if (is_file($this->filename)) {
+			$this->contents = file_get_contents($this->filename);
+		}
+		
+		return $this;
 	}
 	
 	/**
@@ -60,6 +74,7 @@ class File extends Component
 	 */
 	public function write($contents = null, $mode = 0777)
 	{
+		$contents = $this->contents($contents);
 		$dir = dirname($this->filename);
 		if (!is_dir($dir)) {
 			if (!@mkdir($dir, $mode, true)) {
@@ -69,10 +84,6 @@ class File extends Component
 		
 		if (is_file($this->filename) && !is_writable($this->filename)) {
 			throw new Exception("File cannot be written to: {$this->filename}");
-		}
-		
-		if ($contents === null) {
-			$contents = $this->contents;
 		}
 		
 		if (file_put_contents($this->filename, $contents) === false) {

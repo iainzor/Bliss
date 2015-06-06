@@ -2,7 +2,8 @@
 namespace Database\Query;
 
 use Bliss\Component,
-	Database\SQLFactory;
+	Database\SQLFactory,
+	Database\PDO;
 
 class Query extends Component
 {
@@ -12,18 +13,16 @@ class Query extends Component
 	const TYPE_DELETE = 3;
 	
 	const PART_SQL_START = 0;
+	const PART_FROM = 10;
+	const PART_JOIN = 20;
+	const PART_WHERE = 30;
+	const PART_GROUP_BY = 40;
+	const PART_ORDER_BY = 50;
+	const PART_LIMIT = 60;
 	const PART_SQL_END = 1000;
 	
-	const PART_FROM = 10;
-	const PART_JOIN = 11;
-	const PART_WHERE = 12;
-	const PART_GROUP_BY = 13;
-	const PART_ORDER_BY = 14;
-	const PART_LIMIT = 15;
-	
-	
-	const JOIN_DEFAULT = "join.default";
-	const JOIN_LEFT = "join.left";
+	const JOIN_DEFAULT = 0;
+	const JOIN_LEFT = 1;
 	
 	/**
 	 * @var \Database\SQLFactoryInterface
@@ -121,9 +120,10 @@ class Query extends Component
 	/**
 	 * Generate a SQL statement
 	 * 
+	 * @param PDO $db
 	 * @return string
 	 */
-	public function sql()
+	public function sql(PDO $db)
 	{
 		ksort($this->parts);
 		

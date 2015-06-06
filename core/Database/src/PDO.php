@@ -8,14 +8,15 @@ class PDO extends \PDO
 	/**
 	 * Fetch all results of a SQL statement
 	 *
-	 * @param string $sql
+	 * @param string|Query\Query $query
 	 * @param array $params
 	 * @param int $fetchStyle
 	 * @return array
 	 */
-	public function fetchAll($sql, array $params = [], $fetchStyle = \PDO::FETCH_ASSOC)
+	public function fetchAll($query, array $params = [], $fetchStyle = \PDO::FETCH_ASSOC)
 	{
-		$statement = $this->_exec($sql, $params);
+		
+		$statement = $this->_exec($query, $params);
 		$results = $statement->fetchAll($fetchStyle);
 		
 		unset($statement);
@@ -108,6 +109,10 @@ class PDO extends \PDO
 	 */
 	private function _exec($sql, array $params = [])
 	{
+		if ($sql instanceof Query\Query) {
+			$sql = $sql->sql($this);
+		}
+		
 		$startTime = microtime(true);
 		$statement = $this->prepare($sql);
 		$statement->execute($params);

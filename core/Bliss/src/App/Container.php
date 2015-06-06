@@ -305,12 +305,19 @@ class Container extends \Bliss\Component
 	/**
 	 * Call a method with all depencies injected
 	 * 
-	 * @param Object $object
+	 * @param object|callable $object
 	 * @param string $method
 	 */
-	public function call($object, $method)
+	public function call($object, $method = null)
 	{
-		$ref = new \ReflectionMethod($object, $method);
+		if (is_callable($object)) {
+			$func = $object;
+			$ref = new \ReflectionFunction($func);
+		} else {
+			$func = [$object, $method];
+			$ref = new \ReflectionMethod($object, $method);
+		}
+		
 		$refParams = $ref->getParameters();
 		$args = [];
 		
@@ -323,7 +330,7 @@ class Container extends \Bliss\Component
 			}
 		}
 		
-		return call_user_func_array([$object, $method], $args);
+		return call_user_func_array($func, $args);
 	}
 	
 	/**

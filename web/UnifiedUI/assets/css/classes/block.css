@@ -6,7 +6,6 @@
 	position: relative;
 }
 .block.plain {
-	background-color: transparent;
 	color: inherit;
 }
 
@@ -17,6 +16,7 @@
 		background-color: #fff;
 	}
 	
+	.block.plain > .section { background-color: transparent; }
 	.block > .section.alternate { background-color: whitesmoke; }
 	.block > .section.compact { padding: 10px; }
 	.block > .section.short { padding-top: 10px; padding-bottom: 10px; }

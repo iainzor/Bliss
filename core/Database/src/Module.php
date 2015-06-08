@@ -6,7 +6,7 @@ use Bliss\Module\AbstractModule;
 class Module extends AbstractModule
 {
 	/**
-	 * @var \PDO
+	 * @var PDO
 	 */
 	private $connection;
 	
@@ -18,7 +18,7 @@ class Module extends AbstractModule
 	/**
 	 * Get a connection to the database
 	 * 
-	 * @return \PDO
+	 * @return PDO
 	 */
 	public function connection()
 	{

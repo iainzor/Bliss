@@ -10,6 +10,7 @@
 	margin: 0;
 	display: block;
 	overflow: auto;
+	z-index: 5000;
 }
 .dropdown-menu.thin {
 	min-width: 100px;

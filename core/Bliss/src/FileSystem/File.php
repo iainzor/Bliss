@@ -28,6 +28,16 @@ class File extends Component
 	}
 	
 	/**
+	 * Get the full path to the file
+	 * 
+	 * @return string
+	 */
+	public function path()
+	{
+		return $this->filename;
+	}
+	
+	/**
 	 * Check if the file exists
 	 * 
 	 * @return boolean

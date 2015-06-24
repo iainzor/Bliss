@@ -7,20 +7,23 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 {
 	public function testQuery() 
 	{
-		$query = new Query\SelectQuery("A", ["id","foo"]);
+		$pdo = new \Database\PDO("sqlite::memory:");
+		$query = new Query\SelectQuery($pdo);
+		$query->from("my_table", ["*"]);
+		$query->where("foo = :foo");
+		$query->where("bar = :bar");
 		$query->leftJoin("B", "A.baz = B.baz", [
 				"B.bazBlah AS fooBar"
-			])
-			->where("`foo` = 'bar'")
-			->orderBy("A.id DESC");
+		]);
+		$query->orderBy("A.id DESC");
 		
 		$sql = $query->sql();
 		
 		$this->assertEquals(
-			"SELECT `A`.`id`, `A`.`foo`, `B`.`bazBlah` AS `fooBar` " . 
-			"FROM `A` " .
+			"SELECT `my_table`.*, `B`.`bazBlah` AS `fooBar` " . 
+			"FROM `my_table` " .
 			"LEFT JOIN `B` ON A.baz = B.baz " .
-			"WHERE `foo` = 'bar' " .
+			"WHERE foo = :foo AND bar = :bar " .
 			"ORDER BY A.id DESC", 
 		$sql);
 	}

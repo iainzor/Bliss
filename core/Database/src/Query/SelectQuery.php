@@ -1,8 +1,6 @@
 <?php
 namespace Database\Query;
 
-use Database\PDO;
-
 class SelectQuery extends Query
 {
 	/**
@@ -14,11 +12,13 @@ class SelectQuery extends Query
 	 * Set the table to select from
 	 * 
 	 * @param string $tableName
+	 * @param array $fields
 	 * @return SelectQuery
 	 */
-	public function from($tableName)
+	public function from($tableName, array $fields = [])
 	{
 		$this->tableName($tableName);
+		$this->fields($fields);
 		
 		return $this;
 	}
@@ -86,10 +86,9 @@ class SelectQuery extends Query
 	}
 	
 	/**
-	 * @param PDO $db
 	 * @return string
 	 */
-	public function sql(PDO $db) 
+	public function sql() 
 	{
 		$fields = $this->fields();
 		if (!count($fields)) {
@@ -99,6 +98,6 @@ class SelectQuery extends Query
 		$fieldList = implode(", ", $fields);
 		$this->addPart(self::PART_SQL_START, "SELECT {$fieldList} FROM {$this->tableName()}");
 		
-		return parent::sql($db);
+		return parent::sql();
 	}
 }

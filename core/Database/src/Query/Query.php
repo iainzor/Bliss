@@ -120,10 +120,9 @@ class Query extends Component
 	/**
 	 * Generate a SQL statement
 	 * 
-	 * @param PDO $db
 	 * @return string
 	 */
-	public function sql(PDO $db)
+	public function sql()
 	{
 		ksort($this->parts);
 		
@@ -143,16 +142,17 @@ class Query extends Component
 	 */
 	protected function quoteField($input)
 	{
-		if (preg_match_all("/`?([a-z0-9-_]+)`?\.?`?([a-z0-9-_]+)?`?(.*as)?/i", $input, $matches)) {
+		if (preg_match_all("/`?([a-z0-9-_]+|\*)`?\.?`?([a-z0-9-_]+|\*)?`?(.*as)?/i", $input, $matches)) {
 			$items = [];
 			
 			for ($i = 0; $i < count($matches[1]); $i++) {
 				$part1 = $matches[1][$i];
 				$part2 = $matches[2][$i];
-				$field = "`{$part1}`";
+				$field = $part1 === "*" ? "*" : "`{$part1}`";
 			
 				if (!empty($part2)) {
-					$field .= ".`{$part2}`";
+					$part2 = $part2 === "*" ? "*" : "`{$part2}`";
+					$field .= ".{$part2}";
 				}
 				
 				$field .= $matches[3][$i];

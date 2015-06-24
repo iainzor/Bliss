@@ -55,7 +55,7 @@ class MySQLFactory implements SQLFactoryInterface
 	 */
 	public function generateWhereClause(array $exprs) 
 	{
-		return "WHERE ". implode(" ", $exprs);
+		return "WHERE ". implode(" AND ", $exprs);
 	}
 	
 	/**

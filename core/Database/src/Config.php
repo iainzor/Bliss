@@ -3,6 +3,7 @@ namespace Database;
 
 class Config extends \Config\Config
 {
+	const DEFAULT_CONNECTION = "defaultConnection";
 	const SECTION_DEFAULT_CONNECTION = "defaultConnection";
 	
 	const CONF_DSN = "dsn";

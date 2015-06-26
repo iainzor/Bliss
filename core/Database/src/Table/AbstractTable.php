@@ -1,7 +1,8 @@
 <?php
 namespace Database\Table;
 
-use Database\PDO;
+use Database\PDO,
+	Database\Query;
 
 abstract class AbstractTable
 {
@@ -16,14 +17,59 @@ abstract class AbstractTable
 	private $name;
 	
 	/**
+	 * @var string
+	 */
+	private $schemaName;
+	
+	/**
+	 * @var \Database\Module
+	 */
+	private static $dbModule;
+	
+	/**
+	 * @return string
+	 */
+	abstract public function defaultTableName();
+	
+	/**
+	 * @return string
+	 */
+	abstract public function defaultSchemaName();
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param PDO $db
 	 */
-	public function __construct(PDO $db)
+	public function __construct()
 	{
-		$this->db = $db;
-		$this->name = $this->defaultName();
+		$this->name = $this->defaultTableName();
+		$this->schemaName = $this->defaultSchemaName();
+	}
+	
+	/**
+	 * Get or set the PDO instance for the table
+	 * 
+	 * If no PDO is explictly set, it will attempt to retrieve it from
+	 * the Database module
+	 * 
+	 * @param PDO $db
+	 * @return PDO
+	 */
+	public function db(PDO $db = null)
+	{
+		if ($db !== null) {
+			$this->db = $db;
+		}
+		if (!$this->db) {
+			if (!self::$dbModule) {
+				throw new \Exception("The database module has not been set!");
+			}
+			
+			$this->db = self::$dbModule->connection($this->schemaName());
+		}
+		
+		return $this->db;
 	}
 	
 	/**
@@ -41,46 +87,58 @@ abstract class AbstractTable
 	}
 	
 	/**
+	 * Get or set the table's schema name
+	 * 
+	 * @param string $name
 	 * @return string
 	 */
-	abstract public function defaultName();
+	public function schemaName($name = null)
+	{
+		if ($name !== null) {
+			$this->schemaName = $name;
+		}
+		return $this->schemaName;
+	}
+	
+	/**
+	 * Set the DB Module instance
+	 * 
+	 * @param \Database\Module $dbModule
+	 */
+	public static function setDbModule(\Database\Module $dbModule)
+	{
+		self::$dbModule = $dbModule;
+	}
+	
+	/**
+	 * Create a new SelectQuery for the table
+	 * 
+	 * @return \Database\Query\SelectQuery
+	 */
+	public function select()
+	{
+		$query = new Query\SelectQuery();
+		$query->from([$this->schemaName(), $this->name()]);
+		
+		return $query;
+	}
 	
 	/**
 	 * Find a single record from the table
 	 * 
-	 * @param string $where
 	 * @param array $params
-	 * @return array|null
+	 * @return array
 	 */
-	public function find($where = null, array $params = [])
+	public function find(array $params)
 	{
-		if ($where !== null) {
-			$where = "WHERE {$where}";
+		$query = $this->select();
+		foreach ($params as $name => $value) {
+			$query->where("{$name} = :{$name}")->params([
+				":{$name}" => $value
+			]);
 		}
+		$result = $this->db()->fetchRow($query->sql(), $query->getParams());
 		
-		return $this->db->fetchRow("SELECT * FROM `". $this->name() ."` {$where}", $params);
-	}
-	
-	/**
-	 * Insert a record into the database table
-	 * 
-	 * @param array $data
-	 * @return int The ID of the inserted data
-	 */
-	public function insert(array $data)
-	{
-		$fields = [];
-		$values = [];
-		foreach ($data as $field => $value) {
-			$fields[] = "`". $field ."`";
-			$values[] = $this->db->quote($value);
-		}
-		
-		$fieldList = "(". implode(",", $fields) .")";
-		$valueList = "(". implode(",", $values) .")";
-		$statement = $this->db->prepare("INSERT INTO `". $this->name() ."` {$fieldList} VALUES {$valueList}");
-		$statement->execute();
-		
-		return $this->db->lastInsertId();
+		return $result;
 	}
 }

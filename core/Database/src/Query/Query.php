@@ -69,9 +69,11 @@ class Query extends Component
 	 */
 	public function tableName($tableName = null)
 	{
-		return $this->quoteField(
-			$this->getSet("tableName", $tableName)
-		);
+		if ($tableName !== null) {
+			$this->tableName = $this->quoteField($tableName);
+		}
+		
+		return $this->tableName;
 	}
 	
 	/**
@@ -85,6 +87,31 @@ class Query extends Component
 		$this->addPart(self::PART_WHERE, $expr);
 		
 		return $this;
+	}
+	
+	/**
+	 * Set multiple parameters used to bind to the statement
+	 * 
+	 * @param array $params
+	 * @return \Database\Query\Query
+	 */
+	public function params(array $params = null) 
+	{
+		if ($params !== null) {
+			$this->params = array_merge($this->params, $params);
+		}
+		
+		return $this;
+	}
+	
+	/**
+	 * Get all available parameters
+	 * 
+	 * @return array
+	 */
+	public function getParams()
+	{
+		return $this->params;
 	}
 	
 	/**
@@ -142,6 +169,10 @@ class Query extends Component
 	 */
 	protected function quoteField($input)
 	{
+		if (is_array($input)) {
+			$input = implode(".", $input);
+		}
+		
 		if (preg_match_all("/`?([a-z0-9-_]+|\*)`?\.?`?([a-z0-9-_]+|\*)?`?(.*as)?/i", $input, $matches)) {
 			$items = [];
 			

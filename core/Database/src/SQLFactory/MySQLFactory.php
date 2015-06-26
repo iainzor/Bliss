@@ -1,7 +1,8 @@
 <?php
 namespace Database\SQLFactory;
 
-use Database\Query\Query;
+use Database\Query\Query,
+	Database\Expr\ExprInterface;
 
 class MySQLFactory implements SQLFactoryInterface
 {
@@ -32,18 +33,22 @@ class MySQLFactory implements SQLFactoryInterface
 	 * Generate a JOIN clause
 	 * 
 	 * @param string $tableName
-	 * @param string|Expr $expr
+	 * @param string|ExprInterface $expr
 	 * @param string $type
 	 * @return string
 	 */
 	public function generateJoinClause($tableName, $expr, $type = Query::JOIN_DEFAULT) 
 	{
+		if ($expr instanceof ExprInterface) {
+			$expr = $expr->toString();
+		}
+		
 		switch ($type) {
 			case Query::JOIN_LEFT:
-				return "LEFT JOIN {$tableName} ON {$expr}";
+				return "LEFT JOIN {$tableName} {$expr}";
 			case Query::JOIN_DEFAULT:
 			default:
-				return "JOIN {$tableName} ON {$expr}";
+				return "JOIN {$tableName} {$expr}";
 		}
 	}
 	

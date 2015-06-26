@@ -6,6 +6,8 @@ use Database\PDO,
 
 abstract class AbstractTable
 {
+	use JoinableTrait, RelationTrait;
+	
 	/**
 	 * @var PDO
 	 */
@@ -17,9 +19,9 @@ abstract class AbstractTable
 	private $name;
 	
 	/**
-	 * @var string
+	 * @var Definition
 	 */
-	private $schemaName;
+	private $definition;
 	
 	/**
 	 * @var \Database\Module
@@ -34,7 +36,7 @@ abstract class AbstractTable
 	/**
 	 * @return string
 	 */
-	abstract public function defaultSchemaName();
+	abstract public function connectionName();
 	
 	/**
 	 * Constructor
@@ -44,7 +46,21 @@ abstract class AbstractTable
 	public function __construct()
 	{
 		$this->name = $this->defaultTableName();
-		$this->schemaName = $this->defaultSchemaName();
+		$this->definition = new Definition();
+		
+		if ($this instanceof DefinitionInterface) {
+			$this->initTableDefinition($this->definition);
+		}
+	}
+	
+	/**
+	 * Set the DB Module instance
+	 * 
+	 * @param \Database\Module $dbModule
+	 */
+	public static function setDbModule(\Database\Module $dbModule)
+	{
+		self::$dbModule = $dbModule;
 	}
 	
 	/**
@@ -63,10 +79,10 @@ abstract class AbstractTable
 		}
 		if (!$this->db) {
 			if (!self::$dbModule) {
-				throw new \Exception("The database module has not been set!");
+				throw new \Exception("No database instance could be found and the database module has not been provided");
 			}
 			
-			$this->db = self::$dbModule->connection($this->schemaName());
+			$this->db = self::$dbModule->connection($this->connectionName());
 		}
 		
 		return $this->db;
@@ -87,27 +103,31 @@ abstract class AbstractTable
 	}
 	
 	/**
-	 * Get or set the table's schema name
+	 * Get the fully qualified name of the table
+	 * 
+	 * @return string
+	 */
+	public function qualifiedName()
+	{
+		return $this->db()->schemaName() .".". $this->name();
+	}
+	
+	/**
+	 * Get the qualified name of a column
 	 * 
 	 * @param string $name
 	 * @return string
 	 */
-	public function schemaName($name = null)
+	public function column($name)
 	{
-		if ($name !== null) {
-			$this->schemaName = $name;
+		$column = null;
+		foreach ($this->definition->columns() as $c) {
+			if ($c->name() === $name || $c->displayName() === $name) {
+				$column = $c;
+			}
 		}
-		return $this->schemaName;
-	}
-	
-	/**
-	 * Set the DB Module instance
-	 * 
-	 * @param \Database\Module $dbModule
-	 */
-	public static function setDbModule(\Database\Module $dbModule)
-	{
-		self::$dbModule = $dbModule;
+		
+		return $this->name() .".". ($column ? $column->name() : $name);
 	}
 	
 	/**
@@ -118,7 +138,7 @@ abstract class AbstractTable
 	public function select()
 	{
 		$query = new Query\SelectQuery();
-		$query->from([$this->schemaName(), $this->name()]);
+		$query->from([$this->db()->schemaName(), $this->name()]);
 		
 		return $query;
 	}
@@ -131,14 +151,26 @@ abstract class AbstractTable
 	 */
 	public function find(array $params)
 	{
-		$query = $this->select();
+		$factory = $this->db()->queryBuilder();
+		$query = $factory->buildSelectQuery($this, $params);
+		
+		print_r($query);
+		exit;
+		
+		
 		foreach ($params as $name => $value) {
 			$query->where("{$name} = :{$name}")->params([
 				":{$name}" => $value
 			]);
 		}
+		$this->applyJoins($query);
+		
+		
+		var_dump($query->sql());
+		exit;
+		
 		$result = $this->db()->fetchRow($query->sql(), $query->getParams());
 		
-		return $result;
+		return $this->definition->parseRow($result);
 	}
 }

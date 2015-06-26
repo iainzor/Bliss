@@ -1,6 +1,9 @@
 <?php
 namespace Database\Query;
 
+use Database\Expr\ExprInterface,
+	Database\Table\AbstractTable;
+
 class SelectQuery extends Query
 {
 	/**
@@ -53,14 +56,19 @@ class SelectQuery extends Query
 	/**
 	 * Add a JOIN expression to the query
 	 * 
-	 * @param string $tableName
-	 * @param string|Expr $expr
+	 * @param string| $table
+	 * @param string|ExprInterface $expr
 	 * @param array $fields Fields to select from the joined table
 	 * @param string $type
 	 * @return SelectQuery
 	 */
-	public function join($tableName, $expr, array $fields = [], $type = self::JOIN_DEFAULT)
+	public function join($table, $expr, array $fields = [], $type = self::JOIN_DEFAULT)
 	{
+		$tableName = $table;
+		if ($table instanceof AbstractTable) {
+			$tableName = $table->name();
+		}
+		
 		$tableName = $this->quoteField($tableName);
 		$sql = self::sqlFactory()->generateJoinClause($tableName, $expr, $type);
 		
@@ -73,14 +81,14 @@ class SelectQuery extends Query
 	/**
 	 * Add a LEFT JOIN to the query
 	 * 
-	 * @param string $tableName
+	 * @param string $table
 	 * @param string|Expr $expr
 	 * @param array $fields
 	 * @return SelectQuery
 	 */
-	public function leftJoin($tableName, $expr, array $fields = [])
+	public function leftJoin($table, $expr, array $fields = [])
 	{
-		$this->join($tableName, $expr, $fields, self::JOIN_LEFT);
+		$this->join($table, $expr, $fields, self::JOIN_LEFT);
 		
 		return $this;
 	}

@@ -3,7 +3,66 @@ namespace Database;
 
 class PDO extends \PDO
 {
+	/**
+	 * @var array
+	 */
 	private $logs = [];
+	
+	/**
+	 * @var string
+	 */
+	private $schemaName;
+	
+	/**
+	 * @var QueryBuilder\BuilderInterface
+	 */
+	private $queryBuilder;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param string $dsn
+	 * @param string $username
+	 * @param string $passwd
+	 * @param string $options
+	 */
+	public function __construct($dsn, $username, $passwd, $options) 
+	{
+		parent::__construct($dsn, $username, $passwd, $options);
+		
+		$this->queryBuilder = QueryBuilder\Factory::create($dsn);
+	}
+	
+	/**
+	 * Get the name of the database currently connected to
+	 * 
+	 * @return string
+	 */
+	public function schemaName()
+	{
+		if (!$this->schemaName) {
+			$this->schemaName = $this->fetchColumn("SELECT DATABASE()");
+		}
+		return $this->schemaName;
+	}
+	
+	/**
+	 * Get or set the QueryBuilder used for the connection
+	 * 
+	 * @param \Database\QueryBuilder\BuilderInterface $builder
+	 * @return \Database\QueryBuilder\BuilderInterface
+	 */
+	public function queryBuilder(QueryBuilder\BuilderInterface $builder = null)
+	{
+		if ($builder !== null) {
+			$this->queryBuilder = $builder;
+		}
+		if (!$this->queryBuilder) {
+			throw new \Exception("No query builder has been set");
+		}
+		
+		return $this->queryBuilder;
+	}
 	
 	/**
 	 * Fetch all results of a SQL statement
@@ -15,7 +74,6 @@ class PDO extends \PDO
 	 */
 	public function fetchAll($query, array $params = [], $fetchStyle = \PDO::FETCH_ASSOC)
 	{
-		
 		$statement = $this->_exec($query, $params);
 		$results = $statement->fetchAll($fetchStyle);
 		
@@ -98,6 +156,26 @@ class PDO extends \PDO
 		];
 		
 		return $result;
+	}
+	
+	/**
+	 * Override the default prepare method in order to log the statement
+	 * 
+	 * @param string $statement
+	 * @param array $options
+	 * @return \PDOStatement
+	 */
+	public function prepare($statement, $options = null) {
+		if ($options === null) {
+			$options = [];
+		}
+		
+		$this->logs[] = [
+			"sql" => $statement,
+			"options" => $options
+		];
+		
+		return parent::prepare($statement, $options);
 	}
 	
 	/**

@@ -3,7 +3,7 @@ namespace Database\Query;
 
 use Bliss\Component,
 	Database\SQLFactory,
-	Database\PDO;
+	Database\Expr\ExprInterface;
 
 class Query extends Component
 {
@@ -50,10 +50,14 @@ class Query extends Component
 	 * Add a part to the query
 	 * 
 	 * @param int $id
-	 * @param string|Expr $expr
+	 * @param string|ExprInterface $expr
 	 */
 	public function addPart($id, $expr)
 	{
+		if ($expr instanceof ExprInterface) {
+			$expr = $expr->toString();
+		}
+		
 		if (!isset($this->parts[$id])) {
 			$this->parts[$id] = [];
 		}
@@ -173,12 +177,13 @@ class Query extends Component
 			$input = implode(".", $input);
 		}
 		
-		if (preg_match_all("/`?([a-z0-9-_]+|\*)`?\.?`?([a-z0-9-_]+|\*)?`?(.*as)?/i", $input, $matches)) {
+		if (preg_match_all("/`?([a-z0-9-_]+|\*)`?\.?`?([a-z0-9-_]+|\*)?`?\.?`?([a-z0-9-_]+|\*)?`?(.*as)?/i", $input, $matches)) {
 			$items = [];
 			
 			for ($i = 0; $i < count($matches[1]); $i++) {
 				$part1 = $matches[1][$i];
 				$part2 = $matches[2][$i];
+				$part3 = $matches[3][$i];
 				$field = $part1 === "*" ? "*" : "`{$part1}`";
 			
 				if (!empty($part2)) {
@@ -186,7 +191,12 @@ class Query extends Component
 					$field .= ".{$part2}";
 				}
 				
-				$field .= $matches[3][$i];
+				if (!empty($part3)) {
+					$part3 = $part3 === "*" ? "*" : "`{$part3}`";
+					$field .= ".{$part3}";
+				}
+				
+				$field .= $matches[4][$i];
 				$items[] = $field;
 			}
 			

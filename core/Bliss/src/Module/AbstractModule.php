@@ -51,9 +51,12 @@ abstract class AbstractModule extends Component implements ModuleInterface
 		$this->controllers = new ControllerRegistry($this);
 		$this->config = $app->config()->get($name);
 		
+		$this->init();
+		
 		if ($this->config) {
 			$this->applyConfig($this->config);
 		}
+		
 	}
 	
 	/**
@@ -121,8 +124,6 @@ abstract class AbstractModule extends Component implements ModuleInterface
 	 */
 	public function execute(\Request\Module $request) 
 	{
-		$this->init();
-		
 		$controllerName = $request->getController();
 		$controller = $this->controller($controllerName);
 		

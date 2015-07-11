@@ -128,10 +128,6 @@ class Registry
 					throw new \Exception("Module '{$instance->name()}' must be an instance of Bliss\\Module\\ModuleInterface");
 				}
 				
-				$this->app->log("Initializing module '{$moduleName}'");
-				
-				$instance->init();
-				
 				$this->modules[$alias]["instance"] = $instance;
 			}
 			

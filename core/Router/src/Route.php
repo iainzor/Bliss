@@ -41,6 +41,11 @@ class Route
 	private $isActive = true;
 	
 	/**
+	 * @var int
+	 */
+	private $timesUsed = 0;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param string $route
@@ -152,4 +157,29 @@ class Route
 	public function isActive() { return $this->isActive; }
 	public function enable() { $this->isActive = true; }
 	public function disable() { $this->isActive = false; }
+	
+	/**
+	 * Increment the number of times the route has been used
+	 * 
+	 * @param int $amount
+	 */
+	public function incrementTimesUsed($amount = 1)
+	{
+		$this->timesUsed += (int) $amount;
+	}
+	
+	/**
+	 * Get or set the number of times the route has been used
+	 * 
+	 * @param int $number
+	 * @return int
+	 */
+	public function timesUsed($number = null)
+	{
+		if ($number !== null) {
+			$this->timesUsed = (int) $number;
+		}
+		
+		return $this->timesUsed;
+	}
 }

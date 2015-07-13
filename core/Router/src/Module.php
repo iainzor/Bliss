@@ -23,10 +23,11 @@ implements ProviderInterface
 	 * Attempt to find a route matching the $test string
 	 * 
 	 * @param string $test
+	 * @param int $maxTimesUsed Ignores routes used this many times
 	 * @return \Router\Route
 	 * @throws \Exception
 	 */
-	public function find($test)
+	public function find($test, $maxTimesUsed = null)
 	{
 		$this->app->log("Looking for route matching '{$test}'");
 		
@@ -37,6 +38,10 @@ implements ProviderInterface
 		$result = null;
 		
 		foreach ($this->routes as $route) {
+			if ($maxTimesUsed !== null && $route->timesUsed() > $maxTimesUsed) {
+				continue;
+			} 
+			
 			if ($route->isActive() && $route->matches($test)) {
 				if (!isset($result)) {
 					$result = $route;
@@ -52,6 +57,8 @@ implements ProviderInterface
 			$this->app->log("Route found using: ". $result->route());
 		}
 		
+		$result->incrementTimesUsed();
+		
 		return $result;
 	}
 	
@@ -61,7 +68,7 @@ implements ProviderInterface
 	 * @param string $regexRoute A RegEx string used to match the URI
 	 * @param array $matchValues Pairs of values to use for each match found in the route
 	 * @param array $defaultValues Default values of the route
-	 * @param int $priority The order in which the route should be prioritized
+	 * @param int $priority The order in which the route should be prioritized.  Higher numbers are higher priority
 	 * @return \Assets\Module
 	 */
 	public function when($regexRoute, array $matchValues, array $defaultValues = [], $priority = 1)

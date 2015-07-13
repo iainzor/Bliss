@@ -264,6 +264,10 @@ class Container extends \Bliss\Component
 	 */
 	private function initConfig()
 	{
+		if ($this->config) {
+			return;
+		}
+		
 		$this->config = new Config();
 		
 		$files = [

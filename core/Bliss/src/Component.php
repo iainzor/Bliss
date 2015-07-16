@@ -109,9 +109,26 @@ class Component
 			$newValue = $value;
 		}
 		
-		
-		
 		return $newValue;
+	}
+	
+	/**
+	 * Magic getter and setter for additional properties
+	 * 
+	 * @param string $name
+	 * @param array $args
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	public function __call($name, array $args = [])
+	{
+		$value = isset($args[0]) ? $args[0] : null;
+		
+		if (!property_exists($this, $name)) {
+			return $this->getSet($name, $value);
+		}
+		
+		throw new \Exception("Unknown method: ". get_class($this) ."::". $name);
 	}
 	
 	/**

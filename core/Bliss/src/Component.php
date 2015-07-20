@@ -93,13 +93,7 @@ class Component
 	 */
 	protected function _parse($name, $value)
 	{
-		$newValue = null;
-		
-		if (is_array($newValue)) {
-			foreach ($newValue as $n => $v) {
-				$newValue[$n] = $this->_parse($n, $v);
-			}
-		} else if (is_object($value) && method_exists($value, "toArray") ) {
+		if (is_object($value) && method_exists($value, "toArray") ) {
 			$newValue = $value->toArray();
 		} else if ($value instanceOf \DateTime) {
 			$newValue = $value->getTimestamp();
@@ -107,6 +101,12 @@ class Component
 			$newValue = call_user_func(array($this, $name));
 		} else {
 			$newValue = $value;
+		}
+		
+		if (is_array($newValue)) {
+			foreach ($newValue as $n => $v) {
+				$newValue[$n] = $this->_parse(null, $v);
+			}
 		}
 		
 		return $newValue;
@@ -124,7 +124,7 @@ class Component
 	{
 		$value = isset($args[0]) ? $args[0] : null;
 		
-		if (!property_exists($this, $name)) {
+		if (!property_exists($this, $name) && isset($this->_properties[$name])) {
 			return $this->getSet($name, $value);
 		}
 		

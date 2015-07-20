@@ -13,7 +13,7 @@ bliss.controller("user.SignInCtrl", ["$scope", "$window", "bliss.App", "user.Acc
 	form.onsubmit = function() {
 		$scope.$apply(function() {
 			$scope.loading(true);
-			$scope.error.open = false;
+			$scope.error = {open:false};
 		});
 	};
 	frame.onload = function() {
@@ -29,6 +29,7 @@ bliss.controller("user.SignInCtrl", ["$scope", "$window", "bliss.App", "user.Acc
 			if (response.result === "error") {
 				$scope.error = response;
 				$scope.error.open = true;
+				frame.src = "about:blank";
 			} else {
 				Account.user(response.user);
 				App.reload();

@@ -1,11 +1,11 @@
 <article class="block shadow" shrink="!error.open">
-	<section class="section alert alert-danger">
-		<paper-icon-button icon="close" class="pull-right" ng-click="error.open=false;"></paper-icon-button>
+	<section class="alert alert-danger">
+		<paper-icon-button icon="close" class="pull-right" ng-click="error.open=false;" style="margin-top: -8px; margin-right: -8px;"></paper-icon-button>
 		<h3>{{error.message}}</h3>
 	</section>
 </article>
 
-<form id="signInForm" class="block shadow" shrink="response.open" method="post" action="./sign-in.json" target="signInFrame">
+<form id="signInForm" class="block shadow" method="post" action="./sign-in.json" target="signInFrame">
 	<header class="section header">
 		<h1>Sign In</h1>
 	</header>

@@ -149,13 +149,21 @@ class Acl extends Component implements AclInterface
 	 * 
 	 * @return \Acl\Permission\Permission[]
 	 */
-	public function permissions()
+	public function permissions(array $permissions = null)
 	{
-		$permissions = [];
-		foreach ($this->permissions as $resourcePerms) {
-			$permissions = array_merge($permissions, $resourcePerms);
+		if ($permissions !== null) {
+			foreach ($permissions as $config) {
+				$this->add(
+					Permission\Permission::factory($config)
+				);
+			}
 		}
-		return $permissions;
+		
+		$all = [];
+		foreach ($this->permissions as $resourcePerms) {
+			$all = array_merge($all, $resourcePerms);
+		}
+		return $all;
 	}
 	
 	/**

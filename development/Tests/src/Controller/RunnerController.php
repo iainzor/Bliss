@@ -9,7 +9,7 @@ class RunnerController extends \Bliss\Controller\AbstractController
 	
 	public function init()
 	{
-		$this->configPath = $this->app->resolvePath("files/tests/config.xml");
+		$this->configPath = $this->app->resolvePath("tests/config.xml");
 		
 		$dir = dirname($this->configPath);
 		if (!is_dir($dir)) {

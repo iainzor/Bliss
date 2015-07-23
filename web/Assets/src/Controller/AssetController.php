@@ -19,7 +19,7 @@ class AssetController extends \Bliss\Controller\AbstractController
 			);
 			$sourcePath = $module->resolvePath("assets/". $sourceName);
 			$filename = $this->module->resolvePath(
-				sprintf("files/compiled/%s/%s",
+				sprintf("compiled/%s/%s",
 					$moduleName,
 					$sourceName
 				)
@@ -50,7 +50,7 @@ class AssetController extends \Bliss\Controller\AbstractController
 	public function renderAllAction(\Request\Module $request, \Response\Module $response)
 	{
 		$formatName = $request->getFormat();
-		$filename = $this->app->resolvePath("files/assets/compiled/all.{$formatName}");
+		$filename = $this->app->resolvePath("assets/compiled/all.{$formatName}");
 		$compiler = $this->module->compiler();
 		
 		if ($compiler->isEnabled()) {

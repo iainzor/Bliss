@@ -228,7 +228,7 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 			$this->cacheStorage = $storage;
 		}
 		if (!isset($this->cacheStorage)) {
-			$this->cacheStorage = new FileStorage($this->app->resolvePath("files/response"));
+			$this->cacheStorage = new FileStorage($this->app->resolvePath("response"));
 		}
 		return $this->cacheStorage;
 	}

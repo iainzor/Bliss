@@ -72,12 +72,13 @@ class Container extends \Bliss\Component
 	 * 
 	 * @param string $name The name of the application
 	 */
-	public function __construct($name, $rootPath) 
+	public function __construct($name, $rootPath, $cachePath="files") 
 	{
 		ob_start();
 		
 		$this->name = $name;
 		$this->rootPath = $rootPath;
+		$this->cachePath = $cachePath;
 		$this->autoloader = new AutoLoader();
 		$this->moduleRegistry = new ModuleRegistry($this);
 		
@@ -94,9 +95,32 @@ class Container extends \Bliss\Component
 	 */
 	public function resolvePath($partial = null)
 	{
-		return $this->rootPath ."/". $partial;
+		//Detect if using gs:// for google app engine
+		if (strpos($partial, "://") !== false || strpos($partial, ":\\") !== false) {
+			return $this->cachePath ."/" . $partial;
+		} else {
+			return $this->rootPath ."/".$ this->cachePath . "/" . $partial;
+		}
 	}
-	
+
+	/**
+     * Sets the location of the cache
+     * 
+     * 
+     */
+   	public function setCachePath($path) {
+   		$this->cachePath = $path;
+	}
+
+    /**
+     * Gets the location of the cache
+     * 
+     * 
+     */
+    public function getCachePath() {
+        return $this->cachePath;
+    }
+
 	/**
 	 * Set the name of the application
 	 * 

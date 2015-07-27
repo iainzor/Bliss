@@ -24,9 +24,9 @@ class BlissWebApp extends \Bliss\App\Container
 {
 	private $startTime;
 	
-	public function __construct($name, $rootPath) 
+	public function __construct($name, $rootPath,$cachePath ="files") 
 	{
-		parent::__construct($name, $rootPath);
+		parent::__construct($name, $rootPath,$cachePath);
 		
 		$this->startTime = microtime(true);
 		
@@ -37,7 +37,7 @@ class BlissWebApp extends \Bliss\App\Container
 	 * @param string $rootPath
 	 * @return BlissWebApp
 	 */
-	public static function create($name, $rootPath, $environment = self::ENV_PRODUCTION)
+	public static function create($name, $rootPath, $environment = self::ENV_PRODUCTION,$cachePath = "files")
 	{
 		date_default_timezone_set("UTC");
 		error_reporting(-1);
@@ -49,7 +49,7 @@ class BlissWebApp extends \Bliss\App\Container
 		}
 		
 		// Create the application container
-		$instance = new self($name, $rootPath);
+		$instance = new self($name, $rootPath,$cachePath);
 		$instance->environment($environment);
 		$instance->autoloader()->registerNamespace("Bliss", __DIR__ ."/core/Bliss/src");
 		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/core");

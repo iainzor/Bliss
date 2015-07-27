@@ -50,6 +50,11 @@ class Container extends \Bliss\Component
 	/**
 	 * @var string
 	 */
+	private $cachePath;
+	
+	/**
+	 * @var string
+	 */
 	private $environment = self::ENV_PRODUCTION;
 	
 	/**
@@ -72,7 +77,7 @@ class Container extends \Bliss\Component
 	 * 
 	 * @param string $name The name of the application
 	 */
-	public function __construct($name, $rootPath, $cachePath="files") 
+	public function __construct($name, $rootPath, $cachePath=null) 
 	{
 		ob_start();
 		
@@ -99,7 +104,13 @@ class Container extends \Bliss\Component
 		if (strpos($partial, "://") !== false || strpos($partial, ":\\") !== false) {
 			return $this->cachePath ."/" . $partial;
 		} else {
-			return $this->rootPath ."/".$ this->cachePath . "/" . $partial;
+			$parts = [$this->rootPath];
+			if ($this->cachePath) {
+				$parts[] = $this->cachePath;
+			}
+			$parts[] = $partial;
+			
+			return implode("/", $parts);
 		}
 	}
 

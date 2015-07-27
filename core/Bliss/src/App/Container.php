@@ -50,11 +50,6 @@ class Container extends \Bliss\Component
 	/**
 	 * @var string
 	 */
-	private $cachePath;
-	
-	/**
-	 * @var string
-	 */
 	private $environment = self::ENV_PRODUCTION;
 	
 	/**
@@ -76,14 +71,14 @@ class Container extends \Bliss\Component
 	 * Constructor
 	 * 
 	 * @param string $name The name of the application
+	 * @param string $rootPath The root of the application
 	 */
-	public function __construct($name, $rootPath, $cachePath=null) 
+	public function __construct($name, $rootPath) 
 	{
 		ob_start();
 		
 		$this->name = $name;
 		$this->rootPath = $rootPath;
-		$this->cachePath = $cachePath;
 		$this->autoloader = new AutoLoader();
 		$this->moduleRegistry = new ModuleRegistry($this);
 		
@@ -100,18 +95,8 @@ class Container extends \Bliss\Component
 	 */
 	public function resolvePath($partial = null)
 	{
-		//Detect if using gs:// for google app engine
-		if (strpos($partial, "://") !== false || strpos($partial, ":\\") !== false) {
-			return $this->cachePath ."/" . $partial;
-		} else {
-			$parts = [$this->rootPath];
-			if ($this->cachePath) {
-				$parts[] = $this->cachePath;
-			}
-			$parts[] = $partial;
-			
-			return implode("/", $parts);
-		}
+		$parts = [$this->rootPath, $partial];
+		return implode("/", $parts);
 	}
 
 	/**

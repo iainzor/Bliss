@@ -16,7 +16,7 @@ class ErrorController extends \Bliss\Controller\AbstractController
 		$data = [
 			"result" => "error",
 			"message" => isset($e) ? $e->getMessage() : "Unknown",
-			"code" => isset($e) ? $e->getCode() : 0
+			"code" => isset($e) ? $e->getCode() : 500
 		];
 		
 		if ($errorModule->showConsole()) {

@@ -1,9 +1,7 @@
 .controls {
 	position: relative;
 	z-index: 100;
-	margin-bottom: 30px;
 }
-.controls a { color: #fff; }
 
 .controls.icon-text > ul.nav-pills > li {}
 
@@ -29,3 +27,6 @@
 		color: #fff;
 	}
 	
+	
+.controls.nav.pull-right { margin-right: -5px; margin-top: -5px; }
+.controls.small.nav > li > a { font-size: 12px; padding: 8px 12px; }

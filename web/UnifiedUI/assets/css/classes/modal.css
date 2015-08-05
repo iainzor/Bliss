@@ -29,6 +29,8 @@
 		margin: 0;
 		padding: 30px;
 		width: auto;
+		max-height: 100%;
+		overflow: auto;
 	}
 	.modal.open > .modal-dialog {
 		transform: scale(1);

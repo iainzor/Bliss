@@ -1,16 +1,19 @@
 <?php
 namespace Router;
 
-class Route
+use Bliss\Component;
+
+class Route extends Component
 {
 	const PARAM_MODULE = "module";
 	const PARAM_CONTROLLER = "controller";
 	const PARAM_ACTION = "action";
+	const PARAM_ELEMENT = "element";
 	
 	/**
 	 * @var string
 	 */
-	private $route;
+	protected $route;
 	
 	/**
 	 * @var array
@@ -28,7 +31,7 @@ class Route
 	/**
 	 * @var int
 	 */
-	private $priority = 1;
+	protected $priority = 1;
 	
 	/**
 	 * @var array
@@ -38,12 +41,17 @@ class Route
 	/**
 	 * @var boolean
 	 */
-	private $isActive = true;
+	protected $isActive = true;
 	
 	/**
 	 * @var int
 	 */
 	private $timesUsed = 0;
+	
+	/**
+	 * @var string
+	 */
+	protected $element;
 	
 	/**
 	 * Constructor
@@ -79,6 +87,23 @@ class Route
 	public function priority()
 	{
 		return $this->priority;
+	}
+	
+	/**
+	 * Get or set the element used by the route
+	 * 
+	 * @param string $element
+	 * @return string
+	 */
+	public function element($element = null)
+	{
+		if ($element !== null) {
+			$this->element = $element;
+		}
+		if (!$this->element && isset($this->defaultValues[self::PARAM_ELEMENT])) {
+			$this->element = $this->defaultValues[self::PARAM_ELEMENT];
+		}
+		return $this->element;
 	}
 	
 	/**
@@ -181,5 +206,22 @@ class Route
 		}
 		
 		return $this->timesUsed;
+	}
+	
+	/**
+	 * Override the default toArray method to modify some properties
+	 * 
+	 * @return string
+	 */
+	public function toArray() 
+	{
+		$data = parent::toArray();
+		$data["params"] = $this->matchNames;
+		
+		if (preg_match("/^\/(.*)\/$/", $data["route"], $matches)) {
+			$data["route"] = $matches[1];
+		}
+		
+		return $data;
 	}
 }

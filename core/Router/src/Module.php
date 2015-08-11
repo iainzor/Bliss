@@ -1,8 +1,10 @@
 <?php
 namespace Router;
 
-class Module extends \Bliss\Module\AbstractModule
-implements ProviderInterface
+use Bliss\Module\AbstractModule,
+	Config\PublicConfigInterface;
+
+class Module extends AbstractModule implements ProviderInterface, PublicConfigInterface
 {
 	/**
 	 * @var \Router\Route[]
@@ -17,6 +19,35 @@ implements ProviderInterface
 			3 => "action",
 			4 => "format"
 		], [], -1);
+	}
+	
+	public function populatePublicConfig(\Config\Config $config) 
+	{
+		$routes = [];
+		foreach ($this->routes() as $route) {
+			if ($route->element()) {
+				$routes[] = $route->toArray();
+			}
+		}
+		
+		$config->set("routes", $routes);
+	}
+	
+	/**
+	 * Get or set the routes available to the router
+	 * 
+	 * @param array $roues
+	 * @return array
+	 */
+	public function routes(array $routes = null)
+	{
+		if ($routes !== null) {
+			$this->routes = array_merge($this->routes, $routes);
+		}
+		if (empty($this->routes)) {
+			$this->_compileRoutes();
+		}
+		return $this->routes;
 	}
 	
 	/**

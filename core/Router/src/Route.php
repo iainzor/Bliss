@@ -218,7 +218,7 @@ class Route extends Component
 		$data = parent::toArray();
 		$data["params"] = $this->matchNames;
 		
-		if (preg_match("/^\/(.*)\/$/", $data["route"], $matches)) {
+		if (preg_match("/^\/(.*)\/[a-z]*$/", $data["route"], $matches)) {
 			$data["route"] = $matches[1];
 		}
 		

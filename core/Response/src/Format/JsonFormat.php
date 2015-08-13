@@ -14,10 +14,6 @@ class JsonFormat implements FormatInterface
 			$params[$name] = $this->_transform($value);
 		}
 		
-		if (!count($params)) { 
-			$params = null;
-		}
-		
 		return json_encode($params);
 	}
 	

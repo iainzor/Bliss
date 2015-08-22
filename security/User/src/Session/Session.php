@@ -2,7 +2,8 @@
 namespace User\Session;
 
 use Bliss\Component,
-	User\User;
+	User\User,
+	User\GuestUser;
 
 class Session extends Component implements SessionInterface
 {
@@ -89,6 +90,9 @@ class Session extends Component implements SessionInterface
 		if ($user !== null) {
 			$this->user = $user;
 			$this->userId($user->id());
+		}
+		if (!$this->user) {
+			$this->user = new GuestUser();
 		}
 		return $this->user;
 	}

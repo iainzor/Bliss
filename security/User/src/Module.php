@@ -16,7 +16,7 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	const RESOURCE_NAME = "user-module";
 	
 	/**
-	 * @var \User\Session\SessionInterface
+	 * @var \User\Session\Session
 	 */
 	private $session;
 	
@@ -53,8 +53,8 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 		if (!isset($this->sessionManager)) {
 			$db = $this->app->database()->connection();
 			$this->sessionManager = new Session\Manager(
-				new Session\DbTable($db),
-				new DbTable($db),
+				new Db\UserSessionsTable($db),
+				new Db\UsersTable(),
 				User::passwordHasher()
 			);
 		}
@@ -74,12 +74,39 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	
 	public function initRouter(\Router\Module $router) 
 	{
-		$router->when("/^sign-in\.?([a-z]+)?$/", [
+		$router->when("/^users\.?(json)?$/i", [
+			1 => "format"
+		], [
+			"module" => "user",
+			"controller" => "users",
+			"action" => "all",
+			"element" => "user-list"
+		])->when("/^users\/([a-z-_]+)\.json$/i", [
+			1 => "action"
+		], [
+			"module" => "user",
+			"controller" => "users",
+			"format" => "json"
+		])->when("/^users\/([0-9]+)\.?(json)?$/i", [
+			1 => "userId",
+			2 => "format"
+		], [
+			"module" => "user",
+			"controller" => "user",
+			"action" => "index",
+			"element" => "user-profile"
+		])->when("/^sign-in\.?([a-z]+)?$/", [
 			1 => "format"
 		], [
 			"module" => "user",
 			"controller" => "auth",
 			"action" => "sign-in"
+		])->when("/^sign-out\.?([a-z]+)?$/i", [
+			1 => "format"
+		], [
+			"module" => "user",
+			"controller" => "auth",
+			"action" => "sign-out"
 		]);
 	}
 	
@@ -119,6 +146,8 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	public function populatePublicConfig(Config $config) 
 	{
 		$session = $this->session();
+		$config->setData($session->user()->toArray());
+		return;
 		
 		if ($session->isValid()) {
 			if ($session->user()) {

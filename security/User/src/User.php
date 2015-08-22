@@ -1,7 +1,8 @@
 <?php
 namespace User;
 
-use Bliss\ResourceComponent;
+use Bliss\ResourceComponent,
+	Acl\Acl;
 
 class User extends ResourceComponent
 {
@@ -26,6 +27,11 @@ class User extends ResourceComponent
 	 * @var boolean
 	 */
 	protected $isActive = true;
+	
+	/**
+	 * @var \Acl\Acl
+	 */
+	protected $acl;
 	
 	/**
 	 * @var \User\Hasher\HasherInterface
@@ -91,6 +97,37 @@ class User extends ResourceComponent
 			$this->isActive = (boolean) $flag;
 		}
 		return $this->isActive;
+	}
+	
+	/**
+	 * Get or set the user's ACL.  If one has not been set, an empty ACL instance will be created
+	 * 
+	 * @param Acl $acl
+	 * @return Acl
+	 */
+	public function acl(Acl $acl = null)
+	{
+		if ($acl !== null) {
+			$this->acl = $acl;
+		}
+		if (!$this->acl) {
+			$this->acl = new Acl();
+		}
+		
+		return $this->acl;
+	}
+	
+	/**
+	 * Check if the user is allowed to perform an action on a resource
+	 * 
+	 * @param string $resourceName
+	 * @param string $action
+	 * @param array $params
+	 * @return boolean
+	 */
+	public function isAllowed($resourceName, $action = null, array $params = [])
+	{
+		return $this->acl()->isAllowed($resourceName, $action, $params);
 	}
 	
 	/**

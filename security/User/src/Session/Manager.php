@@ -1,7 +1,8 @@
 <?php
 namespace User\Session;
 
-use User\DbTable as UserDbTable,
+use User\Db\UsersTable,
+	User\Db\UserSessionsTable,
 	User\User,
 	User\Hasher\HasherInterface,
 	User\Hasher\Blowfish;
@@ -9,12 +10,12 @@ use User\DbTable as UserDbTable,
 class Manager
 {
 	/**
-	 * @var \User\Session\DbTable
+	 * @var \User\Db\UserSessionsTable
 	 */
 	private $sessionDbTable;
 	
 	/**
-	 * @var \User\DbTable
+	 * @var \User\Db\UsersTable
 	 */
 	private $userDbTable;
 	
@@ -26,11 +27,11 @@ class Manager
 	/**
 	 * Constructor
 	 * 
-	 * @param \User\Session\DbTable $sessionDbTable
-	 * @param \User\DbTable $userDbTable
+	 * @param \User\Db\UserSessionsTable $sessionDbTable
+	 * @param \User\Db\UsersTable $userDbTable
 	 * @param HasherInterface
 	 */
-	public function __construct(DbTable $sessionDbTable, UserDbTable $userDbTable, HasherInterface $hasher = null)
+	public function __construct(UserSessionsTable $sessionDbTable, UsersTable $userDbTable, HasherInterface $hasher = null)
 	{
 		if ($hasher === null) {
 			$hasher = User::passwordHasher();

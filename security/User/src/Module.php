@@ -100,7 +100,8 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 		], [
 			"module" => "user",
 			"controller" => "auth",
-			"action" => "sign-in"
+			"action" => "sign-in",
+			"element" => "user-login"
 		])->when("/^sign-out\.?([a-z]+)?$/i", [
 			1 => "format"
 		], [

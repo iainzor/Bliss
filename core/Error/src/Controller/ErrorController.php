@@ -10,7 +10,8 @@ class ErrorController extends \Bliss\Controller\AbstractController
 		$e = $request->param("exception");
 		
 		if ($e) {
-			$response->header("X-Exception: {$e->getMessage()}");
+			$message = substr(preg_replace("/\n/", " ", $e->getMessage()), 0, 50);
+			$response->header("X-Exception: {$message}");
 		};
 		
 		$data = [

@@ -31,7 +31,13 @@ interface PageInterface
 	 * @param boolean $flag
 	 * @return boolean
 	 */
-	public function visible($flag = null);
+	public function isVisible($flag = null);
+	
+	/**
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function isActive($flag = null);
 	
 	/**
 	 * @param array $pages

@@ -28,7 +28,12 @@ class Page extends Component implements PageInterface
 	/**
 	 * @var boolean
 	 */
-	protected $visible = true;
+	protected $isVisible = true;
+	
+	/**
+	 * @var boolean
+	 */
+	protected $isActive = false;
 	
 	/**
 	 * @var \Pages\Container
@@ -109,11 +114,41 @@ class Page extends Component implements PageInterface
 	 * @param boolean $visible
 	 * @return boolean
 	 */
-	public function visible($visible = null) {
+	public function isVisible($visible = null) 
+	{
 		if ($visible !== null) {
-			$this->visible = (boolean) $visible;
+			$this->isVisible = (boolean) $visible;
 		}
-		return $this->visible;
+		return $this->isVisible;
+	}
+	
+	/**
+	 * @param type $flag
+	 * @return type
+	 */
+	public function isActive($flag = null) 
+	{
+		if ($flag !== null) {
+			$this->isActive = (boolean) $flag;
+		}
+		return $this->isActive;
+	}
+	
+	/**
+	 * Activate any pages that match the path
+	 * 
+	 * @param string $path
+	 * @return Page[] All pages that were activated
+	 */
+	public function activate($path)
+	{
+		if ($this->path() === $path) {
+			$this->isActive(true);
+		}
+		
+		foreach ($this->pages() as $page) {
+			$page->activate($path);
+		}
 	}
 	
 	/**

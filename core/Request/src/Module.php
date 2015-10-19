@@ -147,7 +147,7 @@ class Module extends \Bliss\Module\AbstractModule
 	 * @param string $name
 	 * @param mixed $value
 	 */
-	public function set($name, $value)
+	public function setParam($name, $value)
 	{
 		$this->params[$name] = $value;
 	}
@@ -205,16 +205,16 @@ class Module extends \Bliss\Module\AbstractModule
 	 * Getters and setters
 	 */
 	public function getModule() { return $this->param(self::PARAM_MODULE); }
-	public function setModule($module) { $this->set(self::PARAM_MODULE, $module); }
+	public function setModule($module) { $this->setParam(self::PARAM_MODULE, $module); }
 	
 	public function getController() { return $this->param(self::PARAM_CONTROLLER); }
-	public function setController($controller) { return $this->set(self::PARAM_CONTROLLER, $controller); }
+	public function setController($controller) { return $this->setParam(self::PARAM_CONTROLLER, $controller); }
 	
 	public function getAction() { return $this->param(self::PARAM_ACTION); }
-	public function setAction($action) { $this->set(self::PARAM_ACTION, $action); }
+	public function setAction($action) { $this->setParam(self::PARAM_ACTION, $action); }
 	
 	public function getFormat() { return $this->param(self::PARAM_FORMAT); }
-	public function setFormat($format) { $this->set(self::PARAM_FORMAT, $format); }
+	public function setFormat($format) { $this->setParam(self::PARAM_FORMAT, $format); }
 	
 	
 	/**

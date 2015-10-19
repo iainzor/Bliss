@@ -58,13 +58,15 @@ class Component
 	
 	/**
 	 * Get or set a property of the component
-	 * If the value IS NULL is provided the method acts as a getter and returns the current value
-	 * If the value IS NOT NULL the method first sets the property and then returns the new value
+	 * If the value is NULL the method acts as a getter and returns the current value
+	 * If the value is NOT NULL the method first sets the property and then returns the new value
+	 * 
+	 * Only properties that are part of the class or have been explicitly set in $this._properties are affected
 	 * 
 	 * @param string $property
 	 * @param mixed $value
 	 */
-	protected function getSet($property, $value = null)
+	public function getSet($property, $value = null)
 	{
 		$exists = $property != "_properties" ? property_exists($this, $property) : false;
 		
@@ -82,6 +84,17 @@ class Component
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Set a custom property value
+	 *   
+	 * @param string $property
+	 * @param mixed $value
+	 */
+	public function set($property, $value = null)
+	{
+		$this->_properties[$property] = $value;
 	}
 	
 	/**

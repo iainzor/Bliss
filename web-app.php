@@ -40,7 +40,7 @@ class BlissWebApp extends \Bliss\App\Container
 	public static function create($name, $rootPath, $environment = self::ENV_PRODUCTION)
 	{
 		date_default_timezone_set("UTC");
-		error_reporting(-1);
+		error_reporting(E_ALL);
 		ini_set("display_errors", true);
 		ini_set("display_startup_errors", true);
 		
@@ -67,10 +67,22 @@ class BlissWebApp extends \Bliss\App\Container
 	public function run()
 	{
 		// Setup the request
-		$baseUrl = preg_replace("/^(.*)\/.*\.php$/i", "\\1/", filter_input(INPUT_SERVER, "SCRIPT_NAME"));
-		$requestUri = preg_replace("/([^\?]*)\?(.*)$/i", "\\1", 
-			substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl))
-		);
+		preg_match("/^([^\/]*)\/((.*)\.php)$/i", filter_input(INPUT_SERVER, "SCRIPT_NAME"), $matches);
+		if ($matches[3] !== "index") {
+			$baseUrl = filter_input(INPUT_SERVER, "SCRIPT_NAME") ."/";
+		} else {
+			$baseUrl = $matches[1] ."/";
+		}
+		
+		preg_match("/^([^\/]*)(\/[^\.]+\.php)?\/?(.*)$/i", filter_input(INPUT_SERVER, "REQUEST_URI"), $matches);
+		$requestUri = $matches[3];
+		
+		/*
+		var_dump($baseUrl);
+		var_dump($requestUri);
+		exit;
+		//*/
+		
 		$request = $this->request();
 		$request->setUri($requestUri);
 		$request->baseUrl($baseUrl);

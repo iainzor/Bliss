@@ -41,6 +41,11 @@ class Page extends Component implements PageInterface
 	protected $pages;
 	
 	/**
+	 * @var int
+	 */
+	protected $order = 100;
+	
+	/**
 	 * Constructor
 	 */
 	public function __construct() 
@@ -174,5 +179,16 @@ class Page extends Component implements PageInterface
 			}
 		}
 		return $this->pages;
+	}
+	
+	/**
+	 * Get or set the ordering of the page
+	 * 
+	 * @param int $index
+	 * @return int
+	 */
+	public function order($index = null)
+	{
+		return $this->getSet("order", $index);
 	}
 }

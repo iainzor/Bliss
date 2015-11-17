@@ -49,8 +49,16 @@ class Container extends AbstractIterator
 	 */
 	public function toArray()
 	{
+		$items = $this->allItems();
+		usort($items, function(Page $a, Page $b) {
+			if ($a->order() === $b->order()) {
+				return strcasecmp($a->title(), $b->title());
+			}
+			return $a->order() > $b->order() ? 1 : -1;
+		});
+		
 		$data = [];
-		foreach ($this->allItems() as $page) {
+		foreach ($items as $page) {
 			$data[] = $page->toArray();
 		}
 		return $data;

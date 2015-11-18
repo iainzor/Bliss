@@ -74,7 +74,7 @@ class BlissWebApp extends \Bliss\App\Container
 			$baseUrl = $matches[1] ."/";
 		}
 		
-		preg_match("/^([^\/]*)(\/[^\.]+\.php)?\/?(.*)$/i", filter_input(INPUT_SERVER, "REQUEST_URI"), $matches);
+		preg_match("/^([^\/]*)(\/[^\.]+\.php)?\/?([^\?]+)/i", filter_input(INPUT_SERVER, "REQUEST_URI"), $matches);
 		$requestUri = $matches[3];
 		
 		/*

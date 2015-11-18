@@ -16,12 +16,13 @@ class Module extends AbstractModule implements RouteProvider, InjectorInterface,
 	
 	public function initRouter(\Router\Module $router) 
 	{
-		$router->when("/^tests\.([a-z0-9]+)?$/i", [
+		$router->when("/^tests\.?([a-z0-9]+)?$/i", [
 			1 => "format"
 		], [
 			"module" => "tests",
 			"controller" => "runner",
-			"action" => "run"
+			"action" => "run",
+			"element" => "test-results"
 		]);
 	}
 	

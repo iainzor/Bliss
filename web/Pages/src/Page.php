@@ -5,10 +5,18 @@ use Bliss\Component;
 
 class Page extends Component implements PageInterface
 {
+	const TYPE_LINK = "link";
+	const TYPE_DIVIDER = "divider";
+	
 	/**
 	 * @var string
 	 */
 	protected $id;
+	
+	/**
+	 * @var string
+	 */
+	protected $is = self::TYPE_LINK;
 	
 	/**
 	 * @var string
@@ -43,7 +51,7 @@ class Page extends Component implements PageInterface
 	/**
 	 * @var int
 	 */
-	protected $order = 100;
+	protected $order = 50;
 	
 	/**
 	 * Constructor
@@ -51,6 +59,35 @@ class Page extends Component implements PageInterface
 	public function __construct() 
 	{
 		$this->pages = new Container();
+	}
+	
+	/**
+	 * Get or set the item's type
+	 * 
+	 * @param string $type
+	 * @return string
+	 */
+	public function is($type = null)
+	{
+		if ($type !== null) {
+			$this->is = $type;
+		}
+		return $this->is;
+	}
+	
+	/**
+	 * Check if the page is sortable
+	 * 
+	 * @return boolean
+	 */
+	public function isSortable()
+	{
+		switch ($this->is) {
+			case self::TYPE_DIVIDER:
+				return false;
+			default:
+				return true;
+		}
 	}
 	
 	/**

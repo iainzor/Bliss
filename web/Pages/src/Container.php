@@ -36,7 +36,11 @@ class Container extends AbstractIterator
 			$pages = [$pages];
 		}
 		
-		foreach ($pages as $data) {
+		$order = $this->count();
+		foreach ($pages as $i => $data) {
+			if (!isset($data["order"])) {
+				$data["order"] = $order + $i + 1;
+			}
 			$page  = Page::factory($data);
 			$this->addItem($page);
 		}
@@ -50,10 +54,12 @@ class Container extends AbstractIterator
 	public function toArray()
 	{
 		$items = $this->allItems();
+		
 		usort($items, function(Page $a, Page $b) {
 			if ($a->order() === $b->order()) {
-				return strcasecmp($a->title(), $b->title());
+				return 0;
 			}
+			
 			return $a->order() > $b->order() ? 1 : -1;
 		});
 		

@@ -154,14 +154,5 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	{
 		$session = $this->session();
 		$config->setData($session->user()->toArray());
-		return;
-		
-		if ($session->isValid()) {
-			if ($session->user()) {
-				$config->setData(
-					$session->user()->toArray()
-				);
-			}
-		}
 	}
 }

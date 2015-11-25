@@ -21,7 +21,7 @@ class Module extends \Bliss\Module\AbstractModule
 	/**
 	 * @var array
 	 */
-	private $params = [];
+	private $params;
 	
 	/**
 	 * @var string
@@ -134,7 +134,7 @@ class Module extends \Bliss\Module\AbstractModule
 	 */
 	public function param($name, $defaultValue = null)
 	{
-		$all = $this->params;
+		$all = $this->params();
 		
 		return isset($all[$name])
 			? $all[$name]

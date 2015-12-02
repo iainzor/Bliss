@@ -66,18 +66,19 @@ class BlissWebApp extends \Bliss\App\Container
 	
 	public function run()
 	{
-		// Setup the request
-		preg_match("/^([^\/]*)\/((.*)\.php)$/i", filter_input(INPUT_SERVER, "SCRIPT_NAME"), $matches);
-		if ($matches[3] !== "index") {
-			$baseUrl = filter_input(INPUT_SERVER, "SCRIPT_NAME") ."/";
-		} else {
-			$baseUrl = $matches[1] ."/";
-		}
-		
-		preg_match("/^([^\/]*)(\/[^\.]+\.php)?\/?([^\?]+)/i", filter_input(INPUT_SERVER, "REQUEST_URI"), $matches);
-		$requestUri = $matches[3];
+		$baseMatch = preg_match("/^(.*)\/((.+)\.php)$/i", filter_input(INPUT_SERVER, "SCRIPT_NAME"), $baseMatches);
+		$uriMatch = preg_match("/^([^\/]*)(\/[^\.]+\.php)?\/?([^\?]+)/i", filter_input(INPUT_SERVER, "REQUEST_URI"), $uriMatches);
+		$baseUrl = $baseMatches[1] ."/";
+		$requestUri = substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl));
 		
 		/*
+		echo "<pre>";
+		var_dump($baseMatch);
+		print_r($baseMatches);
+		
+		var_dump($uriMatch);
+		print_r($uriMatches);
+		
 		var_dump($baseUrl);
 		var_dump($requestUri);
 		exit;

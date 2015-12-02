@@ -134,7 +134,7 @@ class Registry
 			return $instance;
 		}
 		
-		throw new \Exception("Module '{$moduleName}' could not be found", 404);
+		throw new ModuleNotFoundException("Module '{$moduleName}' could not be found", 404);
 	}
 	
 	/**

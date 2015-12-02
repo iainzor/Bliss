@@ -33,7 +33,7 @@ class Component
 	{
 		$refClass = new \ReflectionClass($this);
 		$props = $refClass->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PUBLIC);
-		$data = [];
+		$data = $this->_properties;
 
 		foreach ($props as $refProp) {
 			$name = $refProp->getName();
@@ -51,9 +51,7 @@ class Component
 			$data[$name] = $this->_parse($name, $value);
 		}
 		
-		$diff = array_diff_assoc($this->_properties, $data);
-		
-		return array_merge($data, $diff);
+		return $data;
 	}
 	
 	/**
@@ -94,7 +92,11 @@ class Component
 	 */
 	public function set($property, $value = null)
 	{
-		$this->_properties[$property] = $value;
+		if (method_exists($this, $property)) {
+			call_user_func([$this, $property], $value);
+		} else {
+			$this->_properties[$property] = $value;
+		}
 	}
 	
 	/**

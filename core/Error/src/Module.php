@@ -24,8 +24,6 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 
 	public function handleException(\Exception $e) 
 	{
-		
-		
 		$response = $this->app->response();
 		$request = $this->app->request();
 		$code = $e->getCode();
@@ -38,12 +36,14 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 				break;
 		}
 		
-		if ($e instanceof InvalidFormatException) {
-			$request->setFormat(null);
+		$ext = $request->getFormat();
+		
+		try {
+			$format = $response->format($ext);
+		} catch (InvalidFormatException $e) {
+			$format = $response->defaultFormat();
 		}
 		
-		$ext = $request->getFormat();
-		$format = $response->format($ext);
 		if ($format instanceof GenericFormat) {
 			$ext = null;
 		}

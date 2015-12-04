@@ -3,6 +3,13 @@ namespace Bliss;
 
 class Component
 {
+	const VALUE_INT = "intval";
+	const VALUE_FLOAT = "floatval";
+	const VALUE_DOUBLE = "doubleval";
+	const VALUE_STRING = "strval";
+	const VALUE_BOOLEAN = "boolval";
+	
+	
 	private $_properties = [];
 	
 	/**
@@ -63,10 +70,15 @@ class Component
 	 * 
 	 * @param string $property
 	 * @param mixed $value
+	 * @param callable $valueParser OPTIONAL Function used to parse the value
 	 */
-	public function getSet($property, $value = null)
+	public function getSet($property, $value = null, $valueParser = null)
 	{
 		$exists = $property != "_properties" ? property_exists($this, $property) : false;
+		
+		if ($value !== null && is_callable($valueParser)) {
+			$value = call_user_func($valueParser, $value);
+		}
 		
 		if ($exists && $value !== null) {
 			$ref = new \ReflectionProperty($this, $property);

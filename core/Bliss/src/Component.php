@@ -175,11 +175,13 @@ class Component
 	 * Populate a component with a set of properties
 	 * 
 	 * @param \Bliss\Component $component
-	 * @param array $properties
+	 * @param array|Component $properties
 	 * @return \Bliss\Component
 	 */
-	final public static function populate(Component $component, array $properties)
+	final public static function populate(Component $component, $properties)
 	{
+		$properties = self::convertValueToArray($properties);
+		
 		foreach ($properties as $name => $value) {
 			if (method_exists($component, $name)) {
 				call_user_func([$component, $name], $value);
@@ -189,5 +191,31 @@ class Component
 		}
 		
 		return $component;
+	}
+	
+	/**
+	 * Convert a mixed value to an array
+	 * 
+	 * @param mixed $value
+	 * @return array
+	 * @throws \UnexpectedValueException
+	 */
+	final public static function convertValueToArray($value)
+	{
+		if ($value instanceof \Bliss\Component) {
+			$parsed = $value->toArray();
+		} else if ($value instanceof \stdClass) {
+			$parsed = (array) $value;
+		} else {
+			$parsed = $value;
+		}
+		
+		if (!is_array($parsed)) {
+			$type = gettype($parsed) === "object" ? get_class($parsed) : gettype($parsed);
+			
+			throw new \UnexpectedValueException("\$value must be an array or an instance of \\Bliss\\Component, `{$type}` given");
+		}
+		
+		return $parsed;
 	}
 }

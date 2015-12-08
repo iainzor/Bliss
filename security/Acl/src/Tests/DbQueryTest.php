@@ -29,31 +29,53 @@ class DbQueryTest extends \PHPUnit_Framework_TestCase
 				`isAllowed` BOOLEAN NOT NULL DEFAULT 0
 			);
 		");
-		$this->db->exec("
-			INSERT INTO `acl` VALUES 
-			(NULL, 'test', 'article', NULL, 'read', 1), 
-			(NULL, 'test', 'article', 2, 'read', 0),
-			
-			(NULL, 'test', 'client', NULL, 'read', 1),
-			(NULL, 'test', 'client', 1, 'read', 0),
-			
-			(NULL, 'user', 'client', NULL, 'read', 0),
-			(NULL, 'user', 'client', 1, 'read', 1)
-		");
+		$aclValues = [
+			"('test', 'article', NULL, 'read', 1)",
+			"('test', 'article', 2, 'read', 0)",
+			"('test', 'client', NULL, 'read', 1)",
+			"('test', 'client', 1, 'read', 0)",
+			"('user', 'client', NULL, 'read', 0)",
+			"('user', 'client', 1, 'read', 1)"
+		];
+		foreach ($aclValues as $value) {
+			$this->db->exec("
+				INSERT INTO acl
+				(role, resourceName, resourceId, action, isAllowed)
+				VALUES
+				{$value}
+			");
+		}
+		
+		
 		$this->db->exec("	
 			CREATE TABLE `articles` (
 				`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 				`title` VARCHAR(128) NOT NULL
 			);
 		");
-		$this->db->exec("INSERT INTO `articles` VALUES (NULL, 'Foo Bar'), (NULL, 'Bar Baz!');");
+		$articleValues = [
+			"(NULL, 'Foo Bar')", 
+			"(NULL, 'Bar Baz!')"
+		];
+		foreach ($articleValues as $value) {
+			$this->db->exec("INSERT INTO `articles` VALUES {$value};");
+		}
+		
+		
 		$this->db->exec("	
 			CREATE TABLE `clients` (
 				`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 				`name` VARCHAR(64) NOT NULL
 			);
 		");
-		$this->db->exec("INSERT INTO `clients` VALUES (NULL, 'Foo Industries'), (NULL, 'Bar Corp'), (NULL, 'Baz Inc');");
+		$clientValues = [
+			"(NULL, 'Foo Industries')", 
+			"(NULL, 'Bar Corp')", 
+			"(NULL, 'Baz Inc')"
+		];
+		foreach ($clientValues as $value) {
+			$this->db->exec("INSERT INTO `clients` VALUES {$value};");
+		}
 	}
 	
 	public function testSetup()
@@ -89,7 +111,7 @@ class DbQueryTest extends \PHPUnit_Framework_TestCase
 		$results = $query->fetchAll();
 		
 		$this->assertCount(2, $results);
-		$this->assertEquals("Bar Corp", $results[0]["name"]);
+		$this->assertEquals("Bar Corp", $results[0]->name());
 	}
 	
 	public function testDenyAllButOne()

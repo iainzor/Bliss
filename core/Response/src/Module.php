@@ -67,10 +67,14 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	 * @param string $extension
 	 * @return \Response\Format\FormatInterface
 	 */
-	public function format($extension = null)
+	public function format($extension, Format\FormatInterface $format = null)
 	{
 		if (!isset($this->formats)) {
 			$this->_compileFormats();
+		}
+		
+		if ($format !== null) {
+			$this->formats->set($extension, $format);
 		}
 		
 		return $this->formats->get($extension);

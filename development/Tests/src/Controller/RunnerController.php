@@ -24,8 +24,9 @@ class RunnerController extends \Bliss\Controller\AbstractController
 		if ($request->param("format") === "json") {
 			$this->_generateConfig();
 			
-			$response = shell_exec("cd ". $this->app->resolvePath() ." && phpunit -c {$this->configPath} --bootstrap ". __DIR__ ."/autoload.php");
-			$result = new Result();
+			$command = "cd ". $this->app->resolvePath() ." && phpunit -c {$this->configPath} --bootstrap ". __DIR__ ."/autoload.php";
+			$response = shell_exec($command);
+			$result = new Result($command);
 			$result->parseResponse($response);
 			
 			return $result->toArray();

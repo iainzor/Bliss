@@ -331,7 +331,6 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 		header("{$protocol} {$this->code}");
 		
 		echo $contents;
-		exit;
 	}
 	
 	/**

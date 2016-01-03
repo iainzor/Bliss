@@ -232,7 +232,7 @@ class Container extends \Bliss\Component
 	 * Attempt to execute a Route
 	 * 
 	 * @param array $params
-	 * @return string
+	 * @return \Response\Module
 	 */
 	public function execute(array $params = [])
 	{
@@ -263,6 +263,7 @@ class Container extends \Bliss\Component
 		}
 
 		$response->send($request, $this->view());
+		return $response;
 	}
 	
 	/**

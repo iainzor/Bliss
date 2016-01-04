@@ -106,6 +106,22 @@ abstract class AbstractModule extends Component implements ModuleInterface
 	}
 	
 	/**
+	 * Enable the module
+	 */
+	public function enable()
+	{
+		$this->enabled(true);
+	}
+	
+	/**
+	 * Disable the module
+	 */
+	public function disable()
+	{
+		$this->enabled(false);
+	}
+	
+	/**
 	 * Get the module's parent application
 	 * 
 	 * @return \Bliss\App\Container

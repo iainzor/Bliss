@@ -42,7 +42,8 @@ class String
 		$compiled = "";
 		
 		foreach ($chars as $i => $char) {
-			if ($i > 0 && $char === ucwords($char)) {
+			$next = isset($chars[$i+1]) ? $chars[$i+1] : null;
+			if ($i > 0 && $char === strtoupper($char) && $next && $next !== strtoupper($next)) {
 				$compiled .= $separator;
 			}
 			$compiled .= $char;

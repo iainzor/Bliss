@@ -27,9 +27,7 @@ class BlissCLIApp extends BlissApp
 			$params = $route->params();
 			$params["format"] = "cli";
 
-			ob_start();
 			$response = $this->execute($params);
-			ob_end_clean();
 
 			$body = $response->body();
 			$rParams = $response->params();

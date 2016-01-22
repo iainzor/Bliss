@@ -153,5 +153,6 @@ class Session extends Component implements SessionInterface
 	public function delete() 
 	{
 		unset($_SESSION[$this->key]);
+		$this->user = new GuestUser();
 	}
 }

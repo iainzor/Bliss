@@ -144,7 +144,7 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 		$root->add([
 			[
 				"id" => self::RESOURCE_NAME,
-				"visible" => false,
+				"isVisible" => false,
 				"pages" => $pages
 			]
 		]);

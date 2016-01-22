@@ -1,8 +1,7 @@
 <?php
 namespace User;
 
-use Bliss\ResourceComponent,
-	Acl\Acl;
+use Bliss\ResourceComponent;
 
 class User extends ResourceComponent
 {
@@ -29,9 +28,9 @@ class User extends ResourceComponent
 	protected $isActive = true;
 	
 	/**
-	 * @var \Acl\Acl
+	 * @var \Acl\Role\Role 
 	 */
-	protected $acl;
+	protected $role;
 	
 	/**
 	 * @var \User\Hasher\HasherInterface
@@ -100,21 +99,21 @@ class User extends ResourceComponent
 	}
 	
 	/**
-	 * Get or set the user's ACL.  If one has not been set, an empty ACL instance will be created
+	 * Get or set the user's ACL Role.  If one has not been set, an empty ACL Role instance will be created
 	 * 
-	 * @param Acl $acl
-	 * @return Acl
+	 * @param Role $role
+	 * @return Role
 	 */
-	public function acl(Acl $acl = null)
+	public function role(Role $role = null)
 	{
-		if ($acl !== null) {
-			$this->acl = $acl;
+		if ($role !== null) {
+			$this->role = $role;
 		}
-		if (!$this->acl) {
-			$this->acl = new Acl();
+		if (!$this->role) {
+			$this->role = new Role(Role::ROLE_DEFAULT);
 		}
 		
-		return $this->acl;
+		return $this->role;
 	}
 	
 	/**

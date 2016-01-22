@@ -23,7 +23,7 @@ class AuthController extends AbstractController
 			$manager->attachUser($session);
 			$manager->save($session);
 			
-			return $session->toArray();
+			return $session;
 		}
 	}
 	
@@ -46,20 +46,18 @@ class AuthController extends AbstractController
 				$session = $manager->createSession($user->email(), $userData["password"]);
 				$manager->save($session);
 				
-				return $user->toArray();
+				return $user;
 			}
 		}
 	}
 	
-	public function signOutAction(\Request\Module $request, \User\Module $user) 
+	public function signOutAction(\Request\Module $request, \User\Module $userModule) 
 	{
 		if ($request->isPost()) {
-			$session = $user->session();
+			$session = $userModule->session();
 			$session->delete();
 			
-			return [
-				"result" => "success"
-			];
+			return $session->user();
 		}
 	}
 }

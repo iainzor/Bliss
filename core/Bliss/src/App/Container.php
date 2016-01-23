@@ -82,7 +82,9 @@ class Container extends \Bliss\Component
 		$this->autoloader = new AutoLoader();
 		$this->moduleRegistry = new ModuleRegistry($this);
 		
-		if (!is_dir($this->resolvePath("files"))) {
+		# ToDo - Create FileSysytem module
+		$filesDir = $this->resolvePath("files");
+		if (!is_dir($filesDir) && !mkdir($filesDir, 0777, true)) {
 			throw new \Exception("Directory could not be found: ". $this->resolvePath("files"));
 		}
 	}

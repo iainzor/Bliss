@@ -7,6 +7,8 @@ class GuestUser extends User
 	
 	public function __construct() 
 	{
-		$this->role(new GuestRole());
+		$this->role(
+			Role::registry()->role(Role::ROLE_GUEST)
+		);
 	}
 }

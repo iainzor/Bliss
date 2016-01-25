@@ -28,7 +28,7 @@ class User extends ResourceComponent
 	protected $isActive = true;
 	
 	/**
-	 * @var \Acl\Role\Role 
+	 * @var Role 
 	 */
 	protected $role;
 	
@@ -110,7 +110,7 @@ class User extends ResourceComponent
 			$this->role = $role;
 		}
 		if (!$this->role) {
-			$this->role = new Role(Role::ROLE_DEFAULT);
+			$this->role = Role::registry()->role(Role::ROLE_DEFAULT);
 		}
 		
 		return $this->role;

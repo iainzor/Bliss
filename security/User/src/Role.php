@@ -8,9 +8,30 @@ class Role extends \Acl\Role\Role
 	const ROLE_ADMIN = "admin";
 	
 	/**
+	 * @var RoleRegistry
+	 */
+	private static $registry;
+	
+	/**
 	 * @var string
 	 */
 	protected $defaultPath;
+	
+	/**
+	 * Get or set the global role registry
+	 * 
+	 * @param \User\RoleRegistry $registry
+	 */
+	public static function registry(RoleRegistry $registry = null)
+	{
+		if ($registry !== null) {
+			self::$registry = $registry;
+		}
+		if (!self::$registry) {
+			self::$registry = new RoleRegistry();
+		}
+		return self::$registry;
+	}
 	
 	/**
 	 * Get or set the role's default path

@@ -7,7 +7,6 @@ use Bliss\Module\AbstractModule,
 	View\Partial\Partial,
 	UnifiedUI\Module as UI,
 	Config\PublicConfigInterface,
-	Config\Config,
 	Router\ProviderInterface as RouteProvider,
 	Pages\ProviderInterface as PageProvider;
 
@@ -24,6 +23,11 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	 * @var \User\Session\Manager
 	 */
 	private $sessionManager;
+	
+	/**
+	 * @var RoleRegistry
+	 */
+	private $roleRegistry;
 	
 	/**
 	 * Get the user session
@@ -150,9 +154,44 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 		]);
 	}
 	
-	public function populatePublicConfig(Config $config) 
+	public function populatePublicConfig(\Config\Config $config) 
 	{
 		$session = $this->session();
 		$config->setData($session->user()->toArray());
+	}
+	
+	/**
+	 * Configure multiple user roles
+	 * 
+	 * @param array $roles
+	 * @return RoleRegistry
+	 */
+	public function roles(array $roles = null)
+	{
+		$registry = $this->roleRegistry();
+		
+		if ($roles !== null) {
+			$registry->configure($roles);
+		}
+		return $registry;
+	}
+	
+	/**
+	 * Get or set the role registry
+	 * @param \User\RoleRegistry $registry
+	 * @return type
+	 */
+	public function roleRegistry(RoleRegistry $registry = null)
+	{
+		if ($registry !== null) {
+			$this->roleRegistry = $registry;
+		}
+		if (!$this->roleRegistry) {
+			$this->roleRegistry = new RoleRegistry();
+		}
+		
+		Role::registry($this->roleRegistry);
+		
+		return $this->roleRegistry;
 	}
 }

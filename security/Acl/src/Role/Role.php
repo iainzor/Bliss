@@ -32,4 +32,17 @@ class Role extends Acl implements RoleInterface
 		}
 		return $this->name;
 	}
+	
+	/**
+	 * Override the default merge method to change the role's name
+	 * 
+	 * @param \Acl\AclInterface $acl
+	 */
+	public function merge(\Acl\AclInterface $acl) {
+		parent::merge($acl);
+		
+		if ($acl instanceof Role) {
+			$this->name = $acl->name();
+		}
+	}
 }

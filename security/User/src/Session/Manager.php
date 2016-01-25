@@ -4,8 +4,7 @@ namespace User\Session;
 use User\Db\UsersTable,
 	User\Db\UserSessionsTable,
 	User\User,
-	User\Hasher\HasherInterface,
-	User\Hasher\Blowfish;
+	User\Hasher\HasherInterface;
 
 class Manager
 {

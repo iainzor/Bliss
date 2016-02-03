@@ -65,6 +65,11 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 		return $this->sessionManager;
 	}
 	
+	/**
+	 * Initializes the user's session and attempts to attach an authenticated user
+	 * 
+	 * Once complete, each module in the system that implements UserSessionProcessorInterface will be executed
+	 */
 	public function initSession()
 	{
 		$this->session = new Session\Session();
@@ -73,6 +78,12 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 		if ($this->session->id()) {
 			$manager = $this->sessionManager();
 			$manager->attachUser($this->session);
+		}
+		
+		foreach ($this->app->modules() as $module) {
+			if ($module instanceof UserSessionProcessorInterface) {
+				$module->processUserSession($this->session);
+			}
 		}
 	}
 	

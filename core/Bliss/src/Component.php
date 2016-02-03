@@ -40,7 +40,7 @@ class Component
 	{
 		$refClass = new \ReflectionClass($this);
 		$props = $refClass->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PUBLIC);
-		$data = $this->_properties;
+		$data = [];
 
 		foreach ($props as $refProp) {
 			$name = $refProp->getName();
@@ -56,6 +56,13 @@ class Component
 			}
 			
 			$data[$name] = $this->_parse($name, $value);
+		}
+		
+		// Add custom properties to the exported array
+		foreach ($this->_properties as $name => $value) {
+			if (!isset($data[$name])) {
+				$data[$name] = $this->_parse(null, $value);
+			}
 		}
 		
 		return $data;

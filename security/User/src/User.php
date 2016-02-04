@@ -20,6 +20,11 @@ class User extends ResourceComponent
 	/**
 	 * @var string
 	 */
+	protected $roleId = Role::ROLE_DEFAULT;
+	
+	/**
+	 * @var string
+	 */
 	protected $displayName;
 	
 	/**

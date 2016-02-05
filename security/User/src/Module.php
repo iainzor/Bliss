@@ -10,7 +10,7 @@ use Bliss\Module\AbstractModule,
 	Router\ProviderInterface as RouteProvider,
 	Pages\ProviderInterface as PageProvider;
 
-class Module extends AbstractModule implements InjectorInterface, PublicConfigInterface, RouteProvider, PageProvider
+class Module extends AbstractModule implements InjectorInterface, PublicConfigInterface, RouteProvider
 {
 	const RESOURCE_NAME = "user-module";
 	
@@ -136,33 +136,6 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	{
 		$accountWidget = new Partial($this->resolvePath("layouts/partials/user-menu-widget.html.phtml"));
 		$injectable->inject(UI::AREA_MENU, $accountWidget, -1);
-	}
-	
-	public function initPages(\Pages\Container $root) 
-	{
-		$pages = [
-			[
-				"title" => "Sign In",
-				"path" => "sign-in"
-			], [
-				"title" => "Signing Out",
-				"path" => "sign-out"
-			], [
-				"title" => "Create an Account",
-				"path" => "sign-up"
-			], [
-				"title" => "Account Recovery",
-				"path" => "account/recover"
-			]
-		];
-		
-		$root->add([
-			[
-				"id" => self::RESOURCE_NAME,
-				"isVisible" => false,
-				"pages" => $pages
-			]
-		]);
 	}
 	
 	public function populatePublicConfig(\Config\Config $config) 

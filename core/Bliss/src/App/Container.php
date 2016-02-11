@@ -421,8 +421,11 @@ class Container extends \Bliss\Component
 			if ($module instanceof \Config\PublicConfigInterface) {
 				$config = new \Config\Config();
 				$module->populatePublicConfig($config);
+				$moduleConfig = $config->toArray();
 				
-				$data[$module->name()] = $config->toArray();
+				if (!empty($moduleConfig)) {
+					$data[$module->name()] = $moduleConfig;
+				}
 			}
 		}
 		

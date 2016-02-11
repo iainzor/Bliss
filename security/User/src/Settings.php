@@ -54,7 +54,7 @@ class Settings extends Component
 	 */
 	public function data()
 	{
-		if (!isset($this->data)) {
+		if (!isset($this->data) && $this->user->isActive()) {
 			$table = new Db\UserSettingsTable();
 			$query = $table->select();
 			$query->where([

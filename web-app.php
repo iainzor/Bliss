@@ -78,11 +78,19 @@ class BlissWebApp extends BlissApp
 
 		echo "<h1>Startup Error!</h1>";
 		echo "<h3>". $e->getMessage() ."</h3>";
-
+		
+		$showConsole = $this->error()->showConsole();
+		$showTrace = $this->error()->showTrace();
 		if ($this->debugMode()) {
+			$showConsole = $showTrace = true;
+		}
+
+		if ($showTrace) {
 			echo "<h4>Error Trace</h4>";
 			echo "<pre>". $e->getTraceAsString() ."</pre>";
-
+		}
+		
+		if ($showConsole) {
 			echo "<h4>Execution Log</h4>";
 			echo "<pre>";
 			foreach ($this->logs() as $i => $log) {

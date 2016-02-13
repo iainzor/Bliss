@@ -157,8 +157,9 @@ class Component
 	public function __call($name, array $args = [])
 	{
 		$value = isset($args[0]) ? $args[0] : null;
+		$ref = new \ReflectionClass($this);
 		
-		if (!property_exists($this, $name) && isset($this->_properties[$name])) {
+		if (!$ref->hasProperty($name)) {
 			return $this->getSet($name, $value);
 		}
 		
@@ -190,11 +191,7 @@ class Component
 		$properties = self::convertValueToArray($properties);
 		
 		foreach ($properties as $name => $value) {
-			if (method_exists($component, $name)) {
-				call_user_func([$component, $name], $value);
-			} else {
-				$component->getSet($name, $value);
-			}
+			call_user_func([$component, $name], $value);
 		}
 		
 		return $component;

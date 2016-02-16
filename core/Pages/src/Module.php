@@ -3,10 +3,9 @@ namespace Pages;
 
 use Bliss\Module\AbstractModule,
 	Config\Config,
-	Config\PublicConfigInterface,
 	Router\ProviderInterface as RouteProvider;
 
-class Module extends AbstractModule implements PublicConfigInterface, RouteProvider
+class Module extends AbstractModule implements RouteProvider
 {
 	/**
 	 * @var \Pages\Container
@@ -41,17 +40,6 @@ class Module extends AbstractModule implements PublicConfigInterface, RouteProvi
 		}
 		
 		return $this->root;
-	}
-	
-	/**
-	 * Generate a public configuration object for all
-	 * registered pages
-	 * 
-	 * @param \Config\Config
-	 */
-	public function populatePublicConfig(Config $config) 
-	{
-		$config->setData($this->pages()->toArray());
 	}
 	
 	/**

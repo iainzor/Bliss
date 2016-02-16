@@ -7,8 +7,7 @@ use Bliss\Module\AbstractModule,
 	View\Partial\Partial,
 	UnifiedUI\Module as UI,
 	Config\PublicConfigInterface,
-	Router\ProviderInterface as RouteProvider,
-	Pages\ProviderInterface as PageProvider;
+	Router\ProviderInterface as RouteProvider;
 
 class Module extends AbstractModule implements InjectorInterface, PublicConfigInterface, RouteProvider
 {
@@ -28,6 +27,15 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	 * @var RoleRegistry
 	 */
 	private $roleRegistry;
+
+	/**
+	 * Get the user instance
+	 * 
+	 * @return User
+	 */
+	public function user() {
+		return $this->session()->user();
+	}
 	
 	/**
 	 * Get the user session

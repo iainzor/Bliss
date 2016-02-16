@@ -1,9 +1,9 @@
 <?php
 namespace User;
 
-use Bliss\ResourceComponent;
+use Database\Model;
 
-class User extends ResourceComponent
+class User extends Model\AbstractResourceModel
 {
 	const RESOURCE_NAME = "user";
 	
@@ -104,14 +104,32 @@ class User extends ResourceComponent
 	}
 	
 	/**
+	 * Get or set the user's role Id
+	 * 
+	 * @param int $id
+	 * @return int
+	 */
+	public function roleId($id = null)
+	{
+		return $this->getSet("roleId", $id, "intval");
+	}
+	
+	/**
 	 * Get or set the user's ACL Role.  If one has not been set, an empty ACL Role instance will be created
 	 * 
-	 * @param Role $role
+	 * @param array|Role $role
 	 * @return Role
 	 */
-	public function role(Role $role = null)
+	public function role($role = null)
 	{
 		if ($role !== null) {
+			if (is_array($role)) {
+				$role = Role::factory($role);
+			}
+			if (!($role instanceof Role)) {
+				throw new \UnexpectedValueException("\$role must be a property array or and instance of \\User\\Role");
+			}
+			
 			$this->role = $role;
 		}
 		if (!$this->role) {

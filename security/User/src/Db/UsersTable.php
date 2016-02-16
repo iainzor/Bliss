@@ -2,13 +2,18 @@
 namespace User\Db;
 
 use Database\Table\AbstractTable,
+	Database\Model,
 	User\User;
 
-class UsersTable extends AbstractTable
+class UsersTable extends AbstractTable implements Model\ModelGeneratorInterface
 {
+	use Model\ModelGeneratorTrait;
+	
 	const NAME = "users";
 	
 	public function defaultName() { return self::NAME; }
+	
+	public function createModelInstance() { return new User(); }
 	
 	/**
 	 * Check if an email address exists in the database

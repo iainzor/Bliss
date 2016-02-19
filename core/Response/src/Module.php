@@ -273,6 +273,11 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 			return $modified;
 		}
 		
+		if ($this->expires) {
+			$now = new \DateTime();
+			return $now > $this->expires;
+		}
+		
 		return true;
 	}
 	

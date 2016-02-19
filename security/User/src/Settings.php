@@ -2,7 +2,8 @@
 namespace User;
 
 use Bliss\Component,
-	Bliss\Module\AbstractModule;
+	Bliss\Module\AbstractModule,
+	Database\Query\InsertQuery;
 
 class Settings extends Component
 {
@@ -19,7 +20,12 @@ class Settings extends Component
 	/**
 	 * @var array
 	 */
-	private $data;
+	private $data = [];
+	
+	/**
+	 * @var boolean
+	 */
+	private $isLoaded = false;
 	
 	/**
 	 * Constructor
@@ -48,13 +54,24 @@ class Settings extends Component
 	}
 	
 	/**
+	 * Put a value into the settings instance
+	 * 
+	 * @param string $key
+	 * @param mixed $value
+	 */
+	public function put($key, $value)
+	{
+		$this->data[$key] = $value;
+	}
+	
+	/**
 	 * Get the settings for the current module and user
 	 * 
 	 * @return array
 	 */
 	public function data()
 	{
-		if (!isset($this->data) && $this->user->isActive()) {
+		if (!$this->isLoaded && $this->user->isActive()) {
 			$table = new Db\UserSettingsTable();
 			$query = $table->select();
 			$query->where([
@@ -65,8 +82,32 @@ class Settings extends Component
 			foreach ($query->fetchAll() as $setting) {
 				$this->data[$setting->key()] = $setting->value();
 			}
+			
+			$this->isLoaded = true;
 		}
 		
 		return $this->data;
+	}
+	
+	/**
+	 * Commit the settings to the database
+	 */
+	public function commit()
+	{
+		$table = new Db\UserSettingsTable();
+		$query = new InsertQuery($table->db());
+		$query->into($table);
+		$query->onDuplicateKeyUpdate(["value"]);
+		
+		foreach ($this->data as $key => $value) {
+			$query->addRow([
+				"userId" => $this->user->id(),
+				"moduleName" => $this->module->name(),
+				"key" => $key,
+				"value" => $value
+			]);
+		}
+		
+		$query->execute();
 	}
 }

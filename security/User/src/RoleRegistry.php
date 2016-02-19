@@ -8,25 +8,33 @@ class RoleRegistry
 	 */
 	private $roles = [];
 	
+	public function __construct()
+	{
+		$this->configure([
+			Role::ROLE_GUEST => new GuestRole(),
+			Role::ROLE_DEFAULT => new Role()
+		]);
+	}
+	
 	/**
 	 * Get or set a role directly
 	 * If the role does not exist, it will be created
 	 * 
-	 * @param string $roleName
+	 * @param string $roleId
 	 * @param \User\Role $role
 	 * @return Role
 	 */
-	public function role($roleName, Role $role = null)
+	public function role($roleId, Role $role = null)
 	{
 		if ($role !== null) {
-			$this->roles[$roleName] = $role;
-			echo "Setting {$roleName} to ". get_class($role) ."\n";
+			$this->roles[$roleId] = $role;
 		}
-		if (!isset($this->roles[$roleName])) {
-			$this->roles[$roleName] = new Role($roleName);
-			echo "Created new role {$roleName}\n";
+		if (!isset($this->roles[$roleId])) {
+			$this->roles[$roleId] = Role::factory([
+				"id" => $roleId
+			]);
 		}
-		return $this->roles[$roleName];
+		return $this->roles[$roleId];
 	}
 	
 	/**
@@ -36,8 +44,8 @@ class RoleRegistry
 	 */
 	public function configure(array $roles)
 	{
-		foreach ($roles as $roleName => $role) {
-			$this->configureRole($role, $roleName);
+		foreach ($roles as $id => $role) {
+			$this->configureRole($role, $id);
 		}
 	}
 	
@@ -45,12 +53,12 @@ class RoleRegistry
 	 * Configure a user role
 	 * 
 	 * @param array|Role $role
-	 * @param string $roleName
+	 * @param string $roleId
 	 * @return Role The resulting configured role
 	 * @throws \Exception
 	 * @throws \UnexpectedValueException
 	 */
-	public function configureRole($role, $roleName = null) 
+	public function configureRole($role, $roleId = null) 
 	{
 		if (is_array($role)) {
 			$role = Role::factory($role);
@@ -58,11 +66,12 @@ class RoleRegistry
 			throw new \Exception("\$role must be a configuration array or an instance of \\User\\Role");
 		}
 		
-		if ($roleName !== null) {
-			$role->name($roleName);
+		if ($roleId !== null) {
+			$role->id($roleId);
 		}
-		if (!$role->name()) {
-			throw new \UnexpectedValueException("No role name provided in configuration: ". json_encode($role->toArray()));
+		
+		if (!$role->id()) {
+			//throw new \UnexpectedValueException("No role ID provided in configuration: ". json_encode($role->toArray()));
 		}
 		
 		if (!isset($this->roles[$role->name()])) {

@@ -4,6 +4,7 @@ namespace User;
 class GuestUser extends User
 {
 	protected $isActive = false;
+	protected $roleId = Role::ROLE_GUEST;
 	
 	public function __construct() 
 	{

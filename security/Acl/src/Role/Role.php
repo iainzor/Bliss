@@ -17,7 +17,7 @@ class Role extends Acl implements RoleInterface
 	 */
 	public function __construct($name = null)
 	{
-		$this->name = $name;
+		$this->name($name);
 	}
 	
 	/**

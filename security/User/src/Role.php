@@ -1,11 +1,13 @@
 <?php
 namespace User;
 
-class Role extends \Acl\Role\Role
+use Database\Model\ModelInterface,
+	Acl\Role\Role as BaseRole;
+
+class Role extends BaseRole implements ModelInterface
 {
-	const ROLE_DEFAULT = "default";
-	const ROLE_GUEST = "guest";
-	const ROLE_ADMIN = "admin";
+	const ROLE_DEFAULT = 1;
+	const ROLE_GUEST = 0;
 	
 	/**
 	 * @var RoleRegistry
@@ -13,9 +15,19 @@ class Role extends \Acl\Role\Role
 	private static $registry;
 	
 	/**
+	 * @var int
+	 */
+	protected $id = self::ROLE_DEFAULT;
+	
+	/**
 	 * @var string
 	 */
-	protected $defaultPath;
+	protected $name = "Standard User";
+	
+	/**
+	 * @var string
+	 */
+	protected $defaultPath = "/";
 	
 	/**
 	 * Get or set the global role registry
@@ -31,6 +43,17 @@ class Role extends \Acl\Role\Role
 			self::$registry = new RoleRegistry();
 		}
 		return self::$registry;
+	}
+	
+	/**
+	 * Get or set the ID of the role
+	 * 
+	 * @param int $id
+	 * @return int
+	 */
+	public function id($id = null)
+	{
+		return $this->getSet("id", $id, "intval");
 	}
 	
 	/**

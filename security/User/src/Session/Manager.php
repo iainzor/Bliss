@@ -3,21 +3,13 @@ namespace User\Session;
 
 use User\Db\UsersTable,
 	User\Db\UserSessionsTable,
+	User\Db\UserRolesTable,
 	User\User,
+	User\GuestUser,
 	User\Hasher\HasherInterface;
 
 class Manager
 {
-	/**
-	 * @var \User\Db\UserSessionsTable
-	 */
-	private $sessionDbTable;
-	
-	/**
-	 * @var \User\Db\UsersTable
-	 */
-	private $userDbTable;
-	
 	/**
 	 * @var HasherInterface
 	 */
@@ -26,18 +18,14 @@ class Manager
 	/**
 	 * Constructor
 	 * 
-	 * @param \User\Db\UserSessionsTable $sessionDbTable
-	 * @param \User\Db\UsersTable $userDbTable
 	 * @param HasherInterface
 	 */
-	public function __construct(UserSessionsTable $sessionDbTable, UsersTable $userDbTable, HasherInterface $hasher = null)
+	public function __construct(HasherInterface $hasher = null)
 	{
 		if ($hasher === null) {
 			$hasher = User::passwordHasher();
 		}
 		
-		$this->sessionDbTable = $sessionDbTable;
-		$this->userDbTable = $userDbTable;
 		$this->hasher = $hasher;
 	}
 	
@@ -65,17 +53,19 @@ class Manager
 	public function createSession($email, $password)
 	{
 		$session = new Session();
-		$userRow = $this->userDbTable->find("`email`=:email", [
+		$usersTable = new UsersTable();
+		$query = $usersTable->select(["id", "email", "password"]);
+		$query->where(["email" => ":email"]);
+		$user = $query->fetchRow([
 			":email" => $email
 		]);
 		
-		if (!empty($userRow)) {
-			$user = User::populate(new User(), $userRow);
+		if (!empty($user) && $this->hasher->matches($password, $user->password())) {
+			$session->isValid(true);
+			$session->userId($user->id());
 			
-			if ($this->hasher->matches($password, $user->password())) {
-				$session->user($user);
-				$session->isValid(true);
-			}
+			$this->save($session);
+			$this->attachUser($session);
 		}
 		
 		return $session;
@@ -89,20 +79,25 @@ class Manager
 	 */
 	public function attachUser(Session $session)
 	{
-		$row = $this->sessionDbTable->find("`id` = :id", [
-			":id" => $session->id()
-		]);
+		$sessionsTable = new UserSessionsTable();
+		$usersTable = new UsersTable();
+		$rolesTable = new UserRolesTable();
 		
-		if (!empty($row)) {
-			Session::populate($session, $row);
-			
-			$userRow = $this->userDbTable->find("`id` = :id", [
-				":id" => $session->userId()
-			]);
-			if ($userRow) {
-				$user = User::populate(new User(), $userRow);
-				$session->user($user);
-			}
+		$query = $usersTable->select();
+		$query->join($sessionsTable, "userId", "id")->where([
+			"id" => $session->id()
+		]);
+		$query->hasOne("role", $rolesTable, "roleId", "id");
+		
+		$user = $query->fetchRow();
+		
+		if ($user) {
+			$session->user($user);
+			$session->isValid(true);
+			$user->touch();
+		} else {
+			$session->isValid(false);
+			$session->user(new GuestUser());
 		}
 		
 		return $session;
@@ -112,6 +107,7 @@ class Manager
 	{
 		$session->save();
 		
-		$this->sessionDbTable->insert($session->toBasicArray());
+		$sessionTable = new UserSessionsTable();
+		$sessionTable->insert($session, ["updated"]);
 	}
 }

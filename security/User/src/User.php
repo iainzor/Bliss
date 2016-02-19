@@ -153,6 +153,22 @@ class User extends Model\AbstractResourceModel
 	}
 	
 	/**
+	 * Set the user's last updated time
+	 */
+	public function touch()
+	{
+		if ($this->id()) {
+			$usersTable = new Db\UsersTable();
+			$query = $usersTable->update();
+			$query->values([
+				"updated" => time()
+			]);
+			$query->where(["id" => $this->id()]);
+			$query->execute();
+		}
+	}
+	
+	/**
 	 * Get or set the global password hasher for users
 	 * 
 	 * @param \User\Hasher\HasherInterface $hasher

@@ -6,8 +6,9 @@ use Database\Model\ModelInterface,
 
 class Role extends BaseRole implements ModelInterface
 {
-	const ROLE_DEFAULT = 1;
 	const ROLE_GUEST = 0;
+	const ROLE_DEFAULT = 1;
+	const ROLE_ADMIN = 2;
 	
 	/**
 	 * @var RoleRegistry

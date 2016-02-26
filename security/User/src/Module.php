@@ -128,8 +128,9 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 			"module" => "user",
 			"controller" => "auth",
 			"action" => "sign-out"
-		])->when("/^account\.?([a-z]+)?$/i", [
-			1 => "format"
+		])->when("/^account\/?([a-z0-9-]+)?\.?([a-z]+)?$/i", [
+			1 => "action",
+			2 => "format"
 		], [
 			"module" => "user",
 			"controller" => "account",

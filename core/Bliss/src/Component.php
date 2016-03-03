@@ -9,7 +9,6 @@ class Component
 	const VALUE_STRING = "strval";
 	const VALUE_BOOLEAN = "boolval";
 	
-	
 	private $_properties = [];
 	
 	/**

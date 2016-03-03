@@ -26,6 +26,11 @@ class Resource extends Component implements ResourceInterface
 	protected $contents;
 	
 	/**
+	 * @var int
+	 */
+	protected $expires = null;
+	
+	/**
 	 * Get or set the cache's resource name
 	 * 
 	 * @param string $resourceName
@@ -82,5 +87,23 @@ class Resource extends Component implements ResourceInterface
 		}
 		
 		return $this->contents;
+	}
+	
+	/**
+	 * Get or set the lifetime, if seconds, of the resource
+	 * Defaults to 30 seconds
+	 * 
+	 * @param int $expires
+	 * @return int
+	 */
+	public function expires($expires = null)
+	{
+		if ($expires !== null) {
+			$this->expires = $expires;
+		}
+		if ($this->expires === null) {
+			$this->expires = 30;
+		}
+		return $this->expires;
 	}
 }

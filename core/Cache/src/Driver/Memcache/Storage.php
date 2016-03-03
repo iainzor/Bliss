@@ -1,12 +1,19 @@
 <?php
-namespace Cache\Storage;
+namespace Cache\Driver\Memcache;
 
-class MemcacheStorage implements StorageInterface
+use Cache\Driver\StorageInterface;
+
+class Storage implements StorageInterface
 {
 	/**
 	 * @var \Memcache
 	 */
 	private $memcache;
+	
+	/**
+	 * @var int
+	 */
+	private $defaultLifetime = 30;
 	
 	/**
 	 * Constructor
@@ -30,10 +37,9 @@ class MemcacheStorage implements StorageInterface
 	 * Attempt to get cache from the memcached server
 	 * 
 	 * @param string $hash
-	 * @param \DataTime $expires Optional time of when the content expires
 	 * @return mixed
 	 */
-	public function get($hash, \DateTime $expires = null) 
+	public function get($hash) 
 	{
 		return $this->memcache->get($hash);
 	}
@@ -54,10 +60,14 @@ class MemcacheStorage implements StorageInterface
 	 * 
 	 * @param string $hash
 	 * @param mixed $contents
+	 * @param int $expires Optional unix timestamp of when the content expires
 	 * @return boolean
 	 */
-	public function put($hash, $contents) 
+	public function put($hash, $contents, $expires = null) 
 	{
-		return $this->memcache->set($hash, $contents);
+		$expires = $expires === null ? $this->defaultLifetime : (int) $expires;
+		$res = $this->memcache->set($hash, $contents, 0, $expires);
+		
+		return $res;
 	}
 }

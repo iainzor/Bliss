@@ -1,9 +1,10 @@
 <?php
-namespace Cache\Storage;
+namespace Cache\Driver\File;
 
-use Bliss\FileSystem\File;
+use Cache\Driver\StorageInterface,
+	Bliss\FileSystem\File;
 
-class FileStorage implements StorageInterface
+class Storage implements StorageInterface
 {
 	/**
 	 * @var string

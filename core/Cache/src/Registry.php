@@ -23,35 +23,29 @@ class Registry
 	 * 
 	 * @param \Cache\Storage\StorageInterface $storage
 	 */
-	public function __construct(Storage\StorageInterface $storage)
+	public function __construct(Driver\StorageInterface $storage)
 	{
 		$this->storage = $storage;
 		$this->resourceTemplate = new Resource\Resource();
 	}
 	
 	/**
-	 * Attempt to find a resource stored in the cache.  If one cannot be found
-	 * it will be created, added to the cache and returned
+	 * Create a new cache resource
 	 * 
 	 * @param string $resourceName
-	 * @param int $resourceId
+	 * @param string $resourceId
 	 * @param array $params
-	 * @return \Cache\Resource\ResourceInterface
+	 * @param mixed $contents
+	 * @return Resource\ResourceInterface
 	 */
-	public function findOrCreate($resourceName, $resourceId = null, array $params = [])
+	public function create($resourceName, $resourceId, array $params = [], $contents = null)
 	{
-		$resource = $this->get($resourceName, $resourceId, $params);
-		
-		if ($resource === false) {
-			$resource = $this->generateResource([
-				"resourceName" => $resourceName,
-				"resourceId" => $resourceId,
-				"params" => $params
-			]);
-			$this->put($resource);
-		}
-		
-		return $resource;
+		return $this->generateResource([
+			"resourceName" => $resourceName,
+			"resourceId" => $resourceId,
+			"params" => $params,
+			"contents" => $contents
+		]);
 	}
 	
 	/**
@@ -84,16 +78,16 @@ class Registry
 	 * Save a resource's cache to the registry's storage
 	 * 
 	 * @param \Cache\Resource\ResourceInterface $resource
-	 * @return \Cache\Resource\ResourceInterface
+	 * @param \DateTime $expires The date and time the cache resource expires
+	 * @return boolean TRUE on success, FALSE on failure
 	 */
 	public function put(Resource\ResourceInterface $resource)
 	{
 		$hash = $this->generateHash($resource->resourceName(), $resource->resourceId(), $resource->params());
-		
-		$this->storage->put($hash, $resource->contents());
+		$res = $this->storage->put($hash, $resource->contents(), $resource->expires());
 		$this->hashes[$hash] = $hash;
 		
-		return $resource;
+		return $res;
 	}
 	
 	/**

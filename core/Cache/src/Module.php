@@ -35,7 +35,7 @@ class Module extends AbstractModule
 	public function driver(array $config)
 	{
 		$factory = new Driver\Factory($config);
-		$storage = $factory->storageInstance();
+		$storage = $factory->storageInstance($this->app);
 		
 		$this->registry(
 			new Registry($storage)

@@ -1,16 +1,18 @@
 <?php
 namespace Cache\Driver\Memcache;
 
-use Cache\Driver\StorageFactoryInterface;
+use Cache\Driver\StorageFactoryInterface,
+	Bliss\App;
 
 class StorageFactory implements StorageFactoryInterface
 {
 	/**
+	 * @param App\Container $app
 	 * @param array $options
 	 * @return \Cache\Driver\Memcache\Storage
 	 * @throws \Exception
 	 */
-	public function create(array $options) 
+	public function create(App\Container $app, array $options) 
 	{
 		if (!isset($options[Config::HOST])) {
 			throw new \Exception("No host provided for memcache driver");

@@ -1,7 +1,8 @@
 <?php
 namespace Cache\Driver;
 
-use Cache\Config;
+use Cache\Config,
+	Bliss\App\Container as AppContainer;
 
 class Factory
 {
@@ -30,7 +31,14 @@ class Factory
 		$this->options = isset($config[Config::DRIVER_OPTIONS]) ? $config[Config::DRIVER_OPTIONS] : [];
 	}
 	
-	public function storageInstance()
+	/**
+	 * Generate a new storage instance
+	 * 
+	 * @param \Bliss\App\Container $app
+	 * @return StorageInterface
+	 * @throws \Exception
+	 */
+	public function storageInstance(AppContainer $app)
 	{
 		$factoryClass = __NAMESPACE__ ."\\". ucfirst($this->name) ."\\StorageFactory";
 		if (!class_exists($factoryClass)) {
@@ -42,6 +50,10 @@ class Factory
 			throw new \Exception("Class '{$factoryClass}' must implement \\Cache\\Driver\\StorageFactoryInterface");
 		}
 		
-		return $factory->create($this->options);
+		$storage = $factory->create($app, $this->options);
+		if (!($storage instanceof StorageInterface)) {
+			throw new \Exception("Storage instance returned from {$factoryClass}::create() must be an instance of StorageInterface");
+		}
+		return $storage;
 	}
 }

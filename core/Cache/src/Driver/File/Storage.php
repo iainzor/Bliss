@@ -47,17 +47,22 @@ class Storage implements StorageInterface
 	 * Attempt to load a cached file
 	 * 
 	 * @param string $hash
-	 * @param \DateTime $expires An optional expiration time of the file
 	 * @return mixed Returns FALSE if the file does not exist or is expired, otherwise it returns the file's contents
 	 */
-	public function get($hash, \DateTime $expires = null) 
+	public function get($hash) 
 	{
 		$path = $this->path($hash);
-		if (is_file($path)) {
+		$datapath = $path .".metadata";
+		if (is_file($path) && is_file($datapath)) {
 			$modified = (int) filemtime($path);
+			$metadata = unserialize(file_get_contents($datapath));
+			$expires = time() + $metadata["expires"];
 			
-			if (!isset($expires) || $modified < $expires->getTimestamp()) {
-				return file_get_contents($path);
+			if ($modified < $expires) {
+				return unserialize(file_get_contents($path));
+			} else {
+				unlink($path);
+				unlink($datapath);
 			}
 		}
 		return false;
@@ -68,10 +73,19 @@ class Storage implements StorageInterface
 	 * 
 	 * @param string $hash
 	 * @param string $contents
+	 * @param int $expires
 	 */
-	public function put($hash, $contents) 
+	public function put($hash, $contents, $expires = null) 
 	{
-		$file = new File($this->path($hash), $contents);
+		$filepath = $this->path($hash);
+		$file = new File($filepath, serialize($contents));
 		$file->write();
+		
+		$datapath = $filepath .".metadata";
+		$metadata = [
+			"expires" => $expires
+		];
+		$data = new File($datapath, serialize($metadata));
+		$data->write();
 	}
 }

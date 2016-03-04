@@ -38,7 +38,7 @@ class Registry
 	 * @param mixed $contents
 	 * @return Resource\ResourceInterface
 	 */
-	public function create($resourceName, $resourceId, array $params = [], $contents = null)
+	public function create($resourceName, $resourceId = null, array $params = [], $contents = null)
 	{
 		return $this->generateResource([
 			"resourceName" => $resourceName,

@@ -1,6 +1,8 @@
 <?php
 namespace Cache;
 
+use Bliss\Component;
+
 class Registry
 {
 	/**
@@ -26,7 +28,7 @@ class Registry
 	public function __construct(Driver\StorageInterface $storage)
 	{
 		$this->storage = $storage;
-		$this->resourceTemplate = new Resource\Resource();
+		$this->resourceTemplate = new Resource\Resource($this);
 	}
 	
 	/**
@@ -173,7 +175,10 @@ class Registry
 	 */
 	private function generateResource(array $properties)
 	{
-		$className = get_class($this->resourceTemplate);
-		return $className::factory($properties);
+		$resource = clone $this->resourceTemplate;
+		
+		Component::populate($resource, $properties);
+		
+		return $resource;
 	}
 }

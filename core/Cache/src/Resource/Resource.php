@@ -1,10 +1,16 @@
 <?php
 namespace Cache\Resource;
 
-use Bliss\Component;
+use Bliss\Component,
+	Cache\Registry;
 
 class Resource extends Component implements ResourceInterface 
 {
+	/**
+	 * @var Registry
+	 */
+	private $registry;
+	
 	/**
 	 * @var string
 	 */
@@ -29,6 +35,21 @@ class Resource extends Component implements ResourceInterface
 	 * @var int
 	 */
 	protected $expires = null;
+	
+	/**
+	 * @var boolean
+	 */
+	protected $isExpired = false;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param Registry $registry
+	 */
+	public function __construct(Registry $registry) 
+	{
+		$this->registry = $registry;
+	}
 	
 	/**
 	 * Get or set the cache's resource name
@@ -105,5 +126,42 @@ class Resource extends Component implements ResourceInterface
 			$this->expires = 30;
 		}
 		return $this->expires;
+	}
+	
+	/**
+	 * Check if the cache resource is expired
+	 * 
+	 * @return boolean
+	 */
+	public function isExpired()
+	{
+		return $this->isExpired;
+	}
+	
+	/**
+	 * Save the cache resource to the registry
+	 * 
+	 * @return boolean
+	 */
+	public function save()
+	{
+		return $this->registry->put($this);
+	}
+	
+	/**
+	 * Attempt to load the cache resource and return its contents
+	 * 
+	 * @return mixed
+	 */
+	public function load()
+	{
+		$resource = $this->registry->get($this->resourceName, $this->resourceId, $this->params);
+		if ($resource) {
+			$this->contents($resource->contents());
+			return $resource->contents();
+		} else {
+			$this->isExpired = true;
+			return false;
+		}
 	}
 }

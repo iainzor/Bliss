@@ -28,6 +28,19 @@ class Module extends AbstractModule
 	}
 	
 	/**
+	 * Create a new cache resource
+	 * 
+	 * @param string $resourceName
+	 * @param string $resourceId
+	 * @param array $params
+	 * @return \Cache\Resource\ResourceInterface
+	 */
+	public function create($resourceName, $resourceId, array $params = [])
+	{
+		return $this->registry()->create($resourceName, $resourceId, $params);
+	}
+	
+	/**
 	 * Set the cache driver options and create the registry
 	 * 
 	 * @param array $config

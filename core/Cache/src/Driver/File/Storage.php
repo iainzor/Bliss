@@ -56,9 +56,9 @@ class Storage implements StorageInterface
 		if (is_file($path) && is_file($datapath)) {
 			$modified = (int) filemtime($path);
 			$metadata = unserialize(file_get_contents($datapath));
-			$expires = $modified + $metadata["expires"];
+			$expires = time() - $metadata["expires"];
 			
-			if ($expires < time()) {
+			if ($modified > $expires) {
 				return unserialize(file_get_contents($path));
 			} else {
 				unlink($path);

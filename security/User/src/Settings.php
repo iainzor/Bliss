@@ -1,11 +1,10 @@
 <?php
 namespace User;
 
-use Bliss\Component,
-	Bliss\Module\AbstractModule,
+use Bliss\Module\AbstractModule,
 	Database\Query\InsertQuery;
 
-class Settings extends Component
+class Settings
 {
 	/**
 	 * @var AbstractModule
@@ -65,6 +64,17 @@ class Settings extends Component
 	}
 	
 	/**
+	 * Alias for put()
+	 * 
+	 * @param string $property
+	 * @param mixed $value
+	 */
+	public function set($property, $value = null) 
+	{
+		$this->data[$property] = $value;
+	}
+	
+	/**
 	 * Get the settings for the current module and user
 	 * 
 	 * @return array
@@ -80,7 +90,12 @@ class Settings extends Component
 			]);
 			
 			foreach ($query->fetchAll() as $setting) {
-				$this->data[$setting->key()] = $setting->value();
+				$key = $setting->key();
+				$value = $setting->value();
+				
+				if (!isset($this->data[$key])) {
+					$this->data[$setting->key()] = $setting->value();
+				}
 			}
 			
 			$this->isLoaded = true;
@@ -109,5 +124,14 @@ class Settings extends Component
 		}
 		
 		$query->execute();
+	}
+	
+	/**
+	 * 
+	 * @return type
+	 */
+	public function toArray()
+	{
+		return $this->data();
 	}
 }

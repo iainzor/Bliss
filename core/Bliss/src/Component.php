@@ -160,9 +160,12 @@ class Component
 		
 		if (!$ref->hasProperty($name)) {
 			return $this->getSet($name, $value);
+		} else {
+			$prop = $ref->getProperty($name);
+			if (!$prop->isPrivate()) {
+				throw new \Exception("Unknown method: ". get_class($this) ."::". $name);
+			}
 		}
-		
-		throw new \Exception("Unknown method: ". get_class($this) ."::". $name);
 	}
 	
 	/**

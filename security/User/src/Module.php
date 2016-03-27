@@ -122,6 +122,11 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 			"controller" => "auth",
 			"action" => "sign-in",
 			"element" => "user-login"
+		])->when("/^sign-up\.json$/i", [], [
+			"module" => $this->name(),
+			"controller" => "auth",
+			"action" => "sign-up",
+			"format" => "json"
 		])->when("/^sign-out\.?([a-z]+)?$/i", [
 			1 => "format"
 		], [

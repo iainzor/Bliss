@@ -15,7 +15,17 @@ class User extends Model\AbstractResourceModel
 	/**
 	 * @var string
 	 */
+	protected $username;
+	
+	/**
+	 * @var string
+	 */
 	private $password;
+	
+	/**
+	 * @var boolean 
+	 */
+	private $preservePassword = false;
 	
 	/**
 	 * @var string
@@ -62,17 +72,47 @@ class User extends Model\AbstractResourceModel
 	}
 	
 	/**
+	 * Get or set the user's unique username
+	 * 
+	 * @param string $username
+	 * @return string
+	 */
+	public function username($username = null)
+	{
+		return $this->getSet("username", $username);
+	}
+	
+	/**
 	 * Get or set the user's hashed password
 	 * 
 	 * @param string $password
+	 * @param boolean $hash Whether to hash the password before setting it
 	 * @return string
 	 */
-	public function password($password = null)
+	public function password($password = null, $hash = false)
 	{
 		if ($password !== null) {
+			if ($hash === true) {
+				$password = self::passwordHasher()->hash($password);
+			}
 			$this->password = $password;
 		}
 		return $this->password;
+	}
+	
+	/**
+	 * Get or set whether to preserve the password hash in 
+	 * the exported array
+	 * 
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function preservePassword($flag = null)
+	{
+		if ($flag !== null) {
+			$this->preservePassword = (boolean) $flag;
+		}
+		return $this->preservePassword;
 	}
 	
 	/**
@@ -166,6 +206,22 @@ class User extends Model\AbstractResourceModel
 			$query->where(["id" => $this->id()]);
 			$query->execute();
 		}
+	}
+	
+	/**
+	 * Make alterations to the exported array
+	 * 
+	 * @return array
+	 */
+	public function toArray() 
+	{
+		$data = parent::toArray();
+		
+		if ($this->preservePassword) {
+			$data["password"] = $this->password();
+		}
+		
+		return $data;
 	}
 	
 	/**

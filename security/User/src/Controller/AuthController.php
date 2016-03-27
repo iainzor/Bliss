@@ -2,7 +2,7 @@
 namespace User\Controller;
 
 use Bliss\Controller\AbstractController,
-	User\DbTable as UserDbTable,
+	User\Db\UsersTable,
 	User\Form\SignUpForm;
 
 class AuthController extends AbstractController
@@ -27,14 +27,13 @@ class AuthController extends AbstractController
 		}
 	}
 	
-	public function signUpAction(\Database\Module $db, \Request\Module $request, \User\Module $user)
+	public function signUpAction(\Database\Module $db, \Request\Module $request, \User\Module $userModule)
 	{
 		if ($request->isPost()) {
 			$form = new SignUpForm(
-				new UserDbTable($db->connection())
+				new UsersTable()
 			);
-			$userData = $this->param("user", []);
-			$user = $form->create($userData);
+			$user = $form->create($request->params());
 			
 			if ($user === false) {
 				return [
@@ -42,8 +41,8 @@ class AuthController extends AbstractController
 					"errors" => $form->errors()
 				];
 			} else {
-				$manager = $user->sessionManager();
-				$session = $manager->createSession($user->email(), $userData["password"]);
+				$manager = $userModule->sessionManager();
+				$session = $manager->createSession($user->email(), $user->password(), true);
 				$manager->save($session);
 				
 				return $user;

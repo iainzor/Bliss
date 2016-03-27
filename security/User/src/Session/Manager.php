@@ -48,9 +48,10 @@ class Manager
 	 * 
 	 * @param string $email
 	 * @param string $password
+	 * @param boolean $isHashed Whether the value passed is already hashed
 	 * @return \User\Session\Session
 	 */
-	public function createSession($email, $password)
+	public function createSession($email, $password, $isHashed = false)
 	{
 		$session = new Session();
 		$usersTable = new UsersTable();
@@ -60,12 +61,18 @@ class Manager
 			":email" => $email
 		]);
 		
-		if (!empty($user) && $this->hasher->matches($password, $user->password())) {
-			$session->isValid(true);
+		if (!empty($user)) {
+			$valid = $isHashed === true
+					? $password === $user->password()
+					: $this->hasher->matches($password, $user->password());
+			
+			$session->isValid($valid);
 			$session->userId($user->id());
 			
-			$this->save($session);
-			$this->attachUser($session);
+			if ($valid === true) {
+				$this->save($session);
+				$this->attachUser($session);
+			}
 		}
 		
 		return $session;

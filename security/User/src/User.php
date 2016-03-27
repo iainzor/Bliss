@@ -189,7 +189,7 @@ class User extends Model\AbstractResourceModel
 	 */
 	public function isAllowed($resourceName, $action = null, array $params = [])
 	{
-		return $this->acl()->isAllowed($resourceName, $action, $params);
+		return $this->role()->isAllowed($resourceName, $action, $params);
 	}
 	
 	/**
@@ -241,5 +241,4 @@ class User extends Model\AbstractResourceModel
 		
 		return self::$passwordHasher;
 	}
-			
 }

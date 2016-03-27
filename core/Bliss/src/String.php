@@ -53,8 +53,10 @@ class String
 			$compiled = strtolower($compiled);
 		}
 		
-		$compiled = trim($compiled, "-");
-		$compiled = preg_replace("/". preg_quote($separator) ."+/i", $separator, $compiled);
+		if (!empty($separator)) {
+			$compiled = trim($compiled, "-");
+			$compiled = preg_replace("/". preg_quote($separator) ."+/i", $separator, $compiled);
+		}
 		
 		return $compiled;
 	}

@@ -1,8 +1,15 @@
 <?php
 namespace Bliss;
 
+require_once "ArrayExportTrait.php";
+
 class Component
 {
+	use ArrayExportTrait {
+		ArrayExportTrait::toArray as private baseToArray;
+		ArrayExportTrait::toBasicArray as private baseToBasicArray;
+	}
+	
 	const VALUE_INT = "intval";
 	const VALUE_FLOAT = "floatval";
 	const VALUE_DOUBLE = "doubleval";
@@ -18,7 +25,9 @@ class Component
 	 */
 	public function toArray()
 	{
-		return $this->_toArray();
+		return $this->_addCustomProperties(
+			$this->baseToArray()
+		);
 	}
 	
 	/**
@@ -28,42 +37,24 @@ class Component
 	 */
 	public function toBasicArray()
 	{
-		return $this->_toArray(true);
+		return $this->_addCustomProperties(
+			$this->baseToBasicArray()
+		);
 	}
 	
 	/**
-	 * @param boolean $basic
+	 * Add custom properties to the exported array
+	 * 
+	 * @param array $data
 	 * @return array
 	 */
-	private function _toArray($basic = false)
+	private function _addCustomProperties(array $data)
 	{
-		$refClass = new \ReflectionClass($this);
-		$props = $refClass->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PUBLIC);
-		$data = [];
-
-		foreach ($props as $refProp) {
-			$name = $refProp->getName();
-			
-			if (method_exists($this, $name)) {
-				$value = call_user_func([$this, $name]);
-			} else {
-				$value = $this->{$name};
-			}
-			
-			if ($basic === true && $value instanceof Component) {
-				continue;
-			}
-			
-			$data[$name] = $this->_parse($name, $value);
-		}
-		
-		// Add custom properties to the exported array
 		foreach ($this->_properties as $name => $value) {
 			if (!isset($data[$name])) {
 				$data[$name] = $this->_parse(null, $value);
 			}
 		}
-		
 		return $data;
 	}
 	
@@ -115,34 +106,6 @@ class Component
 		} else {
 			$this->_properties[$property] = $value;
 		}
-	}
-	
-	/**
-	 * Parse a value based on its type
-	 * 
-	 * @param string $name
-	 * @param mixed $value
-	 * @return mixed
-	 */
-	protected function _parse($name, $value)
-	{
-		if (is_object($value) && method_exists($value, "toArray") ) {
-			$newValue = $value->toArray();
-		} else if ($value instanceOf \DateTime) {
-			$newValue = $value->getTimestamp();
-		} else if (method_exists($this, $name)) {
-			$newValue = call_user_func(array($this, $name));
-		} else {
-			$newValue = $value;
-		}
-		
-		if (is_array($newValue)) {
-			foreach ($newValue as $n => $v) {
-				$newValue[$n] = $this->_parse(null, $v);
-			}
-		}
-		
-		return $newValue;
 	}
 	
 	/**

@@ -20,7 +20,7 @@ class User extends Model\AbstractResourceModel
 	/**
 	 * @var string
 	 */
-	private $password;
+	protected $password;
 	
 	/**
 	 * @var boolean 
@@ -217,8 +217,8 @@ class User extends Model\AbstractResourceModel
 	{
 		$data = parent::toArray();
 		
-		if ($this->preservePassword) {
-			$data["password"] = $this->password();
+		if ($this->preservePassword !== true) {
+			unset($data["password"]);
 		}
 		
 		return $data;

@@ -58,16 +58,13 @@ class SignUpForm
 			"isActive" => true
 		]);
 		$user->preservePassword(true);
-		echo "<pre>";
-		print_r($user->toBasicArray());
 		
 		try {
 			$this->userDbTable->insert($user);
 		} catch (\PDOException $e) {
-			print_r($this->userDbTable->db()->logs());
+			throw new \Exception("Could not create user", 500, $e);
 		}
 		
-		exit;
 			
 		$user->preservePassword(false);
 		

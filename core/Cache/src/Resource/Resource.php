@@ -111,7 +111,7 @@ class Resource extends Component implements ResourceInterface
 	}
 	
 	/**
-	 * Get or set the lifetime, if seconds, of the resource
+	 * Get or set the lifetime, in seconds, of the resource.
 	 * Defaults to 30 seconds
 	 * 
 	 * @param int $expires

@@ -1,7 +1,8 @@
 <?php
 namespace Cache\Driver\Memcache;
 
-use Cache\Driver\StorageInterface;
+use Cache\Driver\StorageInterface,
+	Cache\Resource\ResourceInterface;
 
 class Storage implements StorageInterface
 {
@@ -41,7 +42,12 @@ class Storage implements StorageInterface
 	 */
 	public function get($hash) 
 	{
-		return $this->memcache->get($hash);
+		/* @var $resource ResourceInterface */
+		$resource = $this->memcache->get($hash);
+		if ($resource) {
+			return $resource->contents();
+		}
+		return false;
 	}
 	
 	/**
@@ -59,14 +65,13 @@ class Storage implements StorageInterface
 	 * Add a resource's contents to the memcached server
 	 * 
 	 * @param string $hash
-	 * @param mixed $contents
-	 * @param int $expires Optional unix timestamp of when the content expires
+	 * @param ResourceInterface $resource
 	 * @return boolean
 	 */
-	public function put($hash, $contents, $expires = null) 
+	public function put($hash, ResourceInterface $resource) 
 	{
-		$expires = $expires === null ? $this->defaultLifetime : (int) $expires;
-		$res = $this->memcache->set($hash, $contents, 0, $expires);
+		$expires = $resource->expires() ? $resource->expires() : $this->defaultLifetime;
+		$res = $this->memcache->set($hash, $resource, 0, $expires);
 		
 		return $res;
 	}

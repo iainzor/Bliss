@@ -86,7 +86,7 @@ class Registry
 	public function put(Resource\ResourceInterface $resource)
 	{
 		$hash = $this->generateHash($resource->resourceName(), $resource->resourceId(), $resource->params());
-		$res = $this->storage->put($hash, $resource->contents(), $resource->expires());
+		$res = $this->storage->put($hash, $resource);
 		$this->hashes[$hash] = $hash;
 		
 		return $res;

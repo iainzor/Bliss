@@ -2,6 +2,7 @@
 namespace Cache\Driver\File;
 
 use Cache\Driver\StorageInterface,
+	Cache\Resource\ResourceInterface,
 	Bliss\FileSystem\File;
 
 class Storage implements StorageInterface
@@ -52,20 +53,16 @@ class Storage implements StorageInterface
 	public function get($hash) 
 	{
 		$path = $this->path($hash);
-		$datapath = $path .".metadata";
-		if (is_file($path) && is_file($datapath)) {
-			$modified = (int) filectime($path);
-			$metadata = unserialize(file_get_contents($datapath));
-			$expires = $modified + $metadata["expires"];
+		if (is_file($path)) {
+			/* @var $resource ResourceInterface */
+			$resource = unserialize(file_get_contents($path));
+			$modified = filemtime($path);
+			$age = time() - $modified;
 			
-			//var_dump($modified, $expires, time(), $metadata);
-			//exit;
-			
-			if ($expires < time()) {
-				return unserialize(file_get_contents($path));
+			if ($age < $resource->expires()) {
+				return $resource->contents();
 			} else {
 				unlink($path);
-				unlink($datapath);
 			}
 		}
 		return false;
@@ -75,20 +72,12 @@ class Storage implements StorageInterface
 	 * Write contents to the file
 	 * 
 	 * @param string $hash
-	 * @param string $contents
-	 * @param int $expires
+	 * @param ResourceInterface $resource
 	 */
-	public function put($hash, $contents, $expires = null) 
+	public function put($hash, ResourceInterface $resource) 
 	{
 		$filepath = $this->path($hash);
-		$file = new File($filepath, serialize($contents));
+		$file = new File($filepath, serialize($resource));
 		$file->write();
-		
-		$datapath = $filepath .".metadata";
-		$metadata = [
-			"expires" => $expires
-		];
-		$data = new File($datapath, serialize($metadata));
-		$data->write();
 	}
 }

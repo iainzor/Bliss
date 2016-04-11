@@ -9,7 +9,7 @@ use Bliss\Module\AbstractModule,
 	Config\PublicConfigInterface,
 	Router\ProviderInterface as RouteProvider;
 
-class Module extends AbstractModule implements InjectorInterface, PublicConfigInterface, RouteProvider
+class Module extends AbstractModule implements InjectorInterface, PublicConfigInterface, RouteProvider, Settings\SettingsProviderInterface
 {
 	const RESOURCE_NAME = "user-module";
 	
@@ -85,11 +85,22 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 			$manager->attachUser($this->session);
 		}
 		
+		$user = $this->session->user();
+		$settings = $user->settings();
+		
 		foreach ($this->app->modules() as $module) {
 			if ($module instanceof UserSessionProcessorInterface) {
 				$module->processUserSession($this->session);
 			}
+			if ($module instanceof Settings\SettingsProviderInterface) {
+				$moduleSettings = $settings->module($module);
+				$module->defineUserSettings(
+					$moduleSettings->definitions()
+				);
+			}
 		}
+		
+		$settings->load();
 	}
 	
 	public function initRouter(\Router\Module $router) 
@@ -188,5 +199,21 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 		Role::registry($this->roleRegistry);
 		
 		return $this->roleRegistry;
+	}
+	
+	/**
+	 * Define the user settings for the user module
+	 * 
+	 * @param \User\Settings\Definitions $definitions
+	 */
+	public function defineUserSettings(Settings\Definitions $definitions) 
+	{
+		$definitions->set([
+			[
+				"key" => "twoFactorAuth",
+				"defaultValue" => false,
+				"valueParser" => "boolval"
+			]
+		]);
 	}
 }

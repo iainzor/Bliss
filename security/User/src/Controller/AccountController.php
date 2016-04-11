@@ -2,15 +2,39 @@
 namespace User\Controller;
 
 use Bliss\Controller\AbstractController,
-	User\Form\ChangePasswordForm;
+	User\Form\ChangePasswordForm,
+	User\User,
+	User\AbstractSettings;
 
 class AccountController extends AbstractController 
 {
-	public function indexAction(\User\Module $users, \Request\Module $request)
+	/**
+	 * @var User
+	 */
+	private $user;
+	
+	public function init()
 	{
-		$user = $users->session()->user();
+		$this->user = $this->app->call($this, "load");
+	}
+	
+	public function load(\User\Module $userModule)
+	{
+		return $userModule->user();
+	}
+	
+	public function indexAction()
+	{
+		return $this->user;
+	}
+	
+	public function settingsAction(\Request\Module $request)
+	{
+		$moduleName = $request->param("moduleName", "user");
+		$module = $this->app->module($moduleName);
+		$settings = AbstractSettings::create($module, $this->user);
 		
-		return $user;
+		return $settings->data();
 	}
 	
 	public function changePasswordAction(\Request\Module $request, \User\Module $um)

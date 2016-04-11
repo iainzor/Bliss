@@ -48,6 +48,11 @@ class User extends Model\AbstractResourceModel
 	protected $role;
 	
 	/**
+	 * @var Settings\Container
+	 */
+	protected $settings;
+	
+	/**
 	 * @var \User\Hasher\HasherInterface
 	 */
 	private static $passwordHasher;
@@ -190,6 +195,24 @@ class User extends Model\AbstractResourceModel
 	public function isAllowed($resourceName, $action = null, array $params = [])
 	{
 		return $this->role()->isAllowed($resourceName, $action, $params);
+	}
+	
+	/**
+	 * Get or set the user's settings container.  If the user does not have
+	 * a settings container, a new blank container will be created.
+	 * 
+	 * @param \User\Settings\Container $settings
+	 * @return \User\Settings\Container
+	 */
+	public function settings(Settings\Container $settings = null)
+	{
+		if ($settings !== null) {
+			$this->settings = $settings;
+		}
+		if (!$this->settings) {
+			$this->settings = new Settings\Container($this);
+		}
+		return $this->settings;
 	}
 	
 	/**

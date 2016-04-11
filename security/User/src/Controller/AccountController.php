@@ -3,8 +3,7 @@ namespace User\Controller;
 
 use Bliss\Controller\AbstractController,
 	User\Form\ChangePasswordForm,
-	User\User,
-	User\AbstractSettings;
+	User\User;
 
 class AccountController extends AbstractController 
 {
@@ -32,9 +31,9 @@ class AccountController extends AbstractController
 	{
 		$moduleName = $request->param("moduleName", "user");
 		$module = $this->app->module($moduleName);
-		$settings = AbstractSettings::create($module, $this->user);
+		$settings = $this->user->settings()->module($module);
 		
-		return $settings->data();
+		return $settings;
 	}
 	
 	public function changePasswordAction(\Request\Module $request, \User\Module $um)

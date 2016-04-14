@@ -52,6 +52,9 @@ class Container
 	 */
 	public function load()
 	{
+		if (!$this->user->id()) {
+			return;
+		}
 		$table = new UserSettingsTable();
 		$query = $table->select();
 		$query->where([

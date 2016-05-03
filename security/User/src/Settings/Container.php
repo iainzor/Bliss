@@ -25,7 +25,21 @@ class Container
 	 */
 	public function __construct(User $user)
 	{
-		$this->user = $user;
+		$this->user($user);
+	}
+	
+	/**
+	 * Get or set the user the settings belong to
+	 * 
+	 * @param User $user
+	 * @return User
+	 */
+	public function user(User $user = null)
+	{
+		if ($user !== null) {
+			$this->user = $user;
+		}
+		return $this->user;
 	}
 	
 	/**

@@ -70,4 +70,18 @@ class Definition extends Component
 		}
 		return call_user_func($this->valueParser, $value);
 	}
+	
+	/**
+	 * Create a new default Setting instance from the definition
+	 * 
+	 * @return Setting
+	 */
+	public function toSetting()
+	{
+		$setting = new Setting();
+		$setting->key($this->key());
+		$setting->value($this->defaultValue());
+		
+		return $setting;
+	}
 }

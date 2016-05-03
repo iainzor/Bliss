@@ -46,11 +46,28 @@ class ModuleSettings
 	{
 		if ($definitions !== null) {
 			$this->definitions = $definitions;
+			$this->populate($definitions);
 		}
 		if (!$this->definitions) {
 			$this->definitions = new Definitions();
 		}
 		return $this->definitions;
+	}
+	
+	/**
+	 * Populate the settings container with a set of default settings.
+	 * This will only set default settings if they are not already set.
+	 * 
+	 * @param \User\Settings\Definitions $definitions
+	 */
+	public function populate(Definitions $definitions)
+	{
+		foreach ($definitions->getDefaults() as $default) {
+			$key = $default->key();
+			if (!isset($this->settings[$key])) {
+				$this->settings[$key] = $default;
+			}
+		}
 	}
 	
 	/**
@@ -69,6 +86,10 @@ class ModuleSettings
 		}
 		if (!$this->settings) {
 			$this->settings = $this->definitions()->getDefaults();
+		}
+		foreach ($this->settings as $setting) {
+			$setting->userId($this->container->user()->id());
+			$setting->moduleName($this->module->name());
 		}
 		return $this->settings;
 	}
@@ -105,7 +126,7 @@ class ModuleSettings
 			
 			return $def->parse($setting->value());
 		}
-		return null;
+		return $defaultValue;
 	}
 	
 	/**
@@ -116,9 +137,11 @@ class ModuleSettings
 	 */
 	public function setValue($key, $value)
 	{
-		if (isset($this->settings[$key])) {
-			$this->settings[$key]->value($value);
+		if (!isset($this->settings[$key])) {
+			$this->settings[$key] = $this->definitions()->get($key)->toSetting();
 		}
+		
+		$this->settings[$key]->value($value);
 	}
 	
 	/**

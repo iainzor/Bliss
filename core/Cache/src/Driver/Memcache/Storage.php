@@ -31,7 +31,7 @@ class Storage implements StorageInterface
 	 */
 	public function __destruct() 
 	{
-		$this->memcache->close();
+		unset($this->memcache);
 	}
 	
 	/**

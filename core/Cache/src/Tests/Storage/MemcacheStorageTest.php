@@ -1,7 +1,8 @@
 <?php
 namespace Cache\Tests\Storage;
 
-use Cache\Storage\MemcacheStorage,
+use Cache\Driver\Memcache\Storage as MemcacheStorage,
+	Cache\Registry,
 	Cache\Resource\Resource;
 
 class MemcacheStorageTest extends \PHPUnit_Framework_TestCase
@@ -21,15 +22,20 @@ class MemcacheStorageTest extends \PHPUnit_Framework_TestCase
 	
 	public function testIO()
 	{
-		$resource = $this->storage->get("foo");
+		$registry = new Registry($this->storage);
 		
-		$this->assertFalse($resource);
+		$falseResource = $this->storage->get("foo");
 		
-		$this->storage->put("foo", "bar");
+		$this->assertFalse($falseResource);
 		
-		$resource = $this->storage->get("foo");
+		$resource = new Resource($registry, [
+			"contents" => "bar"
+		]);
+		$this->storage->put("foo", $resource);
 		
-		$this->assertEquals("bar", $resource);
+		$resourceContents = $this->storage->get("foo");
+		
+		$this->assertEquals("bar", $resourceContents);
 		
 		$this->storage->delete("foo");
 	}

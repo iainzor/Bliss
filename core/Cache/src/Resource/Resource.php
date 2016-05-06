@@ -45,10 +45,13 @@ class Resource extends Component implements ResourceInterface
 	 * Constructor
 	 * 
 	 * @param Registry $registry
+	 * @param array $params
 	 */
-	public function __construct(Registry $registry) 
+	public function __construct(Registry $registry, array $params = []) 
 	{
 		$this->registry = $registry;
+		
+		self::populate($this, $params);
 	}
 	
 	/**

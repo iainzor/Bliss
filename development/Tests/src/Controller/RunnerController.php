@@ -25,6 +25,10 @@ class RunnerController extends \Bliss\Controller\AbstractController
 		$response = shell_exec($command);
 		$result = new Result($command);
 		$result->parseResponse($response);
+		
+		echo "<pre>";
+		echo $result->toArray()["response"];
+		exit;
 
 		return $result->toArray();
 	}

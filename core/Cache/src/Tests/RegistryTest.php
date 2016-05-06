@@ -19,11 +19,11 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 	{
 		$storage = new MockStorage();
 		$registry = new Registry($storage);
-		$registry->put(Resource::factory([
-			"resourceName" => "my-resource",
-			"resourceId" => 123,
-			"contents" => "hello"
-		]));
+		$resource = new Resource($registry);
+		$resource->resourceName("my-resource");
+		$resource->resourceId(123);
+		$resource->contents("hello");
+		$registry->put($resource);
 		
 		$this->assertEquals("hello", $registry->get("my-resource", 123)->contents());
 	}
@@ -32,16 +32,17 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 	{
 		$storage = new MockStorage();
 		$registry = new Registry($storage);
-		$cache = $registry->put(Resource::factory([
-			"resourceName" => "my-resource",
-			"resourceId" => 123,
-			"contents" => "hello"
-		]));
+		$resource = new Resource($registry);
+		$resource->resourceName("my-resource");
+		$resource->resourceId(123);
+		$resource->contents("hello");
+		
+		$registry->put($resource);
 		
 		$registryB = new Registry($storage);
 		$cacheB = $registryB->get("my-resource", 123);
 		
-		$this->assertEquals($cache->contents(), $cacheB->contents());
+		$this->assertEquals($resource->contents(), $cacheB->contents());
 	}
 	
 	public function testDeleteChildren()
@@ -49,9 +50,8 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 		$storage = new MockStorage();
 		$registry = new Registry($storage);
 		
-		$parent = $registry->findOrCreate("my-resource", 123);
-		$child = $registry->findOrCreate("my-resource", 123, ["foo" => "bar"]);
-		
+		$parent = $registry->create("my-resource", 123);
+		$child = $registry->create("my-resource", 123, ["foo" => "bar"]);
 		
 		$this->assertTrue($registry->exists("my-resource", 123));
 		$this->assertTrue($registry->exists("my-resource", 123, ["foo" => "bar"]));

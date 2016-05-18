@@ -59,7 +59,7 @@ trait ArrayExportTrait
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	protected function _parse($name, $value)
+	private function _parse($name, $value)
 	{
 		if (is_object($value) && method_exists($value, "toArray") ) {
 			$newValue = $value->toArray();

@@ -17,7 +17,7 @@ class Resource extends Component implements ResourceInterface
 	protected $resourceName;
 	
 	/**
-	 * var int
+	 * var string
 	 */
 	protected $resourceId;
 	
@@ -72,13 +72,13 @@ class Resource extends Component implements ResourceInterface
 	/**
 	 * Get or set the cache's unique resource ID
 	 * 
-	 * @param int $resourceId
-	 * @return int
+	 * @param string $resourceId
+	 * @return string
 	 */
 	public function resourceId($resourceId = null) 
 	{
 		if ($resourceId !== null) {
-			$this->resourceId = (int) $resourceId;
+			$this->resourceId = $resourceId;
 		}
 		
 		return $this->resourceId;

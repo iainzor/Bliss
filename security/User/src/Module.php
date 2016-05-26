@@ -42,8 +42,11 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	 * 
 	 * @return \User\Session\SessionInterface
 	 */
-	public function session()
+	public function session(Session\SessionInterface $session = null)
 	{
+		if ($session !== null) {
+			$this->session = $session;
+		}
 		if (!isset($this->session)) {
 			$this->initSession();
 		}
@@ -72,8 +75,6 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	
 	/**
 	 * Initializes the user's session and attempts to attach an authenticated user
-	 * 
-	 * Once complete, each module in the system that implements UserSessionProcessorInterface will be executed
 	 */
 	public function initSession()
 	{
@@ -89,8 +90,9 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 		$settings = $user->settings();
 		
 		foreach ($this->app->modules() as $module) {
-			if ($module instanceof UserSessionProcessorInterface) {
-				$module->processUserSession($this->session);
+			if ($module instanceof BeforeSessionCheckInterface) {
+				$module->beforeSessionCheck($this);
+				//$module->processUserSession($this->session);
 			}
 			if ($module instanceof Settings\SettingsProviderInterface) {
 				$moduleSettings = $settings->module($module);

@@ -92,7 +92,6 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 		foreach ($this->app->modules() as $module) {
 			if ($module instanceof BeforeSessionCheckInterface) {
 				$module->beforeSessionCheck($this);
-				//$module->processUserSession($this->session);
 			}
 			if ($module instanceof Settings\SettingsProviderInterface) {
 				$moduleSettings = $settings->module($module);

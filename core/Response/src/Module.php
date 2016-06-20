@@ -1,8 +1,9 @@
 <?php
 namespace Response;
 
-use Cache\Storage\StorageInterface as CacheStorage,
-	Cache\Storage\FileStorage;
+use Cache\Registry as CacheRegistry,
+	Cache\Driver\File\StorageFactory as CacheStorageFactory,
+	Cache\Driver\File\Config as CacheConfig;
 
 class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInterface
 {
@@ -42,9 +43,9 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	private $cache = false;
 	
 	/**
-	 * @var \Cache\Storage\StorageInterface
+	 * @var \Cache\Registry
 	 */
-	private $cacheStorage;
+	private $cacheRegistry;
 	
 	public function init()
 	{}
@@ -67,10 +68,14 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	 * @param string $extension
 	 * @return \Response\Format\FormatInterface
 	 */
-	public function format($extension = null)
+	public function format($extension, Format\FormatInterface $format = null)
 	{
 		if (!isset($this->formats)) {
 			$this->_compileFormats();
+		}
+		
+		if ($format !== null) {
+			$this->formats->set($extension, $format);
 		}
 		
 		return $this->formats->get($extension);
@@ -178,12 +183,11 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	private function checkCache(\Request\Module $request)
 	{
 		if ($this->cache === true && isset($this->expires)) {
-			$storage = $this->cacheStorage();
-			$hash = $this->cacheId($request->params());
-			$cache = $storage->get($hash, $this->expires);
+			$registry = $this->cacheRegistry();
+			$cached = $registry->get("response", "cache", $request->params());
 			
-			if ($cache) {
-				$this->_send($cache, $request);
+			if ($cached && !$cached->isExpired()) {
+				$this->_send($cached->contents(), $request);
 				exit;
 			}
 		}
@@ -199,9 +203,9 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	private function saveCache($contents, \Request\Module $request)
 	{
 		if ($this->cache === true) {
-			$storage = $this->cacheStorage();
-			$hash = $this->cacheId($request->params());
-			$storage->put($hash, $contents);
+			$registry = $this->cacheRegistry();
+			$resource = $registry->create("response", "cache", $request->params(), $contents);
+			$registry->put($resource);
 		}
 	}
 	
@@ -217,20 +221,26 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	}
 	
 	/**
-	 * Get or set the storage used for caching requests
+	 * Get or set the registry used for caching requests
 	 * 
-	 * @param CacheStorage $storage
-	 * @return CacheStorage
+	 * @param CacheRegistry $registry
+	 * @return CacheRegistry
 	 */
-	public function cacheStorage(CacheStorage $storage = null)
+	public function cacheRegistry(CacheRegistry $registry = null)
 	{
-		if ($storage !== null) {
-			$this->cacheStorage = $storage;
+		if ($registry !== null) {
+			$this->cacheRegistry = $registry;
 		}
-		if (!isset($this->cacheStorage)) {
-			$this->cacheStorage = new FileStorage($this->app->resolvePath("files/response"));
+		if (!isset($this->cacheRegistry)) {
+			$factory = new CacheStorageFactory();
+			$storage = $factory->create($this->app, [
+				CacheConfig::DIRECTORY => "response"
+			]);
+			$registry = new CacheRegistry($storage);
+			
+			$this->cacheRegistry = $registry;
 		}
-		return $this->cacheStorage;
+		return $this->cacheRegistry;
 	}
 	
 	/**
@@ -267,6 +277,11 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 			$modified = strtotime($modifiedHeader) !== $this->lastModified;
 			
 			return $modified;
+		}
+		
+		if ($this->expires) {
+			$now = new \DateTime();
+			return $now > $this->expires;
 		}
 		
 		return true;
@@ -327,7 +342,6 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 		header("{$protocol} {$this->code}");
 		
 		echo $contents;
-		exit;
 	}
 	
 	/**

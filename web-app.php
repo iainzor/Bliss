@@ -1,5 +1,5 @@
 <?php
-require_once "core/Bliss/src/App/Container.php";
+include "bliss-app.php";
 
 /**
  * # Core modules
@@ -20,46 +20,20 @@ require_once "core/Bliss/src/App/Container.php";
  * # Authentication Modules
  * @method \Acl\Module acl() ACL module
  */
-class BlissWebApp extends \Bliss\App\Container
+class BlissWebApp extends BlissApp
 {
-	private $startTime;
-	
-	public function __construct($name, $rootPath) 
-	{
-		parent::__construct($name, $rootPath);
-		
-		$this->startTime = microtime(true);
-		
-		set_exception_handler([$this, "startupExceptionHandler"]);
-	}
 	/**
 	 * @param string $name
 	 * @param string $rootPath
+	 * @param string $environment
 	 * @return BlissWebApp
 	 */
-	public static function create($name, $rootPath, $environment = self::ENV_PRODUCTION)
+	public static function create($name, $rootPath, $environment = self::ENV_PRODUCTION) 
 	{
-		date_default_timezone_set("UTC");
-		error_reporting(E_ALL);
-		ini_set("display_errors", true);
-		ini_set("display_startup_errors", true);
-		
-		if (session_id() === "") {
-			session_start();
-		}
-		
-		// Create the application container
-		$instance = new self($name, $rootPath);
-		$instance->environment($environment);
-		$instance->autoloader()->registerNamespace("Bliss", __DIR__ ."/core/Bliss/src");
-		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/core");
+		$instance = parent::create($name, $rootPath, $environment);
 		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/web");
 		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/security");
 		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/vendors");
-		
-		if ($environment !== self::ENV_PRODUCTION) {
-			$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/development");
-		}
 		
 		return $instance;
 	}
@@ -104,11 +78,19 @@ class BlissWebApp extends \Bliss\App\Container
 
 		echo "<h1>Startup Error!</h1>";
 		echo "<h3>". $e->getMessage() ."</h3>";
-
+		
+		$showConsole = $this->error()->showConsole();
+		$showTrace = $this->error()->showTrace();
 		if ($this->debugMode()) {
+			$showConsole = $showTrace = true;
+		}
+
+		if ($showTrace) {
 			echo "<h4>Error Trace</h4>";
 			echo "<pre>". $e->getTraceAsString() ."</pre>";
-
+		}
+		
+		if ($showConsole) {
 			echo "<h4>Execution Log</h4>";
 			echo "<pre>";
 			foreach ($this->logs() as $i => $log) {

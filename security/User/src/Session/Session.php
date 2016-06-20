@@ -1,13 +1,14 @@
 <?php
 namespace User\Session;
 
-use Bliss\Component,
+use Database\Model\AbstractResourceModel,
 	User\User,
 	User\GuestUser;
 
-class Session extends Component implements SessionInterface
+class Session extends AbstractResourceModel implements SessionInterface
 {
 	const KEY = "USER_SESSION";
+	const RESOURCE_NAME = "user-session";
 	
 	private $key = self::KEY;
 	
@@ -27,14 +28,14 @@ class Session extends Component implements SessionInterface
 	protected $isValid = false;
 	
 	/**
-	 * @var int
-	 */
-	protected $created;
-	
-	/**
 	 * @var \User\User
 	 */
 	protected $user;
+	
+	/**
+	 * @return string
+	 */
+	public function getResourceName() { return self::RESOURCE_NAME; }
 	
 	/**
 	 * Set the key used when saving the session
@@ -112,23 +113,6 @@ class Session extends Component implements SessionInterface
 	}
 	
 	/**
-	 * Get or set the UNIX timestamp of when the session was created
-	 * 
-	 * @param int $created
-	 * @return int
-	 */
-	public function created($created = null)
-	{
-		if ($created !== null) {
-			$this->created = (int) $created;
-		}
-		if (!isset($this->created)) {
-			$this->created = time();
-		}
-		return $this->created;
-	}
-	
-	/**
 	 * Attempt to load the session
 	 */
 	public function load()
@@ -153,5 +137,6 @@ class Session extends Component implements SessionInterface
 	public function delete() 
 	{
 		unset($_SESSION[$this->key]);
+		$this->user = new GuestUser();
 	}
 }

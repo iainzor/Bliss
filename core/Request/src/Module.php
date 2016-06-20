@@ -21,7 +21,7 @@ class Module extends \Bliss\Module\AbstractModule
 	/**
 	 * @var array
 	 */
-	private $params;
+	private $params = [];
 	
 	/**
 	 * @var string

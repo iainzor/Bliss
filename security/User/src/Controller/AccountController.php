@@ -2,15 +2,59 @@
 namespace User\Controller;
 
 use Bliss\Controller\AbstractController,
-	User\Nav;
+	User\Form\ChangePasswordForm,
+	User\User;
 
 class AccountController extends AbstractController 
 {
-	public function indexAction(\User\Module $users, \Request\Module $request)
+	/**
+	 * @var User
+	 */
+	private $user;
+	
+	public function init()
 	{
-		$user = $users->session()->user();
-		$user->set("nav", new Nav($user, $request));
+		$this->user = $this->app->call($this, "load");
+	}
+	
+	public function load(\User\Module $userModule)
+	{
+		return $userModule->user();
+	}
+	
+	public function indexAction()
+	{
+		return $this->user;
+	}
+	
+	public function settingsAction(\Request\Module $request)
+	{
+		$moduleName = $request->param("moduleName", "user");
+		$module = $this->app->module($moduleName);
+		$settings = $this->user->settings()->module($module);
 		
-		return $user;
+		return $settings;
+	}
+	
+	public function changePasswordAction(\Request\Module $request, \User\Module $um)
+	{
+		if (!$request->isPost()) {
+			throw new \Exception("Only POST requests are allowed");
+		}
+		
+		$user = $um->user();
+		$form = new ChangePasswordForm($user);
+		$response = [
+			"result" => "success",
+			"form" => $form
+		];
+		
+		if ($form->isValid($request)) {
+			$form->execute();
+		} else {
+			$response["result"] = "error";
+		}
+		
+		return $response;
 	}
 }

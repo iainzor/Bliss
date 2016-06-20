@@ -5,7 +5,9 @@ use User\Session\Manager,
 	User\Db\UsersTable as UserDbTable,
 	User\Db\UserSessionsTable as SessionDbTable,
 	User\User,
-	Database\PDO;
+	Database\PDO,
+	Database\Registry,
+	Database\Table\AbstractTable;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,6 +28,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 		$db = new PDO("sqlite::memory:", null, null, [
 			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
 		]);
+		$registry = new Registry();
+		$registry->defaultConnection($db);
+		AbstractTable::dbRegistry($registry);
+		
 		$db->driver("mysql");
 		$db->schemaName("");
 		$db->exec("
@@ -49,7 +55,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 			":displayName" => "Johny Doughburg"
 		]);
 		
-		self::$manager = new Manager($sessionDbTable, $userDbTable, $hasher);
+		self::$manager = new Manager($hasher);
 	}
 	
 	public function testBadCredentials()

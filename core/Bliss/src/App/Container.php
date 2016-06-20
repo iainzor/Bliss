@@ -82,7 +82,9 @@ class Container extends \Bliss\Component
 		$this->autoloader = new AutoLoader();
 		$this->moduleRegistry = new ModuleRegistry($this);
 		
-		if (!is_dir($this->resolvePath("files"))) {
+		# ToDo - Create FileSysytem module
+		$filesDir = $this->resolvePath("files");
+		if (!is_dir($filesDir) && !mkdir($filesDir, 0777, true)) {
 			throw new \Exception("Directory could not be found: ". $this->resolvePath("files"));
 		}
 	}
@@ -232,7 +234,7 @@ class Container extends \Bliss\Component
 	 * Attempt to execute a Route
 	 * 
 	 * @param array $params
-	 * @return string
+	 * @return \Response\Module
 	 */
 	public function execute(array $params = [])
 	{
@@ -263,6 +265,7 @@ class Container extends \Bliss\Component
 		}
 
 		$response->send($request, $this->view());
+		return $response;
 	}
 	
 	/**
@@ -331,8 +334,9 @@ class Container extends \Bliss\Component
 	 * 
 	 * @param object|callable $object
 	 * @param string $method
+	 * @param array $params Optional; a [key=>value] pair used to inject into the function being called
 	 */
-	public function call($object, $method = null)
+	public function call($object, $method = null, array $params = null)
 	{
 		if (is_callable($object)) {
 			$func = $object;
@@ -346,11 +350,16 @@ class Container extends \Bliss\Component
 		$args = [];
 		
 		foreach ($refParams as $refParam) {
-			$className = $refParam->getClass()->getName();
-			if (preg_match("/^([a-z0-9]+).module$/i", $className, $matches)) {
+			$paramName = $refParam->getName();
+			$class = $refParam->getClass();
+			$className = $class ? $class->getName() : null;
+			
+			if ($className && preg_match("/^([a-z0-9]+).module$/i", $className, $matches)) {
 				$args[] = $this->module($matches[1]);
-			} else {
-				throw new \InvalidArgumentException("Could not inject parameter '\${$refParam->getName()}' into '{$method}'");
+			} else if (isset($params[$paramName])) {
+				$args[] = $params[$paramName];
+			} else if (!$refParam->isDefaultValueAvailable()) {
+				throw new \InvalidArgumentException("Could not inject required parameter '\${$paramName}' into '{$method}'");
 			}
 		}
 		
@@ -412,8 +421,11 @@ class Container extends \Bliss\Component
 			if ($module instanceof \Config\PublicConfigInterface) {
 				$config = new \Config\Config();
 				$module->populatePublicConfig($config);
+				$moduleConfig = $config->toArray();
 				
-				$data[$module->name()] = $config->toArray();
+				if (!empty($moduleConfig)) {
+					$data[$module->name()] = $moduleConfig;
+				}
 			}
 		}
 		

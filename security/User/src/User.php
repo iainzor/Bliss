@@ -1,10 +1,9 @@
 <?php
 namespace User;
 
-use Bliss\ResourceComponent,
-	Acl\Acl;
+use Database\Model;
 
-class User extends ResourceComponent
+class User extends Model\AbstractResourceModel
 {
 	const RESOURCE_NAME = "user";
 	
@@ -16,7 +15,22 @@ class User extends ResourceComponent
 	/**
 	 * @var string
 	 */
-	private $password;
+	protected $username;
+	
+	/**
+	 * @var string
+	 */
+	protected $password;
+	
+	/**
+	 * @var boolean 
+	 */
+	private $preservePassword = false;
+	
+	/**
+	 * @var string
+	 */
+	protected $roleId = Role::ROLE_DEFAULT;
 	
 	/**
 	 * @var string
@@ -29,9 +43,14 @@ class User extends ResourceComponent
 	protected $isActive = true;
 	
 	/**
-	 * @var \Acl\Acl
+	 * @var Role 
 	 */
-	protected $acl;
+	protected $role;
+	
+	/**
+	 * @var Settings\Container
+	 */
+	protected $settings;
 	
 	/**
 	 * @var \User\Hasher\HasherInterface
@@ -58,17 +77,47 @@ class User extends ResourceComponent
 	}
 	
 	/**
+	 * Get or set the user's unique username
+	 * 
+	 * @param string $username
+	 * @return string
+	 */
+	public function username($username = null)
+	{
+		return $this->getSet("username", $username);
+	}
+	
+	/**
 	 * Get or set the user's hashed password
 	 * 
 	 * @param string $password
+	 * @param boolean $hash Whether to hash the password before setting it
 	 * @return string
 	 */
-	public function password($password = null)
+	public function password($password = null, $hash = false)
 	{
 		if ($password !== null) {
+			if ($hash === true) {
+				$password = self::passwordHasher()->hash($password);
+			}
 			$this->password = $password;
 		}
 		return $this->password;
+	}
+	
+	/**
+	 * Get or set whether to preserve the password hash in 
+	 * the exported array
+	 * 
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function preservePassword($flag = null)
+	{
+		if ($flag !== null) {
+			$this->preservePassword = (boolean) $flag;
+		}
+		return $this->preservePassword;
 	}
 	
 	/**
@@ -100,21 +149,39 @@ class User extends ResourceComponent
 	}
 	
 	/**
-	 * Get or set the user's ACL.  If one has not been set, an empty ACL instance will be created
+	 * Get or set the user's role Id
 	 * 
-	 * @param Acl $acl
-	 * @return Acl
+	 * @param int $id
+	 * @return int
 	 */
-	public function acl(Acl $acl = null)
+	public function roleId($id = null)
 	{
-		if ($acl !== null) {
-			$this->acl = $acl;
+		return $this->getSet("roleId", $id, "intval");
+	}
+	
+	/**
+	 * Get or set the user's ACL Role.  If one has not been set, an empty ACL Role instance will be created
+	 * 
+	 * @param array|Role $role
+	 * @return Role
+	 */
+	public function role($role = null)
+	{
+		if ($role !== null) {
+			if (is_array($role)) {
+				$role = Role::factory($role);
+			}
+			if (!($role instanceof Role)) {
+				throw new \UnexpectedValueException("\$role must be a property array or and instance of \\User\\Role");
+			}
+			
+			$this->role = $role;
 		}
-		if (!$this->acl) {
-			$this->acl = new Acl();
+		if (!$this->role) {
+			$this->role = Role::registry()->role(Role::ROLE_DEFAULT);
 		}
 		
-		return $this->acl;
+		return $this->role;
 	}
 	
 	/**
@@ -127,7 +194,57 @@ class User extends ResourceComponent
 	 */
 	public function isAllowed($resourceName, $action = null, array $params = [])
 	{
-		return $this->acl()->isAllowed($resourceName, $action, $params);
+		return $this->role()->isAllowed($resourceName, $action, $params);
+	}
+	
+	/**
+	 * Get or set the user's settings container.  If the user does not have
+	 * a settings container, a new blank container will be created.
+	 * 
+	 * @param \User\Settings\Container $settings
+	 * @return \User\Settings\Container
+	 */
+	public function settings(Settings\Container $settings = null)
+	{
+		if ($settings !== null) {
+			$this->settings = $settings;
+		}
+		if (!$this->settings) {
+			$this->settings = new Settings\Container($this);
+		}
+		return $this->settings;
+	}
+	
+	/**
+	 * Set the user's last updated time
+	 */
+	public function touch()
+	{
+		if ($this->id()) {
+			$usersTable = new Db\UsersTable();
+			$query = $usersTable->update();
+			$query->values([
+				"updated" => time()
+			]);
+			$query->where(["id" => $this->id()]);
+			$query->execute();
+		}
+	}
+	
+	/**
+	 * Make alterations to the exported array
+	 * 
+	 * @return array
+	 */
+	public function toArray() 
+	{
+		$data = parent::toArray();
+		
+		if ($this->preservePassword !== true) {
+			unset($data["password"]);
+		}
+		
+		return $data;
 	}
 	
 	/**
@@ -147,5 +264,4 @@ class User extends ResourceComponent
 		
 		return self::$passwordHasher;
 	}
-			
 }

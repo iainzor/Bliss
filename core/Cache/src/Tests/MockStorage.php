@@ -1,7 +1,8 @@
 <?php
 namespace Cache\Tests;
 
-use Cache\Storage\StorageInterface;
+use Cache\Driver\StorageInterface,
+	Cache\Resource\ResourceInterface;
 
 class MockStorage implements StorageInterface
 {
@@ -14,9 +15,9 @@ class MockStorage implements StorageInterface
 		return $cache;
 	}
 
-	public function put($hash, $contents) 
+	public function put($hash, ResourceInterface $resource) 
 	{
-		$this->cache[$hash] = $contents;
+		$this->cache[$hash] = $resource;
 	}
 	
 	public function delete($hash) {

@@ -1,17 +1,23 @@
 <?php
 namespace Cache\Resource;
 
-use Bliss\Component;
+use Bliss\Component,
+	Cache\Registry;
 
 class Resource extends Component implements ResourceInterface 
 {
+	/**
+	 * @var Registry
+	 */
+	private $registry;
+	
 	/**
 	 * @var string
 	 */
 	protected $resourceName;
 	
 	/**
-	 * var int
+	 * var string
 	 */
 	protected $resourceId;
 	
@@ -24,6 +30,29 @@ class Resource extends Component implements ResourceInterface
 	 * @var string
 	 */
 	protected $contents;
+	
+	/**
+	 * @var int
+	 */
+	protected $expires = null;
+	
+	/**
+	 * @var boolean
+	 */
+	protected $isExpired = false;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param Registry $registry
+	 * @param array $params
+	 */
+	public function __construct(Registry $registry, array $params = []) 
+	{
+		$this->registry = $registry;
+		
+		self::populate($this, $params);
+	}
 	
 	/**
 	 * Get or set the cache's resource name
@@ -43,13 +72,13 @@ class Resource extends Component implements ResourceInterface
 	/**
 	 * Get or set the cache's unique resource ID
 	 * 
-	 * @param int $resourceId
-	 * @return int
+	 * @param string $resourceId
+	 * @return string
 	 */
 	public function resourceId($resourceId = null) 
 	{
 		if ($resourceId !== null) {
-			$this->resourceId = (int) $resourceId;
+			$this->resourceId = $resourceId;
 		}
 		
 		return $this->resourceId;
@@ -82,5 +111,60 @@ class Resource extends Component implements ResourceInterface
 		}
 		
 		return $this->contents;
+	}
+	
+	/**
+	 * Get or set the lifetime, in seconds, of the resource.
+	 * Defaults to 30 seconds
+	 * 
+	 * @param int $expires
+	 * @return int
+	 */
+	public function expires($expires = null)
+	{
+		if ($expires !== null) {
+			$this->expires = $expires;
+		}
+		if ($this->expires === null) {
+			$this->expires = 30;
+		}
+		return $this->expires;
+	}
+	
+	/**
+	 * Check if the cache resource is expired
+	 * 
+	 * @return boolean
+	 */
+	public function isExpired()
+	{
+		return $this->isExpired;
+	}
+	
+	/**
+	 * Save the cache resource to the registry
+	 * 
+	 * @return boolean
+	 */
+	public function save()
+	{
+		return $this->registry->put($this);
+	}
+	
+	/**
+	 * Attempt to load the cache resource and return its contents
+	 * 
+	 * @return mixed
+	 */
+	public function load()
+	{
+		$resource = $this->registry->get($this->resourceName, $this->resourceId, $this->params);
+		if ($resource) {
+			$this->contents($resource->contents());
+			return $resource->contents();
+		} else {
+			$this->isExpired = true;
+			return false;
+		}
 	}
 }

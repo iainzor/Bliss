@@ -15,6 +15,11 @@ class Result extends \Bliss\Component
 	/**
 	 * @var string
 	 */
+	protected $command;
+	
+	/**
+	 * @var string
+	 */
 	protected $result = self::RESULT_UNKNOWN;
 	
 	protected $counts = [
@@ -22,6 +27,16 @@ class Result extends \Bliss\Component
 		"assertions" => 0,
 		"failures" => 0
 	];
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param string $command
+	 */
+	public function __construct($command = null)
+	{
+		$this->command = $command;
+	}
 	
 	/**
 	 * Parse a response string
@@ -70,6 +85,7 @@ class Result extends \Bliss\Component
 	
 	public function toArray() {
 		return array_merge(parent::toArray(), [
+			"command" => $this->command,
 			"summary" => $this->summary()
 		]);
 	}

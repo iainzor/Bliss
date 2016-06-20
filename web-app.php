@@ -46,7 +46,11 @@ class BlissWebApp extends BlissApp
 			$baseUrl = $baseMatches[1] ."/";
 		}
 		
-		$requestUri = preg_replace("/^([^\?]+).*/i", "$1", substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl)));
+		$_uri = filter_input(INPUT_SERVER, "REQUEST_URI");
+		if ($_uri === null) {
+			$_uri = filter_var($_SERVER["REQUEST_URI"]);
+		}
+		$requestUri = preg_replace("/^([^\?]+).*/i", "$1", substr($_uri, strlen($baseUrl)));
 		
 		/*
 		echo "<pre>";

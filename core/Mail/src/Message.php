@@ -23,6 +23,11 @@ class Message extends ResourceComponent
 	protected $parentUid;
 	
 	/**
+	 * @var array
+	 */
+	protected $references = [];
+	
+	/**
 	 * @var string
 	 */
 	protected $subject;
@@ -84,6 +89,31 @@ class Message extends ResourceComponent
 	public function parentUid($uid = null)
 	{
 		return $this->getSet("parentUid", $uid, self::VALUE_STRING);
+	}
+	
+	/**
+	 * Get or set the list of message UIDs that this message references
+	 * 
+	 * @param array $uids
+	 * @return array
+	 */
+	public function references(array $uids = null)
+	{
+		if ($uids !== null) {
+			$this->references = [];
+			
+			foreach ($uids as $uid) {
+				if (!empty(trim($uid))) {
+					$this->references[] = $uid;
+				}
+			}
+		}
+		
+		if ($this->parentUid) {
+			$this->references[] = $this->parentUid;
+		}
+		
+		return $this->references;
 	}
 	
 	/**

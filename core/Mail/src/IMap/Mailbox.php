@@ -1,8 +1,13 @@
 <?php
 namespace Mail\IMap;
 
+use Mail\Message;
+
 class Mailbox
 {
+	const SORT_ASC = 1;
+	const SORT_DESC = 2;
+	
 	/**
 	 * @var string
 	 */
@@ -24,6 +29,11 @@ class Mailbox
 	 * @var resource
 	 */
 	private $stream;
+	
+	/**
+	 * @var int
+	 */
+	private $sortDir = self::SORT_ASC;
 	
 	/**
 	 * Constructor
@@ -90,7 +100,27 @@ class Mailbox
 			}
 		}
 		
+		usort($messages, [$this, "sort"]);
+		
 		return $messages;
+	}
+	
+	/**
+	 * Message used to sort messages according to the mailbox ordering
+	 * 
+	 * @param Message $a
+	 * @param Message $b
+	 * @return int
+	 */
+	public function sort(Message $a, Message $b)
+	{
+		$up = $this->sortDir === self::SORT_ASC ? 1 : -1;
+		$down = $this->sortDir === self::SORT_ASC ? -1 : 1;
+		
+		if ($a->created() === $b->created()) {
+			return 0;
+		}
+		return $a->created() > $b->created() ? $up : $down;
 	}
 	
 	/**

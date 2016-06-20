@@ -31,10 +31,17 @@ class MessageFactory
 	{
 		$headers = $this->mailbox->messageHeaders($messageNumber);
 		$message = new Message($headers->message_id);
+		$date = new \DateTime($headers->date);
+		
 		$message->parentUid(!empty($headers->in_reply_to) ? $headers->in_reply_to : null);
 		$message->subject($headers->subject);
-		$message->created($headers->udate);
+		$message->created($date->getTimestamp());
 		$message->size($headers->Size);
+		
+		if (!empty($headers->references)) {
+			preg_match_all("/(<[^>]+>)/", $headers->references, $matches);
+			$message->references($matches[1]);
+		}
 		
 		$this->populateIdentities($message, $headers);
 		$this->populateBody($message, $messageNumber);

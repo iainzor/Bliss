@@ -40,8 +40,12 @@ class BlissWebApp extends BlissApp
 	
 	public function run()
 	{
+		$baseUrl = "/";
 		$baseMatch = preg_match("/^(.*)\/((.+)\.php)$/i", filter_input(INPUT_SERVER, "SCRIPT_NAME"), $baseMatches);
-		$baseUrl = $baseMatches[1] ."/";
+		if (isset($baseMatches[1])) {
+			$baseUrl = $baseMatches[1] ."/";
+		}
+		
 		$requestUri = preg_replace("/^([^\?]+).*/i", "$1", substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl)));
 		
 		/*

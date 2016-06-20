@@ -339,7 +339,7 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 		$format = $this->format($request->getFormat());
 		
 		header("Content-type: ". $format->mime());
-		header("{$protocol} {$this->code}");
+		http_response_code($this->code);
 		
 		echo $contents;
 	}

@@ -2,14 +2,15 @@
 namespace User;
 
 use Bliss\Module\AbstractModule,
-	View\Partial\InjectorInterface,
-	View\Partial\InjectableInterface,
-	View\Partial\Partial,
-	UnifiedUI\Module as UI,
+	Bliss\App\BeforeModuleExecuteInterface,
 	Config\PublicConfigInterface,
 	Router\ProviderInterface as RouteProvider;
 
-class Module extends AbstractModule implements InjectorInterface, PublicConfigInterface, RouteProvider, Settings\SettingsProviderInterface
+class Module extends AbstractModule implements 
+	BeforeModuleExecuteInterface,
+	PublicConfigInterface, 
+	RouteProvider, 
+	Settings\SettingsProviderInterface
 {
 	const RESOURCE_NAME = "user-module";
 	
@@ -27,13 +28,26 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	 * @var RoleRegistry
 	 */
 	private $roleRegistry;
-
+	
+	/**
+	 * Initialize the session before executing active module
+	 * 
+	 * @param AbstractModule $module
+	 */
+	public function beforeModuleExecute(AbstractModule $module) 
+	{
+		if (!$this->session) {
+			$this->initSession();
+		}
+	}
+	
 	/**
 	 * Get the user instance
 	 * 
 	 * @return User
 	 */
-	public function user() {
+	public function user() 
+	{
 		return $this->session()->user();
 	}
 	
@@ -77,9 +91,15 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 	 * Initializes the user's session and attempts to attach an authenticated user
 	 */
 	public function initSession()
-	{
+	{	
 		$this->session = new Session\Session();
 		$this->session->load();
+		
+		foreach ($this->app->modules() as $module) {
+			if ($module instanceof BeforeSessionCheckInterface) {
+				$module->beforeSessionCheck($this);
+			}
+		}
 		
 		if ($this->session->id()) {
 			$manager = $this->sessionManager();
@@ -90,9 +110,6 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 		$settings = $user->settings();
 		
 		foreach ($this->app->modules() as $module) {
-			if ($module instanceof BeforeSessionCheckInterface) {
-				$module->beforeSessionCheck($this);
-			}
 			if ($module instanceof Settings\SettingsProviderInterface) {
 				$moduleSettings = $settings->module($module);
 				$module->defineUserSettings(
@@ -153,12 +170,6 @@ class Module extends AbstractModule implements InjectorInterface, PublicConfigIn
 			"controller" => "account",
 			"action" => "index"
 		]);
-	}
-	
-	public function initPartialInjector(InjectableInterface $injectable) 
-	{
-		$accountWidget = new Partial($this->resolvePath("layouts/partials/user-menu-widget.html.phtml"));
-		$injectable->inject(UI::AREA_MENU, $accountWidget, -1);
 	}
 	
 	public function populatePublicConfig(\Config\Config $config) 

@@ -249,6 +249,13 @@ class Container extends \Bliss\Component
 		
 		$moduleName = $request->getModule();
 		$module = $this->module($moduleName);
+		
+		foreach ($this->modules() as $m) {
+			if ($m instanceof BeforeModuleExecuteInterface) {
+				$m->beforeModuleExecute($module);
+			}
+		}
+		
 		$this->log("Executing module: {$moduleName}");
 		$result = $module->execute($request);
 		

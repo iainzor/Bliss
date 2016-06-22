@@ -30,9 +30,8 @@ class MessageFactory
 	public function create($messageNumber)
 	{
 		$headers = $this->mailbox->messageHeaders($messageNumber);
-		$message = new Message($headers->message_id);
 		$date = new \DateTime($headers->date);
-		
+		$message = new Message($headers->message_id);
 		$message->parentUid(!empty($headers->in_reply_to) ? $headers->in_reply_to : null);
 		$message->subject($headers->subject);
 		$message->created($date->getTimestamp());

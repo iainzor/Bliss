@@ -47,6 +47,16 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	 */
 	private $cacheRegistry;
 	
+	/**
+	 * @var array
+	 */
+	private $headers = [];
+	
+	/**
+	 * @var boolean
+	 */
+	private $sendHeaders = true;
+	
 	public function init()
 	{}
 	
@@ -146,7 +156,21 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	 */
 	public function header($string)
 	{
-		header($string);
+		$this->headers[] = $string;
+	}
+	
+	/**
+	 * Get or set whether the response should send headers along with the response body
+	 * 
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function sendHeaders($flag = null)
+	{
+		if ($flag !== null) {
+			$this->sendHeaders = (boolean) $flag;
+		}
+		return $this->sendHeaders;
 	}
 	
 	/**
@@ -335,11 +359,15 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 		$this->app->log("Sending response");
 		$this->saveCache($contents, $request);
 		
-		$protocol = filter_input(INPUT_SERVER, "SERVER_PROTOCOL");
 		$format = $this->format($request->getFormat());
 		
-		header("Content-type: ". $format->mime());
-		http_response_code($this->code);
+		if ($this->sendHeaders === true) {
+			foreach ($this->headers as $header) {
+				header($header);
+			}
+			header("Content-type: ". $format->mime());
+			http_response_code($this->code);
+		}
 		
 		echo $contents;
 	}

@@ -114,6 +114,23 @@ class Container
 	}
 	
 	/**
+	 * Get a single setting's value
+	 * 
+	 * @param AbstractModule $module
+	 * @param string $key
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	public function getValue(AbstractModule $module, $key) 
+	{
+		if (!isset($this->modules[$module->name()])) {
+			throw new \Exception("No settings for module: {$module->name()}");
+		}
+		$modSettings = $this->modules[$module->name()];
+		return $modSettings->getValue($key);
+	}
+	
+	/**
 	 * Convert all settings to an array
 	 * 
 	 * @return array

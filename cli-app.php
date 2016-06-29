@@ -14,21 +14,29 @@ class BlissCLIApp extends BlissApp
 	{
 		global $argv;
 		
-		$this->call($this, "preExecute");
+		ob_end_clean();
 		
 		try {
 			if (count($argv) < 2) {
 				throw new \Exception("Missing uri argument");
 			}
 
-			$path = array_pop($argv);
+			$requestPath = array_pop($argv);
+			$requestParams = [];
+			
+			if (preg_match("/(.*)\?(.*)$/i", $requestPath, $matches)) {
+				$requestPath = $matches[1];
+				parse_str($matches[2], $requestParams);
+			}
+			
+			$this->call($this, "preExecute");
+			
 			$options = getopt("s:");
-			$route = $this->router()->find($path);
-			$params = $route->params();
+			$route = $this->router()->find($requestPath);
+			$params = array_merge($route->params(), $requestParams);
 			$params["format"] = "cli";
-
+			
 			$response = $this->execute($params);
-
 			$body = $response->body();
 			$rParams = $response->params();
 
@@ -40,15 +48,11 @@ class BlissCLIApp extends BlissApp
 					} else {
 						throw new \Exception("Unknown section: {$section}");
 					}
-				} else {
-					throw new \Exception(
-						"No section specified...\r\n" .
-						"Available sections: ". implode(", ", array_keys($rParams))
-					);
 				}
 			} else {
 				echo $body;
 			}
+			
 		} catch (\Exception $e) {
 			$script = filter_input(INPUT_SERVER, "SCRIPT_NAME");
 			echo "usage: php {$script} [-s section=value] <uri>\r\n\r\n";
@@ -58,10 +62,10 @@ class BlissCLIApp extends BlissApp
 		}
 	}
 	
-	public function preExecute(\Response\Module $response, \Error\Module $error)
+	public function preExecute(\Response\Module $response)
 	{
-		$error->enabled(false);
 		$response->format("cli", new CLIFormat());
+		$response->sendHeaders(false);
 		
 		set_error_handler([$this, "_handleError"]);
 		set_exception_handler([$this, "_handleException"]);

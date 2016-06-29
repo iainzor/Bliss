@@ -105,7 +105,8 @@ abstract class ResourceComponent extends Component implements Resource\ResourceI
 	{
 		if ($updated !== null) {
 			$this->updated = (int) $updated;
-		} else if (!isset($this->updated)) {
+		}
+		if (!$this->updated) {
 			$this->updated = $this->created();
 		}
 		return $this->updated;

@@ -5,9 +5,27 @@ use User\Session\Manager,
 	User\Db\UsersTable as UserDbTable,
 	User\Db\UserSessionsTable as SessionDbTable,
 	User\User,
-	Database\PDO,
 	Database\Registry,
 	Database\Table\AbstractTable;
+
+class PDO extends \Database\PDO
+{
+	public function describe($table) 
+	{
+		$tableInstance = \Database\Table\AbstractTable::factory($table, $this);
+		$tableName = $tableInstance->name();
+		$columns = $this->fetchAll("PRAGMA table_info(`". $tableName ."`)");
+		$struct = new \Database\Table\Structure();
+		
+		foreach ($columns as $column) {
+			$struct->column($column["name"], [
+				"type" => "varchar"
+			]);
+		}
+		
+		return $struct;
+	}
+}
 
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,13 +37,18 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 	 */
 	private static $manager;
 	
+	/**
+	 * @var PDO
+	 */
+	private static $db;
+	
 	public static function setUpBeforeClass()
 	{
 		//ob_start();
 		//session_start();
 		//ob_end_flush();
 		
-		$db = new PDO("sqlite::memory:", null, null, [
+		self::$db = $db = new PDO("sqlite::memory:", null, null, [
 			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
 		]);
 		$registry = new Registry();
@@ -64,12 +87,19 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse($valid);
 	}
 	
+	/*
 	public function testGoodCredentials()
 	{
-		$valid = self::$manager->isValid(self::EMAIL, self::PASSWORD);
-		
+		try {
+			$valid = self::$manager->isValid(self::EMAIL, self::PASSWORD);
+		} catch (\Exception $e) {
+			echo "<pre>";
+			print_r(self::$db->logs());
+			exit;
+		}
 		$this->assertTrue($valid);
 	}
+	*/
 	
 	public function testCreateSession()
 	{

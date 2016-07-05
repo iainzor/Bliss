@@ -62,18 +62,9 @@ class Registry
 	public function get($resourceName, $resourceId = null, array $params = [])
 	{
 		$hash = $this->generateHash($resourceName, $resourceId, $params);
-		$data = $this->storage->get($hash);
+		$resource = $this->storage->get($hash);
 		
-		if ($data !== false) {
-			return $this->generateResource([
-				"resourceName" => $resourceName,
-				"resourceId" => $resourceId,
-				"params" => $params,
-				"contents" => $data
-			]);
-		}
-		
-		return false;
+		return $resource;
 	}
 	
 	/**

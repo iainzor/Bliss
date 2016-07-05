@@ -53,6 +53,9 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 		$parent = $registry->create("my-resource", 123);
 		$child = $registry->create("my-resource", 123, ["foo" => "bar"]);
 		
+		$registry->put($parent);
+		$registry->put($child);
+		
 		$this->assertTrue($registry->exists("my-resource", 123));
 		$this->assertTrue($registry->exists("my-resource", 123, ["foo" => "bar"]));
 		

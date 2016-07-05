@@ -72,8 +72,8 @@ class Module extends \Bliss\Module\AbstractModule
 	public function initSSL()
 	{
 		$https = filter_var(isset($_SERVER["HTTPS"]) ? $_SERVER["HTTPS"] : null);
-		$uri = filter_var($_SERVER["REQUEST_URI"]);
-		$host = filter_var($_SERVER["HTTP_HOST"]);
+		$uri = filter_var(isset($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : "");
+		$host = filter_var(isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : null);
 		
 		if ($this->forceSSL === true && empty($https)) {
 			header("Location: https://{$host}{$uri}");
@@ -178,7 +178,7 @@ class Module extends \Bliss\Module\AbstractModule
 	 */
 	public function method()
 	{
-		return filter_var($_SERVER["REQUEST_METHOD"]);
+		return filter_var(isset($_SERVER["REQUEST_METHOD"]) ? $_SERVER["REQUEST_METHOD"] : "GET");
 	}
 	
 	/**

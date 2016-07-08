@@ -20,7 +20,7 @@ spl_autoload_register(function($className) {
 		
 		foreach ($chars as $i => $char) {
 			if ($char === ucwords($char) && $i > 0) {
-				$name .= "-";
+				//$name .= "-";
 			}
 			
 			$name .= strtolower($char);

@@ -1,8 +1,9 @@
 <?php
 namespace User;
 
-use Bliss\Module\AbstractModule,
-	Bliss\App\BeforeModuleExecuteInterface,
+use Acl\RoleRegistry,
+	Bliss\Module\AbstractModule,
+	Bliss\BeforeModuleExecuteInterface,
 	Config\PublicConfigInterface,
 	Router\ProviderInterface as RouteProvider;
 
@@ -107,6 +108,8 @@ class Module extends AbstractModule implements
 		}
 		
 		$user = $this->session->user();
+		$role = $this->roleRegistry()->role($user->roleId());
+		$user->role($role);
 		$settings = $user->settings();
 		
 		foreach ($this->app->modules() as $module) {
@@ -189,15 +192,16 @@ class Module extends AbstractModule implements
 		$registry = $this->roleRegistry();
 		
 		if ($roles !== null) {
-			$registry->configure($roles);
+			$registry->registerAll($roles);
 		}
+		
 		return $registry;
 	}
 	
 	/**
 	 * Get or set the role registry
-	 * @param \User\RoleRegistry $registry
-	 * @return type
+	 * @param RoleRegistry $registry
+	 * @return RoleRegistry
 	 */
 	public function roleRegistry(RoleRegistry $registry = null)
 	{
@@ -207,8 +211,6 @@ class Module extends AbstractModule implements
 		if (!$this->roleRegistry) {
 			$this->roleRegistry = new RoleRegistry();
 		}
-		
-		Role::registry($this->roleRegistry);
 		
 		return $this->roleRegistry;
 	}

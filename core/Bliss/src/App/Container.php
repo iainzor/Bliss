@@ -5,7 +5,8 @@ use Bliss\AutoLoader,
 	Bliss\Module\Registry as ModuleRegistry,
 	Bliss\Module\ModuleInterface,
 	Bliss\String,
-	Bliss\Config;
+	Bliss\Config,
+	Bliss\BeforeModuleExecuteInterface;
 
 require_once dirname(__DIR__) ."/AutoLoader.php";
 require_once dirname(__DIR__) ."/Module/Registry.php";
@@ -66,6 +67,11 @@ class Container extends \Bliss\Component
 	 * @var boolean
 	 */
 	private $hasQuit = false;
+	
+	/**
+	 * @var boolean
+	 */
+	private $firstExecution = true;
 	
 	/**
 	 * Constructor
@@ -238,8 +244,6 @@ class Container extends \Bliss\Component
 	 */
 	public function execute(array $params = [])
 	{
-		$this->initConfig();
-		
 		$this->log("Executing parameters: ". json_encode($params));
 		
 		$response = $this->response();
@@ -250,9 +254,14 @@ class Container extends \Bliss\Component
 		$moduleName = $request->getModule();
 		$module = $this->module($moduleName);
 		
-		foreach ($this->modules() as $m) {
-			if ($m instanceof BeforeModuleExecuteInterface) {
-				$m->beforeModuleExecute($module);
+		if ($this->firstExecution) {
+			$this->firstExecution = false;
+			$this->initConfig();
+			
+			foreach ($this->modules() as $m) {
+				if ($m instanceof BeforeModuleExecuteInterface) {
+					$m->beforeModuleExecute($module);
+				}
 			}
 		}
 		
@@ -270,7 +279,7 @@ class Container extends \Bliss\Component
 		} elseif ($result !== null) {
 			throw new \Exception("Action must either return a string or array");
 		}
-
+		
 		$response->send($request, $this->view());
 		return $response;
 	}

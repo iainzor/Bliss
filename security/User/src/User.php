@@ -1,7 +1,8 @@
 <?php
 namespace User;
 
-use Database\Model;
+use Database\Model,
+	Acl\Role as BaseRole;
 
 class User extends Model\AbstractResourceModel
 {
@@ -30,7 +31,7 @@ class User extends Model\AbstractResourceModel
 	/**
 	 * @var string
 	 */
-	protected $roleId = Role::ROLE_DEFAULT;
+	protected $roleId = Role::BASE_ROLE;
 	
 	/**
 	 * @var string
@@ -160,25 +161,15 @@ class User extends Model\AbstractResourceModel
 	}
 	
 	/**
-	 * Get or set the user's ACL Role.  If one has not been set, an empty ACL Role instance will be created
+	 * Get or set the user's ACL Role
 	 * 
-	 * @param array|Role $role
-	 * @return Role
+	 * @param BaseRole $role
+	 * @return BaseRole
 	 */
-	public function role($role = null)
+	public function role(BaseRole $role = null)
 	{
 		if ($role !== null) {
-			if (is_array($role)) {
-				$role = Role::factory($role);
-			}
-			if (!($role instanceof Role)) {
-				throw new \UnexpectedValueException("\$role must be a property array or and instance of \\User\\Role");
-			}
-			
 			$this->role = $role;
-		}
-		if (!$this->role) {
-			$this->role = Role::registry()->role(Role::ROLE_DEFAULT);
 		}
 		
 		return $this->role;

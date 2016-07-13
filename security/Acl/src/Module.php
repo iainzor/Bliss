@@ -1,7 +1,7 @@
 <?php
 namespace Acl;
 
-class Module extends \Bliss\Module\AbstractModule
-{
-	
-}
+use Bliss\Module\AbstractModule;
+
+class Module extends AbstractModule
+{}

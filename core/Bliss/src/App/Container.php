@@ -408,7 +408,7 @@ class Container extends \Bliss\Component
 	 * @param array $arguments
 	 * @return \Bliss\Module\ModuleInterface
 	 */
-	public function __call($name, array $arguments) 
+	public function __call($name, array $args = []) 
 	{
 		$moduleName = String::hyphenate($name);
 		$module = $this->module($moduleName);

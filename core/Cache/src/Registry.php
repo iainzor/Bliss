@@ -51,7 +51,7 @@ class Registry
 	}
 	
 	/**
-	 * Attempt to find a cache resource matching the arguments
+	 * Attempt to find a cache resource matching the arguments.
 	 * If a resource cannot be found it will be created, added to the registry and returned
 	 * 
 	 * @param string $resourceName
@@ -63,6 +63,10 @@ class Registry
 	{
 		$hash = $this->generateHash($resourceName, $resourceId, $params);
 		$resource = $this->storage->get($hash);
+		
+		if (!$resource) {
+			$resource = $this->create($resourceName, $resourceId, $params);
+		}
 		
 		return $resource;
 	}

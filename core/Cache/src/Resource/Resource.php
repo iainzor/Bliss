@@ -39,7 +39,7 @@ class Resource extends Component implements ResourceInterface
 	/**
 	 * @var boolean
 	 */
-	protected $isExpired = false;
+	protected $isExpired = true;
 	
 	/**
 	 * Constructor
@@ -148,6 +148,8 @@ class Resource extends Component implements ResourceInterface
 	 */
 	public function save()
 	{
+		$this->isExpired = false;
+		
 		return $this->registry->put($this);
 	}
 	

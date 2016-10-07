@@ -48,7 +48,7 @@ class Storage implements StorageInterface
 	 * Attempt to load a cached file
 	 * 
 	 * @param string $hash
-	 * @return mixed Returns FALSE if the file does not exist or is expired, otherwise it returns the file's contents
+	 * @return ResourceInterface
 	 */
 	public function get($hash) 
 	{
@@ -60,7 +60,7 @@ class Storage implements StorageInterface
 			$age = time() - $modified;
 			
 			if ($age < $resource->expires()) {
-				return $resource->contents();
+				return $resource;
 			} else {
 				unlink($path);
 			}

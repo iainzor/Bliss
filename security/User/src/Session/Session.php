@@ -122,13 +122,13 @@ class Session extends AbstractResourceModel implements SessionInterface
 	 */
 	public function load()
 	{
-		if (isset($_SESSION[$this->key])) {
-			$this->isValid(true);
-			$this->id($_SESSION[$this->key]);
-		} else if ($this->lifetime && isset($_COOKIE[$this->key])) {
+		if (isset($_COOKIE[$this->key])) {
 			$this->isValid(true);
 			$this->id($_COOKIE[$this->key]);
-		}
+		} else if (isset($_SESSION[$this->key])) {
+			$this->isValid(true);
+			$this->id($_SESSION[$this->key]);
+		} 
 	}
 	
 	/**

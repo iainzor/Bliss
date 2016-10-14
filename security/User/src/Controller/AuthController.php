@@ -20,6 +20,10 @@ class AuthController extends AbstractController
 				throw new \Exception("Invalid credentials provided", 401);
 			}
 			
+			if ($remember) {
+				$session->lifetime(2592000);
+			}
+			
 			$manager->attachUser($session);
 			$manager->save($session);
 			

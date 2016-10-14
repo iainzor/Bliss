@@ -33,6 +33,11 @@ class Session extends AbstractResourceModel implements SessionInterface
 	protected $user;
 	
 	/**
+	 * @var int
+	 */
+	protected $lifetime;
+	
+	/**
 	 * @return string
 	 */
 	public function getResourceName() { return self::RESOURCE_NAME; }
@@ -120,6 +125,9 @@ class Session extends AbstractResourceModel implements SessionInterface
 		if (isset($_SESSION[$this->key])) {
 			$this->isValid(true);
 			$this->id($_SESSION[$this->key]);
+		} else if ($this->lifetime && isset($_COOKIE[$this->key])) {
+			$this->isValid(true);
+			$this->id($_COOKIE[$this->key]);
 		}
 	}
 	
@@ -129,6 +137,10 @@ class Session extends AbstractResourceModel implements SessionInterface
 	public function save() 
 	{
 		$_SESSION[$this->key] = $this->id();
+		
+		if ($this->lifetime) {
+			setcookie($this->key, $this->id(), time() + $this->lifetime, "/");
+		}
 	}
 	
 	/**
@@ -137,6 +149,20 @@ class Session extends AbstractResourceModel implements SessionInterface
 	public function delete() 
 	{
 		unset($_SESSION[$this->key]);
+		setcookie($this->key, null, time() - 1, "/");
+		
 		$this->user = new GuestUser();
+	}
+	
+	/**
+	 * Set the lifetime, in seconds, the session should stay active for.  If
+	 * this is anything greater than 0, a cookie will be set.
+	 * 
+	 * @param int $seconds
+	 * @return int
+	 */
+	public function lifetime($seconds = null)
+	{
+		return $this->getSet("lifetime", $seconds, self::VALUE_INT);
 	}
 }

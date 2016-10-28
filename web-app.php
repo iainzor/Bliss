@@ -22,6 +22,23 @@ include "bliss-app.php";
  */
 class BlissWebApp extends BlissApp
 {
+	
+	/**
+	 * @var string
+	 */
+	protected $url;
+	
+	/**
+	 * Get or set the application's URL
+	 * 
+	 * @param string $url
+	 * @return string
+	 */
+	public function url($url = null)
+	{
+		return $this->getSet("url", $url);
+	}
+	
 	/**
 	 * @param string $name
 	 * @param string $rootPath
@@ -46,12 +63,15 @@ class BlissWebApp extends BlissApp
 			$baseUrl = $baseMatches[1] ."/";
 		}
 		
-		$_uri = filter_input(INPUT_SERVER, "REQUEST_URI");
-		if ($_uri === null) {
-			$_uri = filter_var($_SERVER["REQUEST_URI"]);
-		}
+		$_uri = $this->_server("REQUEST_URI");
+		$_httpHost = $this->_server("HTTP_HOST");
+		$_https = $this->_server("HTTPS");
+		
 		$requestUri = preg_replace("/^([^\?]+).*/i", "$1", substr($_uri, strlen($baseUrl)));
 		
+		if (!$this->url) {
+			$this->url = ($_https ? "https" : "http") ."://". $_httpHost . $baseUrl;
+		}
 		/*
 		echo "<pre>";
 		var_dump($baseMatch);
@@ -71,6 +91,21 @@ class BlissWebApp extends BlissApp
 		$route = $router->find($requestUri);
 
 		$this->execute($route->params());
+	}
+	
+	/**
+	 * Get a value from the server input
+	 * 
+	 * @param string $field
+	 * @return string
+	 */
+	private function _server($field)
+	{
+		$value = filter_input(INPUT_SERVER, $field);
+		if (!$value) {
+			$value = isset($_SERVER[$field])? $_SERVER[$field] : null;
+		}
+		return $value;
 	}
 	
 	/**

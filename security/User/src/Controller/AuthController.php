@@ -28,7 +28,7 @@ class AuthController extends AbstractController
 		}
 
 		$manager->attachUser($session);
-		$manager->save($session);
+		$manager->saveSession($session);
 
 		return $session;
 	}
@@ -52,7 +52,7 @@ class AuthController extends AbstractController
 		} else {
 			$manager = $userModule->sessionManager();
 			$session = $manager->createSession($user->email(), $user->password(), true);
-			$manager->save($session);
+			$manager->saveSession($session);
 
 			return $user;
 		}
@@ -61,8 +61,9 @@ class AuthController extends AbstractController
 	public function signOutAction(\Request\Module $request, \User\Module $userModule) 
 	{
 		if ($request->isPost()) {
+			$manager = $userModule->sessionManager();
 			$session = $userModule->session();
-			$session->delete();
+			$manager->deleteSession($session);
 			
 			return $session->user();
 		}

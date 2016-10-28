@@ -16,6 +16,11 @@ class Manager
 	private $hasher;
 	
 	/**
+	 * @var Config
+	 */
+	private $config;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param HasherInterface
@@ -27,6 +32,23 @@ class Manager
 		}
 		
 		$this->hasher = $hasher;
+		$this->config = new Config();
+	}
+	
+	/**
+	 * Get or set the session configuration
+	 * 
+	 * @param array $config
+	 * @return Config
+	 */
+	public function config(array $config = null)
+	{
+		if ($config !== null) {
+			foreach ($config as $name => $value) {
+				call_user_func([$this->config, $name], $value);
+			}
+		}
+		return $this->config;
 	}
 	
 	/**
@@ -44,6 +66,27 @@ class Manager
 	}
 	
 	/**
+	 * Attempt to load an existing session
+	 * 
+	 * @return \User\Session\Session
+	 */
+	public function loadSession()
+	{
+		$name = $this->config->name();
+		$session = new Session($name);
+		
+		if (isset($_COOKIE[$name])) {
+			$session->isValid(true);
+			$session->id($_COOKIE[$name]);
+		} else if (isset($_SESSION[$name])) {
+			$session->isValid(true);
+			$session->id($_SESSION[$name]);
+		}
+		
+		return $session;
+	}
+	
+	/**
 	 * Create a new session using the credentials provided
 	 * 
 	 * @param string $email
@@ -53,7 +96,7 @@ class Manager
 	 */
 	public function createSession($email, $password, $isHashed = false)
 	{
-		$session = new Session();
+		$session = new Session($this->config->name());
 		$usersTable = new UsersTable();
 		$query = $usersTable->select(["id", "email", "password"]);
 		$query->where(["email" => ":email"]);
@@ -70,13 +113,58 @@ class Manager
 			$session->userId($user->id());
 			
 			if ($valid === true) {
-				$this->save($session);
+				$this->saveSession($session);
 				$this->attachUser($session);
 			}
 		}
 		
 		return $session;
 	}
+	
+	/**
+	 * Save a session and update its database record
+	 * 
+	 * @param \User\Session\Session $session
+	 */
+	public function saveSession(Session $session)
+	{
+		$_SESSION[$session->name()] = $session->id();
+		
+		if ($session->lifetime() > 0) {
+			setcookie(
+				$session->name(), 
+				$session->id(), 
+				time() + $session->lifetime(), 
+				$this->config->path(), 
+				$this->config->domain(),
+				$this->config->secure(),
+				$this->config->httpOnly()
+			);
+		}
+		
+		$sessionTable = new UserSessionsTable();
+		$sessionTable->insert($session, ["updated"]);
+	}
+	
+	
+	/**
+	 * Delete a session
+	 */
+	public function deleteSession(Session $session) 
+	{
+		unset($_SESSION[$session->name()]);
+		setcookie(
+			$session->name(),
+			null, 
+			time() - 1, 
+			$this->config->path(), 
+			$this->config->domain(),
+			$this->config->secure(),
+			$this->config->httpOnly()
+		);
+		$session->user(new GuestUser());
+	}
+	
 	
 	/**
 	 * Attempt to attach a user session instance
@@ -108,13 +196,5 @@ class Manager
 		}
 		
 		return $session;
-	}
-	
-	public function save(Session $session)
-	{
-		$session->save();
-		
-		$sessionTable = new UserSessionsTable();
-		$sessionTable->insert($session, ["updated"]);
 	}
 }

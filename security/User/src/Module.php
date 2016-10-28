@@ -26,6 +26,11 @@ class Module extends AbstractModule implements
 	private $sessionManager;
 	
 	/**
+	 * @var array
+	 */
+	private $cookieConfig = [];
+	
+	/**
 	 * @var RoleRegistry
 	 */
 	private $roleRegistry;
@@ -50,6 +55,16 @@ class Module extends AbstractModule implements
 	public function user() 
 	{
 		return $this->session()->user();
+	}
+	
+	/**
+	 * Set the user session configuration
+	 * 
+	 * @param array $config
+	 */
+	public function sessionConfig(array $config)
+	{
+		$this->sessionManager()->config($config);
 	}
 	
 	/**
@@ -93,8 +108,8 @@ class Module extends AbstractModule implements
 	 */
 	public function initSession()
 	{	
-		$this->session = new Session\Session();
-		$this->session->load();
+		$manager = $this->sessionManager();
+		$this->session = $manager->loadSession();
 		
 		foreach ($this->app->modules() as $module) {
 			if ($module instanceof BeforeSessionCheckInterface) {

@@ -7,15 +7,17 @@ use Database\Model\AbstractResourceModel,
 
 class Session extends AbstractResourceModel implements SessionInterface
 {
-	const KEY = "USER_SESSION";
 	const RESOURCE_NAME = "user-session";
-	
-	private $key = self::KEY;
 	
 	/**
 	 * @var string
 	 */
 	protected $id;
+	
+	/**
+	 * @var string
+	 */
+	protected $name;
 	
 	/**
 	 * @var int
@@ -38,19 +40,19 @@ class Session extends AbstractResourceModel implements SessionInterface
 	protected $lifetime;
 	
 	/**
+	 * Constructor
+	 * 
+	 * @param string $name
+	 */
+	public function __construct($name) 
+	{
+		$this->name = $name;
+	}
+	
+	/**
 	 * @return string
 	 */
 	public function getResourceName() { return self::RESOURCE_NAME; }
-	
-	/**
-	 * Set the key used when saving the session
-	 * 
-	 * @param string $key
-	 */
-	public function setKey($key)
-	{
-		$this->key = $key;
-	}
 	
 	/**
 	 * Get or set the session's ID
@@ -65,10 +67,20 @@ class Session extends AbstractResourceModel implements SessionInterface
 		}
 		
 		if (!isset($this->id)) {
-			$this->id = md5(uniqid($this->key));
+			$this->id = md5(uniqid("SESSION_ID"));
 		}
 		
 		return $this->id;
+	}
+	
+	/**
+	 * Get or set the session's name
+	 * 
+	 * @param string $name
+	 */
+	public function name($name = null) 
+	{
+		return $this->getSet("name", $name);
 	}
 	
 	/**
@@ -118,51 +130,14 @@ class Session extends AbstractResourceModel implements SessionInterface
 	}
 	
 	/**
-	 * Attempt to load the session
-	 */
-	public function load()
-	{
-		if (isset($_COOKIE[$this->key])) {
-			$this->isValid(true);
-			$this->id($_COOKIE[$this->key]);
-		} else if (isset($_SESSION[$this->key])) {
-			$this->isValid(true);
-			$this->id($_SESSION[$this->key]);
-		} 
-	}
-	
-	/**
-	 * Save the session data
-	 */
-	public function save() 
-	{
-		$_SESSION[$this->key] = $this->id();
-		
-		if ($this->lifetime) {
-			setcookie($this->key, $this->id(), time() + $this->lifetime, "/");
-		}
-	}
-	
-	/**
-	 * Delete the session data
-	 */
-	public function delete() 
-	{
-		unset($_SESSION[$this->key]);
-		setcookie($this->key, null, time() - 1, "/");
-		
-		$this->user = new GuestUser();
-	}
-	
-	/**
-	 * Set the lifetime, in seconds, the session should stay active for.  If
-	 * this is anything greater than 0, a cookie will be set.
+	 * Get or set the lifetime of the session.  If the lifetime is
+	 * anything greater than 0, a cookie will be created.
 	 * 
-	 * @param int $seconds
+	 * @param int $lifetime
 	 * @return int
 	 */
-	public function lifetime($seconds = null)
+	public function lifetime($lifetime = null)
 	{
-		return $this->getSet("lifetime", $seconds, self::VALUE_INT);
+		return $this->getSet("lifetime", $lifetime);
 	}
 }

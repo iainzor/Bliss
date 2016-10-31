@@ -224,7 +224,7 @@ class Module extends AbstractModule implements
 			$this->roleRegistry = $registry;
 		}
 		if (!$this->roleRegistry) {
-			$this->roleRegistry = new RoleRegistry();
+			$this->roleRegistry = new RoleRegistry(new GuestRole());
 		}
 		
 		return $this->roleRegistry;

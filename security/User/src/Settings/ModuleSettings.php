@@ -11,7 +11,7 @@ class ModuleSettings
 	private $container;
 	
 	/**
-	 * @var AbstractModule
+	 * @var string
 	 */
 	private $module;
 	
@@ -28,9 +28,9 @@ class ModuleSettings
 	/**
 	 * Constructor
 	 * 
-	 * @param AbstractModule $module
+	 * @param string $module
 	 */
-	public function __construct(Container $container, AbstractModule $module)
+	public function __construct(Container $container, $module)
 	{
 		$this->container = $container;
 		$this->module = $module;
@@ -89,7 +89,7 @@ class ModuleSettings
 		}
 		foreach ($this->settings as $setting) {
 			$setting->userId($this->container->user()->id());
-			$setting->moduleName($this->module->name());
+			$setting->moduleName($this->module);
 		}
 		return $this->settings;
 	}
@@ -121,10 +121,9 @@ class ModuleSettings
 	public function getValue($key, $defaultValue = null)
 	{
 		if (isset($this->settings[$key])) {
-			$def = $this->definitions()->get($key);
 			$setting = $this->settings[$key];
 			
-			return $def->parse($setting->value());
+			return $setting->value();
 		}
 		return $defaultValue;
 	}
@@ -134,14 +133,15 @@ class ModuleSettings
 	 * 
 	 * @param string $key
 	 * @param mixed $value
+	 * @param boolean $encoded Wether the value being set is encoded
 	 */
-	public function setValue($key, $value)
+	public function setValue($key, $value, $encoded = false)
 	{
 		if (!isset($this->settings[$key])) {
 			$this->settings[$key] = $this->definitions()->get($key)->toSetting();
 		}
 		
-		$this->settings[$key]->value($value);
+		$this->settings[$key]->value($value, $encoded);
 	}
 	
 	/**
@@ -153,6 +153,25 @@ class ModuleSettings
 	}
 	
 	/**
+	 * Merge a setting definition into this one
+	 * 
+	 * @param ModuleSettings|array $settings
+	 * @throws \InvalidArgumentException
+	 */
+	public function merge($settings)
+	{
+		if ($settings instanceof self) {
+			$settings = $settings->toArray();
+		}
+		if (!is_array($settings)) {
+			throw new \InvalidArgumentException("\$settings must be an array");
+		}
+		foreach ($settings as $name => $value) {
+			$this->setValue($name, $value);
+		}
+	}
+	
+	/**
 	 * Convert the module settings to an array
 	 * 
 	 * @return array
@@ -161,8 +180,7 @@ class ModuleSettings
 	{
 		$data = [];
 		foreach ($this->settings() as $setting) {
-			$def = $this->definitions()->get($setting->key());
-			$data[$setting->key()] = $def->parse($setting->value());
+			$data[$setting->key()] = $setting->value();
 		}
 		return $data;
 	}

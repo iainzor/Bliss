@@ -18,7 +18,12 @@ class Definition extends Component
 	/**
 	 * @var callable
 	 */
-	protected $valueParser;
+	protected $encoder = "strval";
+	
+	/**
+	 * @var callable
+	 */
+	protected $decoder = "strval";
 	
 	/**
 	 * Get or set the setting's key name
@@ -43,32 +48,56 @@ class Definition extends Component
 	}
 	
 	/**
-	 * Get or set the callable function used to parse this setting's value
+	 * Get or set the function used to encode the setting's value before 
+	 * saving it to the database.
 	 * 
-	 * @param callable $parser
+	 * @param callable $encoder
 	 * @return callable
 	 */
-	public function valueParser($parser = null)
+	public function encoder($encoder = null)
 	{
-		return $this->getSet("valueParser", $parser);
+		return $this->getSet("encoder", $encoder);
 	}
 	
 	/**
-	 * Parse the value using the definition's value parser
+	 * Encode a value using the definition's encoding function
 	 * 
 	 * @param mixed $value
 	 * @return mixed
 	 * @throws \Exception
 	 */
-	public function parse($value)
+	public function encode($value)
 	{
-		if (!$this->valueParser) {
-			return $value;
+		if (!$this->encoder || !is_callable($this->encoder)) {
+			throw new \Exception("Encoder must be callable");
 		}
-		if (!is_callable($this->valueParser)) {
-			throw new \Exception("Value parser must be callable");
+		return call_user_func($this->encoder, $value);
+	}
+	
+	/**
+	 * Get or set the function used to decode the setting's value from the database.
+	 * 
+	 * @param callable $decoder
+	 * @return callable
+	 */
+	public function decoder($decoder = null)
+	{
+		return $this->getSet("decoder", $decoder);
+	}
+	
+	/**
+	 * Decode an encoded value using the definition's decode function
+	 * 
+	 * @param mixed $value
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	public function decode($value) 
+	{
+		if (!$this->decoder || !is_callable($this->decoder)) {
+			throw new \Exception("Decoder must be callable");
 		}
-		return call_user_func($this->valueParser, $value);
+		return call_user_func($this->decoder, $value);
 	}
 	
 	/**
@@ -78,7 +107,7 @@ class Definition extends Component
 	 */
 	public function toSetting()
 	{
-		$setting = new Setting();
+		$setting = new Setting($this);
 		$setting->key($this->key());
 		$setting->value($this->defaultValue());
 		

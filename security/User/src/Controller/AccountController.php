@@ -3,7 +3,8 @@ namespace User\Controller;
 
 use Bliss\Controller\AbstractController,
 	User\Form\ChangePasswordForm,
-	User\User;
+	User\User,
+	User\Db\UsersTable;
 
 class AccountController extends AbstractController 
 {
@@ -22,16 +23,36 @@ class AccountController extends AbstractController
 		return $userModule->user();
 	}
 	
-	public function indexAction()
+	public function indexAction(\Request\Module $request)
 	{
+		if ($request->isPost()) {
+			$allowed = ["displayName"];
+			$values = [];
+			foreach ($request->params() as $name => $value) {
+				if (in_array($name, $allowed)) {
+					$values[$name] = call_user_func([$this->user, $name], $value);
+				}
+			}
+			$users = new UsersTable();
+			$update = $users->update();
+			$update->values($values);
+			$update->where([
+				"id" => $this->user->id()
+			]);
+			$update->execute();
+		}
 		return $this->user;
 	}
 	
 	public function settingsAction(\Request\Module $request)
 	{
-		$moduleName = $request->param("moduleName", "user");
-		$module = $this->app->module($moduleName);
-		$settings = $this->user->settings()->module($module);
+		$settings = $this->user->settings();
+		
+		if ($request->isPost()) {
+			$newSettings = $request->param("settings");
+			$settings->merge($newSettings);
+			$settings->save();
+		}
 		
 		return $settings;
 	}

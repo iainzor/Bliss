@@ -1,7 +1,0 @@
-.shrink.vertical {
-	transform: scale(0);
-	margin: -50px 0 0 0;
-	overflow: hidden;
-	opacity: 0;
-	visibility: hidden;
-}

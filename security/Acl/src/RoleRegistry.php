@@ -4,9 +4,24 @@ namespace Acl;
 class RoleRegistry
 {
 	/**
+	 * @var Role
+	 */
+	private $defaultRole;
+	
+	/**
 	 * @var Role[]
 	 */
 	protected $roles = [];
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param \Acl\Role $defaultRole The role given when a role ID is not found
+	 */
+	public function __construct(Role $defaultRole)
+	{
+		$this->defaultRole = $defaultRole;
+	}
 	
 	/**
 	 * Registry multiple roles, clearing any existing roles.
@@ -55,7 +70,7 @@ class RoleRegistry
 	public function role($roleId)
 	{
 		if (!isset($this->roles[$roleId])) {
-			throw new \Exception("Invalid role ID #{$roleId}");
+			return $this->defaultRole;
 		}
 		return $this->roles[$roleId];
 	}

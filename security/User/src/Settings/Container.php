@@ -44,19 +44,23 @@ class Container
 	
 	/**
 	 * 
-	 * @param AbstractModule $module
+	 * @param AbstractModule|string $module
 	 * @param ModuleSettings $settings
 	 * @return ModuleSettings
 	 */
-	public function module(AbstractModule $module, ModuleSettings $settings = null) 
+	public function module($module, ModuleSettings $settings = null) 
 	{
+		if ($module instanceof AbstractModule) {
+			$module = $module->name();
+		}
+		
 		if ($settings !== null) {
-			$this->modules[$module->name()] = $settings;
+			$this->modules[$module] = $settings;
 		}
-		if (!isset($this->modules[$module->name()])) {
-			$this->modules[$module->name()] = new ModuleSettings($this, $module);
+		if (!isset($this->modules[$module])) {
+			$this->modules[$module] = new ModuleSettings($this, $module);
 		}
-		return $this->modules[$module->name()];
+		return $this->modules[$module];
 	}
 	
 	/**
@@ -69,6 +73,7 @@ class Container
 		if (!$this->user->id()) {
 			return;
 		}
+		
 		$table = new UserSettingsTable();
 		$query = $table->select();
 		$query->where([
@@ -83,32 +88,32 @@ class Container
 			}
 			
 			$moduleSettings = $this->modules[$moduleName];
-			$moduleSettings->addSetting($setting);
+			$moduleSettings->setValue($setting->key(), $setting->value(), true);
 		}
 	}
 	
 	/**
-	 * Save settings to the database.  If no ModuleSettings instance is provided, 
-	 * all settings for all modules will be saved.
-	 * 
-	 * @param \User\Settings\ModuleSettings $moduleSettings
+	 * Save settings to the database
 	 */
-	public function save(ModuleSettings $moduleSettings = null)
+	public function save()
 	{
 		$table = new UserSettingsTable();
 		$query = new InsertQuery($table->db());
 		$query->into($table);
 		
-		if ($moduleSettings !== null) {
-			$settings = $moduleSettings->settings();
-		} else {
-			$settings = [];
-			foreach ($this->modules as $module) {
-				$settings = array_merge($settings, $module->settings());
+		$rows = [];
+		foreach ($this->modules as $module) {
+			foreach ($module->settings() as $setting) {
+				$setting->userId($this->user->id());
+				
+				$row = $setting->toArray();
+				$row["value"] = $setting->encodedValue();
+				$rows[] = $row;
 			}
 		}
 		
-		$query->rows($settings);
+		
+		$query->rows($rows);
 		$query->onDuplicateKeyUpdate(["value"]);
 		$query->execute();
 	}
@@ -116,18 +121,41 @@ class Container
 	/**
 	 * Get a single setting's value
 	 * 
-	 * @param AbstractModule $module
+	 * @param AbstractModule|string $module
 	 * @param string $key
 	 * @return mixed
 	 * @throws \Exception
 	 */
-	public function getValue(AbstractModule $module, $key) 
+	public function getValue($module, $key) 
 	{
-		if (!isset($this->modules[$module->name()])) {
-			throw new \Exception("No settings for module: {$module->name()}");
+		if ($module instanceof AbstractModule) {
+			$module = $module->name();
 		}
-		$modSettings = $this->modules[$module->name()];
+		
+		if (!isset($this->modules[$module])) {
+			throw new \Exception("No settings for module: {$module}");
+		}
+		$modSettings = $this->modules[$module];
 		return $modSettings->getValue($key);
+	}
+	
+	/**
+	 * Merge a settings definition into the container
+	 * 
+	 * @param Container|array $settings
+	 * @throws \InvalidArgumentException
+	 */
+	public function merge($settings)
+	{
+		if ($settings instanceof self) {
+			$settings = $settings->toArray();
+		}
+		if (!is_array($settings)) {
+			throw new \InvalidArgumentException("\$settings must be an array");
+		}
+		foreach ($settings as $moduleName => $moduleSettings) {
+			$this->module($moduleName)->merge($moduleSettings);
+		}
 	}
 	
 	/**

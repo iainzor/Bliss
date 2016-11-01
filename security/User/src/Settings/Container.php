@@ -84,7 +84,8 @@ class Container
 		foreach ($results as $setting) {
 			$moduleName = $setting->moduleName();
 			if (!isset($this->modules[$moduleName])) {
-				throw new \Exception("Module '{$moduleName}' has no defined settings");
+				continue;
+				//throw new \Exception("Module '{$moduleName}' has no defined settings");
 			}
 			
 			$moduleSettings = $this->modules[$moduleName];

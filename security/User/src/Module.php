@@ -108,10 +108,11 @@ class Module extends AbstractModule implements
 	 */
 	public function initSession()
 	{	
+		$modules = $this->app->modules();
 		$manager = $this->sessionManager();
 		$this->session = $manager->loadSession();
 		
-		foreach ($this->app->modules() as $module) {
+		foreach ($modules as $module) {
 			if ($module instanceof BeforeSessionCheckInterface) {
 				$module->beforeSessionCheck($this);
 			}
@@ -122,12 +123,21 @@ class Module extends AbstractModule implements
 			$manager->attachUser($this->session);
 		}
 		
+		foreach ($modules as $module) {
+			if ($module instanceof AfterSessionCheckInterface) {
+				$module->afterSessionCheck($this->session);
+			}
+		}
+		
 		$user = $this->session->user();
+		
+		// Load role permissions
 		$role = $this->roleRegistry()->role($user->roleId());
 		$user->role($role);
-		$settings = $user->settings();
 		
-		foreach ($this->app->modules() as $module) {
+		// Define user settings
+		$settings = $user->settings();
+		foreach ($modules as $module) {
 			if ($module instanceof Settings\SettingsProviderInterface) {
 				$moduleSettings = $settings->module($module);
 				$module->defineUserSettings(

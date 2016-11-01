@@ -3,5 +3,5 @@ namespace User;
 
 interface BeforeSessionCheckInterface
 {
-	public function beforeSessionCheck(Session\Session $session);
+	public function beforeSessionCheck(Module $userModule);
 }

@@ -125,7 +125,7 @@ class Module extends AbstractModule implements
 		
 		foreach ($modules as $module) {
 			if ($module instanceof AfterSessionCheckInterface) {
-				$module->afterSessionCheck($this->session);
+				$module->afterSessionCheck($this);
 			}
 		}
 		

@@ -4,10 +4,7 @@ namespace User\Settings;
 use Database\Model\AbstractModel;
 
 class Setting extends AbstractModel
-{
-	const TYPE_STRING = "string";
-	const TYPE_JSON = "json";
-	
+{	
 	/**
 	 * @var Definition
 	 */
@@ -32,11 +29,6 @@ class Setting extends AbstractModel
 	 * @var mixed
 	 */
 	protected $value;
-	
-	/**
-	 * @var string
-	 */
-	protected $type = self::TYPE_STRING;
 	
 	/**
 	 * Constructor

@@ -64,7 +64,7 @@ class Definitions
 	{
 		$settings = [];
 		foreach ($this->definitions as $def) {
-			$setting = new Setting();
+			$setting = new Setting($def);
 			$setting->key($def->key());
 			$setting->value($def->defaultValue());
 			$settings[] = $setting;

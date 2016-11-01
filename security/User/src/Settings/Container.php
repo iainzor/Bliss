@@ -103,16 +103,17 @@ class Container
 		$query->into($table);
 		
 		$rows = [];
+		$settings = [];
 		foreach ($this->modules as $module) {
 			foreach ($module->settings() as $setting) {
 				$setting->userId($this->user->id());
+				$settings[] = $setting;
 				
 				$row = $setting->toArray();
 				$row["value"] = $setting->encodedValue();
 				$rows[] = $row;
 			}
 		}
-		
 		
 		$query->rows($rows);
 		$query->onDuplicateKeyUpdate(["value"]);

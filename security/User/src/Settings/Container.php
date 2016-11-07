@@ -95,19 +95,20 @@ class Container
 	
 	/**
 	 * Save settings to the database
+	 * 
+	 * @param ModuleSettings $moduleSettings
 	 */
-	public function save()
+	public function save(ModuleSettings $moduleSettings = null)
 	{
 		$table = new UserSettingsTable();
 		$query = new InsertQuery($table->db());
 		$query->into($table);
 		
 		$rows = [];
-		$settings = [];
-		foreach ($this->modules as $module) {
+		$modules = isset($moduleSettings) ? [$moduleSettings] : $this->modules;
+		foreach ($modules as $module) {
 			foreach ($module->settings() as $setting) {
 				$setting->userId($this->user->id());
-				$settings[] = $setting;
 				
 				$row = $setting->toArray();
 				$row["value"] = $setting->encodedValue();

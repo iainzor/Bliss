@@ -89,7 +89,7 @@ class BlissWebApp extends BlissApp
 
 		$router = $this->router();
 		$route = $router->find($requestUri);
-
+		
 		$this->execute($route->params());
 	}
 	

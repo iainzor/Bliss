@@ -23,7 +23,7 @@ class ComponentCollection implements \ArrayAccess, \Iterator, \Countable
 	 * 
 	 * @param Component $item
 	 */
-	public function push(Component $item)
+	protected function push(Component $item)
 	{
 		$this->items[] = $item;
 	}
@@ -33,7 +33,7 @@ class ComponentCollection implements \ArrayAccess, \Iterator, \Countable
 	 * 
 	 * @param Component $item
 	 */
-	public function unshift(Component $item)
+	protected function unshift(Component $item)
 	{
 		array_unshift($this->items, $item);
 	}
@@ -42,9 +42,19 @@ class ComponentCollection implements \ArrayAccess, \Iterator, \Countable
 	 * Clear all items from the collection
 	 * 
 	 */
-	public function clear()
+	protected function clear()
 	{
 		$this->items = [];
+	}
+	
+	/**
+	 * Get all items in the collection
+	 * 
+	 * @return Component[]
+	 */
+	protected function all()
+	{
+		return $this->items;
 	}
 	
 	/**

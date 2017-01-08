@@ -42,7 +42,7 @@ class ComponentCollection implements \ArrayAccess, \Iterator, \Countable
 	 * Clear all items from the collection
 	 * 
 	 */
-	protected function clear()
+	public function clear()
 	{
 		$this->items = [];
 	}

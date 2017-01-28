@@ -17,7 +17,7 @@ class Resource extends Component implements ResourceInterface
 	protected $resourceName;
 	
 	/**
-	 * var string
+	 * @var string
 	 */
 	protected $resourceId;
 	

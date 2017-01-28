@@ -37,7 +37,7 @@ class Module extends AbstractModule
 	 */
 	public function create($resourceName, $resourceId, array $params = [])
 	{
-		return $this->registry()->create($resourceName, $resourceId, $params);
+		return $this->registry()->get($resourceName, $resourceId, $params);
 	}
 	
 	/**

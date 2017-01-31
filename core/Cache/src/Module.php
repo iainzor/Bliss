@@ -11,7 +11,7 @@ class Module extends AbstractModule
 	private $registry;
 	
 	/**
-	 * Get or set the registry used to load and save cache
+	 * Get or set the registry used to load and save cache resources
 	 * 
 	 * @param \Cache\Registry $registry
 	 * @return \Cache\Registry
@@ -28,30 +28,13 @@ class Module extends AbstractModule
 	}
 	
 	/**
-	 * Create a new cache resource
+	 * Set the driver used to load and save cache resources. Setting this will
+	 * reinstantiate the cache registry instance
 	 * 
-	 * @param string $resourceName
-	 * @param string $resourceId
-	 * @param array $params
-	 * @return \Cache\Resource\ResourceInterface
+	 * @param Driver\DriverInterface $driver
 	 */
-	public function create($resourceName, $resourceId, array $params = [])
+	public function driver(Driver\DriverInterface $driver)
 	{
-		return $this->registry()->get($resourceName, $resourceId, $params);
-	}
-	
-	/**
-	 * Set the cache driver options and create the registry
-	 * 
-	 * @param array $config
-	 */
-	public function driver(array $config)
-	{
-		$factory = new Driver\Factory($config);
-		$storage = $factory->storageInstance($this->app);
-		
-		$this->registry(
-			new Registry($storage)
-		);
+		$this->registry = new Registry($driver);
 	}
 }

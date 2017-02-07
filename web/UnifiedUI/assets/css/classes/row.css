@@ -1,4 +1,0 @@
-.row.single-line > * {
-	padding-bottom: 0;
-}
-	.row.single-line > * > :last-child { margin-bottom: 0; }

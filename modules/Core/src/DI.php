@@ -42,13 +42,40 @@ class DI
 	}
 	
 	/**
+	 * Get an instance of a class registered to the injector.  If an instance
+	 * cannot be found, there will be an attempt to create it.  Throws an exception
+	 * if there is an issue instantiating the class instance.
+	 * 
+	 * If $store is set to TRUE, the created instance will be stored in the injector
+	 * for later consumption.
+	 * 
+	 * @param string $class The name of the class to get
+	 * @param array $injectables Optional injectable parameters if the class needs to be created
+	 * @param boolean $store Whether to store the instance that is created
+	 * @return object
+	 * @throws \Exception
+	 */
+	public function get(string $class, array $injectables = [], bool $store = false)
+	{
+		$instance = isset($this->instances[$class])
+			? $this->instances[$class]
+			: $this->create($class, $injectables);
+		
+		if (!isset($this->instances[$class]) && $store === true) {
+			$this->instances[$class] = $instance;
+		}
+		
+		return $instance;
+	}
+	
+	/**
 	 * Create a new class instance with all of its dependencies injected
 	 * 
 	 * @param string $class
 	 * @param array $injectables
 	 * @return object
 	 */
-	public function create($class, array $injectables = [])
+	public function create(string $class, array $injectables = [])
 	{
 		$ref = new \ReflectionClass($class);
 		$const = $ref->getConstructor();

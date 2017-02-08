@@ -3,7 +3,18 @@ namespace Core;
 
 class DI
 {
+	/**
+	 * @var array
+	 */
 	private $instances = [];
+	
+	/**
+	 * The injector needs to register itself
+	 */
+	public function __construct() 
+	{
+		$this->register($this);
+	}
 	
 	/**
 	 * Register a class instance

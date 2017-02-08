@@ -44,6 +44,24 @@ class ModuleDefinition
 	}
 	
 	/**
+	 * @return string
+	 */
+	public function getNamespace() : string
+	{
+		return $this->namespace;
+	}
+	
+	/**
+	 * Get the root directory of the module
+	 * 
+	 * @return string
+	 */
+	public function rootDir() : string
+	{
+		return $this->rootDir;
+	}
+	
+	/**
 	 * Get the module's instance
 	 * 
 	 * @param AbstractApplication $app

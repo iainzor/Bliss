@@ -78,4 +78,16 @@ class ModuleRegistry
 		
 		return $this->modules[$key];
 	}
+	
+	/**
+	 * Perform a callback function on each ModuleDefinition in the registry
+	 * 
+	 * @param callable $callback
+	 */
+	public function each(callable $callback) 
+	{
+		foreach ($this->modules as $i => $module) {
+			call_user_func($callback, $module, $i);
+		}
+	}
 }

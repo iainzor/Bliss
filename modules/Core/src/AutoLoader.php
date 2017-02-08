@@ -58,7 +58,7 @@ class AutoLoader
 			$namespace = array_shift($parts);
 			if (isset($this->namespaces[$namespace])) {
 				$root = $this->namespaces[$namespace];
-				$path = $root . $this->prefix . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $parts) .".php";
+				$path = $root . $this->prefix . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $parts) .".php";;
 				
 				if (is_file($path)) {
 					require_once $path;

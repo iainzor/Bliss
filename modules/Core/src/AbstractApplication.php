@@ -32,10 +32,13 @@ abstract class AbstractApplication
 		spl_autoload_register([$this->autoLoader, "load"], true);
 		
 		$this->moduleRegistry = new ModuleRegistry($this);
+		$this->moduleRegistry->registerDirectory(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR ."Common");
 		$this->bootstrap();
 	}
 	
 	abstract public function bootstrap();
+	
+	abstract public function run();
 	
 	/**
 	 * Gets the application's autoloader instance.  
@@ -90,11 +93,21 @@ abstract class AbstractApplication
 		return $this->di;
 	}
 	
-	final public function execute(string $module, string $controller, string $action, array $params = [])
+	/**
+	 * Find and execute a path to an action
+	 * 
+	 * @param string $moduleName
+	 * @param string $controllerName
+	 * @param string $actionName
+	 * @param array $params
+	 * @return mixed
+	 */
+	final public function execute(string $moduleName, string $controllerName, string $actionName, array $params = [])
 	{
-		$moduleDef = $this->moduleRegistry()->module($module);
-		$moduleInstance = $moduleDef->instance($this);
+		$module = $this->moduleRegistry()->module($moduleName);
+		$controller = $module->controller($controllerName);
+		$action = $controller->action($actionName);
 		
-		//print_r($moduleInstance);
+		return $action->call($this);
 	}
 }

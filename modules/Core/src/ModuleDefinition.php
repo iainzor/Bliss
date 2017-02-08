@@ -1,6 +1,8 @@
 <?php
 namespace Core;
 
+use Common\StringOperations;
+
 class ModuleDefinition
 {
 	/**
@@ -18,6 +20,16 @@ class ModuleDefinition
 	 * @var AbstractModule
 	 */
 	private $instance;
+	
+	/**
+	 * @var ControllerRegistry[]
+	 */
+	private $controllers = [];
+	
+	/**
+	 * @var boolean
+	 */
+	private $initialized = false;
 	
 	/**
 	 * Constructor
@@ -50,5 +62,38 @@ class ModuleDefinition
 			$this->instance = $app->di()->create($className);
 		}
 		return $this->instance;
+	}
+	
+	/**
+	 * Get the definition for a controller within the module
+	 * 
+	 * @param string $controllerName
+	 * @return ControllerDefinition
+	 */
+	public function controller($controllerName) : ControllerDefinition
+	{
+		$stringOps = new StringOperations();
+		$name = $stringOps->camelize($controllerName);
+		
+		if (!isset($this->controllers[$name])) {
+			$className = $this->namespace ."\\Controller\\". $name;
+			$this->controllers[$name] = new ControllerDefinition($this, $className);
+		}
+		
+		return $this->controllers[$name];
+	}
+	
+	/**
+	 * Initialize the module if it hasn't been already
+	 * 
+	 * @param \Core\AbstractApplication $app
+	 */
+	public function initialize(AbstractApplication $app)
+	{
+		if (!$this->initialized) {
+			// TODO...
+			$this->initialized = true;
+			$app->di()->register($this->instance($app));
+		}
 	}
 }

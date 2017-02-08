@@ -24,45 +24,27 @@ class ModuleRegistry
 	}
 	
 	/**
-	 * Register one or more directories as modules.  This will recursively search
-	 * downward for sub-modules.
+	 * Register a directory as a module.  The only thing that qualifies a directory as
+	 * a module is having a /src directory.
 	 * 
-	 * @param string|array $directories
+	 * Returns the newly created module definition on success or FALSE on failure.
+	 * 
+	 * @param string $path
+	 * @return ModuleDefinition|false
 	 */
-	public function registerDirectory($directories)
+	public function registerDirectory($path)
 	{
-		if (!is_array($directories)) {
-			$directories = [$directories];
-		}
-		foreach ($directories as $dir) {
-			if (!is_dir($dir)) { continue; }
-			
-			foreach (new \DirectoryIterator($dir) as $item) {
-				if ($item->isDot() || $item->isFile()) {
-					continue;
-				}
-				
-				$this->_registerDirectory($item);
-			}
-		}
-	}
-	
-	/**
-	 * @param \DirectoryIterator $dir
-	 */
-	private function _registerDirectory(\DirectoryIterator $dir)
-	{
-		$root = $dir->getPathname();
-		$srcRoot = $root . DIRECTORY_SEPARATOR ."src";
+		$path = str_replace(["/", "\\"], DIRECTORY_SEPARATOR, $path);
+		$srcRoot = $path . DIRECTORY_SEPARATOR ."src";
 		$filename = $srcRoot . DIRECTORY_SEPARATOR ."Module.php";
-		$parts = explode(DIRECTORY_SEPARATOR, $root);
+		$parts = explode(DIRECTORY_SEPARATOR, $path);
 		$namespace = array_pop($parts);
 		$className = $namespace ."\\Module";
 		
 		if (is_dir($srcRoot)) {
-			$def = new ModuleDefinition($namespace, $root);
+			$def = new ModuleDefinition($namespace, $path);
 			$this->modules[strtolower($namespace)] = $def;
-			$this->app->autoLoader()->registerNamespace($namespace, $srcRoot);
+			$this->app->autoLoader()->registerNamespace($namespace, $path);
 			
 			if (is_file($filename)) {
 				require_once $filename;
@@ -73,7 +55,11 @@ class ModuleRegistry
 					call_user_func([$className, "bootstrap"], $this->app);
 				}
 			}
+			
+			return $def;
 		}
+		
+		return false;
 	}
 	
 	/**

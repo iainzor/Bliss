@@ -15,6 +15,7 @@ class DITest extends TestCase
 	
 	public function testBasicFunctionality()
 	{
+		sleep(1);
 		$di = new DI();
 		$di->register(new DateTime("1970-01-01", new DateTimeZone("UTC")));
 		

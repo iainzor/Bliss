@@ -5,7 +5,7 @@ require_once dirname(dirname(__DIR__)) ."/Core/src/AbstractApplication.php";
 
 class Application extends \Core\AbstractApplication
 {
-	public function bootstrap() 
+	protected function bootstrap() 
 	{
 		$this->di()->register($this);
 	}

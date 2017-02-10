@@ -4,56 +4,65 @@ namespace Logs;
 class Logger
 {
 	/**
-	 * @var Output\OutputInterface
-	 */
-	private $output;
-	
-	/**
-	 * @var Message[]
+	 * @var Message\AbstractMessage[]
 	 */
 	private $messages = [];
 	
 	/**
-	 * Constructor
+	 * @var Output\OutputDefinition[]
+	 */
+	private $outputs = [];
+	
+	/**
+	 * Register a new output to send messages to.  If a callable filter is provided,
+	 * it will be used to filter which messages should get through to the output instance. 
 	 * 
 	 * @param \Logs\Output\OutputInterface $output
+	 * @param callable $filter
 	 */
-	public function __construct(Output\OutputInterface $output)
+	public function registerOutput(Output\OutputInterface $output, callable $filter = null)
 	{
-		$this->output = $output;
+		$def = new Output\OutputDefinition($output, $filter);
+		foreach ($this->messages as $message) {
+			$def->next($message);
+		}
+		$this->outputs[] = $def;
 	}
 	
 	/**
 	 * Create and return a new LogMessage
 	 * 
 	 * @param string $text
-	 * @return \Logs\LogMessage
+	 * @return Message\LogMessage
 	 */
-	public function log(string $text) : LogMessage 
+	public function log(string $text) : Message\LogMessage 
 	{
-		return $this->add(new LogMessage($text));
+		return $this->add(new Message\LogMessage($text));
 	}
 	
 	/**
 	 * Create a return a new NoticeMessage
 	 *  
 	 * @param string $text
-	 * @return \Logs\NoticeMessage
+	 * @return Message\NoticeMessage
 	 */
-	public function notice(string $text) : NoticeMessage
+	public function notice(string $text) : Message\NoticeMessage
 	{
-		return $this->add(new NoticeMessage($text));
+		return $this->add(new Message\NoticeMessage($text));
 	}
 	
 	/**
 	 * 
-	 * @param \Logs\AbstractMessage $message
-	 * @return \Logs\AbstractMessage
+	 * @param Message\AbstractMessage $message
+	 * @return Message\AbstractMessage
 	 */
-	public function add(AbstractMessage $message) : AbstractMessage
+	public function add(Message\AbstractMessage $message) : Message\AbstractMessage
 	{
 		$this->messages[] = $message;
-		$this->output->next($message);
+		
+		foreach ($this->outputs as $output) {
+			$output->next($message);
+		}
 		
 		return $message;
 	}

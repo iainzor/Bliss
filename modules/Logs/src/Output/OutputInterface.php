@@ -1,7 +1,7 @@
 <?php
 namespace Logs\Output;
 
-use Logs\AbstractMessage;
+use Logs\Message\AbstractMessage;
 
 interface OutputInterface
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Logs;
+namespace Logs\Message;
 
 abstract class AbstractMessage
 {

@@ -36,7 +36,7 @@ abstract class AbstractApplication
 		$this->bootstrap();
 	}
 	
-	abstract public function bootstrap();
+	abstract protected function bootstrap();
 	
 	abstract public function run();
 	
@@ -86,9 +86,7 @@ abstract class AbstractApplication
 	{
 		if (!$this->di) {
 			$this->di = new DI();
-			$this->di->register(self::class, function() {
-				return $this;
-			});
+			$this->di->register($this);
 		}
 		return $this->di;
 	}

@@ -3,7 +3,14 @@ namespace Common;
 
 class StringOperations
 {
-	public function camelize($str, $ucFirst = true)
+	/**
+	 * Convert a string to camel case
+	 * 
+	 * @param string $str
+	 * @param bool $ucFirst Whether to uppercase the first word
+	 * @return string
+	 */
+	public function camelize(string $str, bool $ucFirst = true) : string
 	{
 		$clean = strtolower(preg_replace("/[^a-z0-9]+/i", " ", $str));
 		$uppercase = ucwords($clean);

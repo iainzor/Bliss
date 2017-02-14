@@ -7,7 +7,7 @@ $argv = $_SERVER["argv"];
 $testsDir = array_pop($argv);
 
 if (is_dir($testsDir)) {
-	spl_autoload_register(function($className) use ($testsDir) {
+	spl_autoload_register(function($className) use ($app, $testsDir) {
 		$parts = explode("\\", $className);
 		$file = implode(DIRECTORY_SEPARATOR, $parts) .".php";
 		$path = $testsDir . DIRECTORY_SEPARATOR . $file;

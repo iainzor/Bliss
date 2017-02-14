@@ -27,4 +27,8 @@ abstract class AbstractMessage
 	{
 		return $this->text;
 	}
+	
+	public function __toString() {
+		return $this->text;
+	}
 }

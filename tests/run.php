@@ -2,9 +2,11 @@
 define("ROOT_DIR", __DIR__ . DIRECTORY_SEPARATOR);
 define("PHPUNIT_DOWNLOAD_URL", "https://phar.phpunit.de/phpunit.phar");
 
+$modulesToTest = array_map(function($m) { return strtolower($m); }, array_slice($argv, 1));
+
 /* @var $app \CmdLine\Application */
 $app = include_once ROOT_DIR . "bootstrap.php";
-$app->di()->call(function(Logs\Logger $logger) use ($app) {
+$app->di()->call(function(Logs\Logger $logger) use ($app, $modulesToTest) {
 	$logger->registerOutput(new class() implements Logs\Output\OutputInterface {
 		public function next(Logs\Message\AbstractMessage $message) {
 			echo "> ". $message ."\n";
@@ -29,7 +31,11 @@ $app->di()->call(function(Logs\Logger $logger) use ($app) {
 		$logger->log("PHPUnit found, continuing with tests");
 	}
 	
-	$app->moduleRegistry()->each(function(\Core\ModuleDefinition $module) use ($app, $logger) {
+	$app->moduleRegistry()->each(function(\Core\ModuleDefinition $module) use ($app, $logger, $modulesToTest) {
+		if (count($modulesToTest) && !in_array($module->name(), $modulesToTest)) {
+			return;
+		}
+		
 		$testDir = $module->rootDir() . DIRECTORY_SEPARATOR ."tests";
 
 		if (is_dir($testDir)) {

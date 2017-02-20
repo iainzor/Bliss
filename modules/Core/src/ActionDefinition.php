@@ -25,6 +25,23 @@ class ActionDefinition
 		$this->name = $name;
 	}
 	
+	/**
+	 * Get the name of the action
+	 * 
+	 * @return string
+	 */
+	public function name() : string	
+	{
+		return $this->name;
+	}
+	
+	/**
+	 * Call the action and return its results
+	 * 
+	 * @param \Core\AbstractApplication $app
+	 * @return mixed
+	 * @throws \Exception
+	 */
 	public function call(AbstractApplication $app)
 	{
 		$this->controller->initialize($app);

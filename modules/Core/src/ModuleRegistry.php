@@ -62,6 +62,19 @@ class ModuleRegistry
 		return false;
 	}
 	
+	public function registerAll(string $directory, array $moduleNames = null)
+	{
+		foreach (new \DirectoryIterator($directory) as $item) {
+			if (!$item->isDot() && $item->isDir()) {
+				$name = $item->getBasename();
+				
+				if ($moduleNames === null || in_array($name, $moduleNames)) {
+					$this->registerDirectory($item->getPathname());
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Get the definition of a module using its name
 	 * 

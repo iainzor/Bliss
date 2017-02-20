@@ -13,6 +13,11 @@ class ModuleDefinition
 	/**
 	 * @var string
 	 */
+	private $name;
+	
+	/**
+	 * @var string
+	 */
 	private $rootDir;
 	
 	/**
@@ -41,6 +46,7 @@ class ModuleDefinition
 	{
 		$this->namespace = $namespace;
 		$this->rootDir = $rootDir;
+		$this->name = strtolower($namespace);
 	}
 	
 	/**
@@ -59,6 +65,16 @@ class ModuleDefinition
 	public function rootDir() : string
 	{
 		return $this->rootDir;
+	}
+	
+	/**
+	 * Get the name of the module.  Names are always the module's root directory name lowercased.
+	 * 
+	 * @return string
+	 */
+	public function name() : string 
+	{
+		return $this->name;
 	}
 	
 	/**
@@ -102,14 +118,13 @@ class ModuleDefinition
 	}
 	
 	/**
-	 * Initialize the module if it hasn't been already
+	 * Initialize the module if it hasn't already
 	 * 
 	 * @param \Core\AbstractApplication $app
 	 */
 	public function initialize(AbstractApplication $app)
 	{
 		if (!$this->initialized) {
-			// TODO...
 			$this->initialized = true;
 			$app->di()->register($this->instance($app));
 		}

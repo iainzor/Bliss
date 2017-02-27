@@ -18,6 +18,11 @@ class Application extends \Core\AbstractApplication
 	private $request;
 	
 	/**
+	 * @var Response
+	 */
+	private $response;
+	
+	/**
 	 * Bootstrap the HTTP application
 	 */
 	protected function bootstrap() 
@@ -26,6 +31,7 @@ class Application extends \Core\AbstractApplication
 		
 		$this->router = new Router();
 		$this->request = new Request();
+		$this->response = new Response();
 		
 		$this->di()->register($this);
 		$this->di()->register($this->router);
@@ -42,18 +48,37 @@ class Application extends \Core\AbstractApplication
 		return $this->router;
 	}
 	
+	/**
+	 * Generate a new caller instance for a route
+	 * 
+	 * @param \Http\Route $route
+	 * @return \Http\RouteCaller
+	 */
 	public function routeCaller(Route $route) : RouteCaller
 	{
 		return new RouteCaller($this, $route);
 	}
-
+	
+	/**
+	 * Run the application and output the result
+	 */
 	public function run() 
 	{
-		$route = $this->router->find($this->request->uri());
-		$caller = $this->routeCaller($route);
-		$body = $caller->execute();
+		$this->request->init($this);
 		
-		header("Content-type: application/json");
-		echo json_encode($body);
+		$format = $this->request->format();
+		try {
+			$route = $this->router->find($this->request->uri());
+		} catch (RouteNotFoundException $e) {
+			$uri = preg_replace("/^(.*)\.". $format->extension() ."$/i", "\\1", $this->request->uri());
+			$route = $this->router->find($uri);
+		}
+		$this->response->header("Content-Type: ". $format->mimeType());
+		
+		$caller = $this->routeCaller($route);
+		$result = $format->parse($caller->execute());
+		
+		$this->response->body($result);
+		$this->response->output();
 	}
 }

@@ -37,7 +37,7 @@ class Router
 		}
 		
 		if ($routeDef === null) {
-			throw new \Exception("Could not find a route matching '{$path}'");
+			throw new RouteNotFoundException("Could not find a route matching '{$path}'");
 		}
 		
 		return $routeDef->generateRoute($path);

@@ -86,13 +86,9 @@ class ModuleDefinition
 	 */
 	public function instance(AbstractApplication $app)
 	{
-		if (!$this->instance) {
-			$className = $this->namespace ."\\Module";
-			
-			if (!class_exists($className)) {
-				throw new \Exception("This module is registered as a library only.");
-			}
-			
+		$className = $this->namespace ."\\Module";
+		
+		if (!$this->instance && class_exists($className)) {
 			$this->instance = $app->di()->create($className);
 		}
 		return $this->instance;

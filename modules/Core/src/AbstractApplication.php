@@ -25,6 +25,9 @@ abstract class AbstractApplication
 	 */
 	private $config;
 	
+	/**
+	 * Constructor
+	 */
 	final public function __construct()
 	{
 		$this->autoLoader = new AutoLoader(DIRECTORY_SEPARATOR . "src");
@@ -33,6 +36,10 @@ abstract class AbstractApplication
 		
 		$this->moduleRegistry = new ModuleRegistry($this);
 		$this->moduleRegistry->registerDirectory(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR ."Common");
+		
+		$this->config = new Config($this);
+		$this->di()->register($this->config);
+		
 		$this->bootstrap();
 	}
 	
@@ -59,21 +66,10 @@ abstract class AbstractApplication
 	}
 	
 	/**
-	 * @return ConfigTuner
-	 */
-	final public function configure()
-	{
-		return new ConfigTuner($this->config());
-	}
-	
-	/**
 	 * @return Config
 	 */
 	final public function config()
 	{
-		if (!$this->config) {
-			$this->config = new Config($this);
-		}
 		return $this->config;
 	}
 	

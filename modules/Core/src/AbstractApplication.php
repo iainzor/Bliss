@@ -105,7 +105,8 @@ abstract class AbstractApplication
 		$module = $this->moduleRegistry()->module($moduleName);
 		$controller = $module->controller($controllerName);
 		$action = $controller->action($actionName);
+		$actionParams = new ActionParams($params);
 		
-		return $action->call($this);
+		return $action->call($this, $actionParams);
 	}
 }

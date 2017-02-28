@@ -39,10 +39,11 @@ class ActionDefinition
 	 * Call the action and return its results
 	 * 
 	 * @param \Core\AbstractApplication $app
+	 * @param \Core\ActionParams $params
 	 * @return mixed
 	 * @throws \Exception
 	 */
-	public function call(AbstractApplication $app)
+	public function call(AbstractApplication $app, ActionParams $params)
 	{
 		$this->controller->initialize($app);
 		
@@ -53,6 +54,8 @@ class ActionDefinition
 			throw new \Exception("Controller '". $this->controller->className() ."' does not have the method '{$method}'");
 		}
 		
-		return $app->di()->call([$classInstance, $method]);
+		return $app->di()->call([$classInstance, $method], [
+			ActionParams::class => $params
+		]);
 	}
 }

@@ -122,7 +122,11 @@ class ModuleDefinition
 	{
 		if (!$this->initialized) {
 			$this->initialized = true;
-			$app->di()->register($this->instance($app));
+			
+			$instance = $this->instance($app);
+			if ($instance) {
+				$app->di()->register($instance);
+			}
 		}
 	}
 }

@@ -119,7 +119,7 @@ class RouteDefinition
 		$moduleName = is_callable($this->module) ? call_user_func($this->module, $matches) : $this->module;
 		$controllerName = is_callable($this->controller) ? call_user_func($this->controller, $matches) : $this->controller;
 		$actionName = is_callable($this->action) ? call_user_func($this->action, $matches) : $this->action;
-		$params = is_callable($this->params) ? call_user_func($this->params, $matches) : $this->params;
+		$params = is_callable($this->params) ? call_user_func($this->params, $matches) : $this->_generateParams($matches, $this->params);
 		
 		return new Route(
 			$moduleName,
@@ -127,5 +127,25 @@ class RouteDefinition
 			$actionName,
 			$params
 		);
+	}
+	
+	/**
+	 * Generate a list of parameters that were parsed from the route
+	 * 
+	 * @param array $matches
+	 * @param array $params
+	 * @return array
+	 */
+	private function _generateParams(array $matches, array $params) : array
+	{
+		$found = [];
+		foreach ($params as $key => $value) {
+			if (is_numeric($key) && isset($matches[$key])) {
+				$found[$value] = $matches[$key];
+			} else {
+				$found[$key] = $value;
+			}
+		}
+		return $found;
 	}
 }

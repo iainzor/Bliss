@@ -12,7 +12,7 @@ class Router
 	 * Create an return a new route
 	 * 
 	 * @param string $test A regex string used to match paths
-	 * @return \Http\Route
+	 * @return RouteDefinition
 	 */
 	public function when(string $test) : RouteDefinition
 	{

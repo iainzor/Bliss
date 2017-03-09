@@ -68,6 +68,20 @@ class Request
 	}
 	
 	/**
+	 * Return the value of a GET input variable
+	 * 
+	 * @see filter_input()
+	 * @param string $name
+	 * @param int $filter
+	 * @param array $options
+	 * @return mixed
+	 */
+	public function inputGet(string $name, int $filter = FILTER_DEFAULT, array $options = [])
+	{
+		return filter_input(INPUT_GET, $name, $filter, $options);
+	}
+	
+	/**
 	 * Find the requested URI that was requested
 	 * 
 	 * @return string
@@ -75,7 +89,7 @@ class Request
 	private function _findUri() : string
 	{
 		$scriptName = filter_input(INPUT_SERVER, "SCRIPT_NAME");
-		$requestUri = filter_input(INPUT_SERVER, "REQUEST_URI");
+		$requestUri = preg_replace("/^\/?([^\?]+)?.*$/i", "\\1", filter_input(INPUT_SERVER, "REQUEST_URI"));
 		$quoted = preg_quote($scriptName, "/");
 		$uri = preg_replace("/^". $quoted ."\/?(.*)$/i", "\\1", $requestUri);
 		

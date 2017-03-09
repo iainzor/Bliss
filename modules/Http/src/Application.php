@@ -49,17 +49,6 @@ class Application extends \Core\AbstractApplication
 	}
 	
 	/**
-	 * Generate a new caller instance for a route
-	 * 
-	 * @param \Http\Route $route
-	 * @return \Http\RouteCaller
-	 */
-	public function routeCaller(Route $route) : RouteCaller
-	{
-		return new RouteCaller($this, $route);
-	}
-	
-	/**
 	 * Run the application and output the result
 	 */
 	public function run() 
@@ -73,12 +62,19 @@ class Application extends \Core\AbstractApplication
 			$uri = preg_replace("/^(.*)\.". $format->extension() ."$/i", "\\1", $this->request->uri());
 			$route = $this->router->find($uri);
 		}
+		
+		$this->di()->register($route);
+		
+		$result = $this->execute(
+			$route->module(), 
+			$route->controller(),
+			$route->action(), 
+			$route->params()
+		);
+		$body = $format->parse($result);
+		
 		$this->response->header("Content-Type: ". $format->mimeType());
-		
-		$caller = $this->routeCaller($route);
-		$result = $format->parse($caller->execute());
-		
-		$this->response->body($result);
+		$this->response->body($body);
 		$this->response->output();
 	}
 }

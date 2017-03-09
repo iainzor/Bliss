@@ -10,12 +10,17 @@ class ApplicationTest extends TestCase
 		$app->moduleRegistry()->registerDirectory(__DIR__ . DIRECTORY_SEPARATOR . "MockModule");
 		
 		$route = $app->router()->find("users/123/profile");
-		$caller = $app->routeCaller($route);
-		$module = $caller->module();
-		$controller = $caller->controller();
 		
-		$this->assertInstanceOf(\MockModule\Module::class, $module);
-		$this->assertInstanceOf(\MockModule\Controller\User::class, $controller);
+		$moduleName = $route->module();
+		$moduleDef = $app->moduleRegistry()->module($moduleName);
+		$moduleInstance = $moduleDef->instance($app);
+		
+		$controllerName = $route->controller();
+		$controllerDef = $moduleDef->controller($controllerName);
+		$controllerInstance = $controllerDef->instance($app);
+		
+		$this->assertInstanceOf(\MockModule\Module::class, $moduleInstance);
+		$this->assertInstanceOf(\MockModule\Controller\User::class, $controllerInstance);
 		$this->assertEquals(123, $route->param("userId"));
 	}
 }

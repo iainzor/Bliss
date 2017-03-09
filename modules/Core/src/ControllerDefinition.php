@@ -103,9 +103,6 @@ class ControllerDefinition
 	{
 		if (!$this->initialized) {
 			$this->module->initialize($app);
-			
-			// TODO...
-			
 			$this->initialized = true;
 			$app->di()->register($this->instance($app));
 		}

@@ -59,7 +59,7 @@ class Application extends \Core\AbstractApplication
 		try {
 			$route = $this->router->find($this->request->uri());
 		} catch (RouteNotFoundException $e) {
-			$uri = preg_replace("/^(.*)\.". $format->extension() ."$/i", "\\1", $this->request->uri());
+			$uri = preg_replace("/^(.*)(\.[a-z0-9]+)$/i", "\\1", $this->request->uri());
 			$route = $this->router->find($uri);
 		}
 		

@@ -121,6 +121,11 @@ class RouteDefinition
 		$actionName = is_callable($this->action) ? call_user_func($this->action, $matches) : $this->action;
 		$params = is_callable($this->params) ? call_user_func($this->params, $matches) : $this->_generateParams($matches, $this->params);
 		
+		if (isset($params["action"])) {
+			$actionName = $params["action"];
+			unset($params["action"]);
+		}
+		
 		return new Route(
 			$moduleName,
 			$controllerName,
@@ -140,9 +145,9 @@ class RouteDefinition
 	{
 		$found = [];
 		foreach ($params as $key => $value) {
-			if (is_numeric($key) && isset($matches[$key])) {
+			if (is_numeric($key) && !empty($matches[$key])) {
 				$found[$value] = $matches[$key];
-			} else {
+			} else if (!is_numeric($key)) {
 				$found[$key] = $value;
 			}
 		}

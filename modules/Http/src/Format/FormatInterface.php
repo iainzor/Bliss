@@ -3,7 +3,7 @@ namespace Http\Format;
 
 interface FormatInterface
 {
-	public function extension() : string;
+	public function matches(string $path) : bool;
 	
 	public function mimeType() : string;
 	

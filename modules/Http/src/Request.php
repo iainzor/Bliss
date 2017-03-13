@@ -67,6 +67,11 @@ class Request
 		return $this->format;
 	}
 	
+	public function header($header)
+	{
+		return filter_input(INPUT_SERVER, "HTTP-". $header);
+	}
+	
 	/**
 	 * Return the value of a GET input variable
 	 * 
@@ -79,6 +84,19 @@ class Request
 	public function inputGet(string $name, int $filter = FILTER_DEFAULT, array $options = [])
 	{
 		return filter_input(INPUT_GET, $name, $filter, $options);
+	}
+	
+	/**
+	 * Return all GET variables
+	 * 
+	 * @see filter_input_array()
+	 * @param mixed $definition
+	 * @param bool $addEmpty
+	 * @return array
+	 */
+	public function inputGetAll($definition = null, bool $addEmpty = true) : array
+	{
+		return filter_input_array(INPUT_GET, $definition, $addEmpty) ?: [];
 	}
 	
 	/**

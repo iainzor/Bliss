@@ -3,7 +3,10 @@ namespace Http\Format;
 
 class PlainTextFormat implements FormatInterface
 {
-	public function extension() : string { return "txt"; }
+	public function matches(string $path) : bool 
+	{ 
+		return preg_match("/\.(te?xt)$/i", $path);
+	}
 	
 	public function mimeType() : string { return "text/plain"; }
 	

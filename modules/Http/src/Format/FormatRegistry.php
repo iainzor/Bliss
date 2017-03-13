@@ -27,14 +27,25 @@ class FormatRegistry
 	}
 	
 	/**
-	 * Register a format.  This will overwrite any existing format that shares
-	 * the same extension.
+	 * Register a format
 	 * 
 	 * @param \Http\Response\FormatInterface $format
 	 */
 	public function register(FormatInterface $format)
 	{
-		$this->formats[$format->extension()] = $format;
+		$this->formats[] = $format;
+	}
+	
+	/**
+	 * Register multiple formats
+	 * 
+	 * @param array $formats
+	 */
+	public function registerAll(array $formats)
+	{
+		foreach ($formats as $format) {
+			$this->register($format);
+		}
 	}
 	
 	/**
@@ -47,7 +58,7 @@ class FormatRegistry
 	public function determine(string $path) : FormatInterface
 	{
 		foreach ($this->formats as $format) {
-			if (preg_match("/^(.*)\.". $format->extension() ."$/i", $path)) {
+			if ($format->matches($path)) {
 				return $format;
 			}
 		}

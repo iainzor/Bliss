@@ -5,6 +5,10 @@ class Module implements Format\FormatProviderInterface
 {
 	public function registerResponseFormats(Format\FormatRegistry $formatRegistry) 
 	{
-		$formatRegistry->register(new Format\JsonFormat());
+		$formatRegistry->registerAll([
+			new Format\JsonFormat(),
+			new Format\ImageFormat()
+		]);
+		
 	}
 }

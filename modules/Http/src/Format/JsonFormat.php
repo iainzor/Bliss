@@ -3,7 +3,10 @@ namespace Http\Format;
 
 class JsonFormat implements FormatInterface
 {
-	public function extension() : string { return "json"; }
+	public function matches(string $path) : bool 
+	{ 
+		return preg_match("/\.(json)$/i", $path);
+	}
 	
 	public function mimeType() : string { return "application/json"; }
 	

@@ -22,4 +22,26 @@ class StringOperations
 		
 		return $combined;
 	}
+	
+	public function hyphenate(string $str, int $maxLength = 0) : string
+	{
+		$str = preg_replace("/[^a-z0-9]+/i", " ", $str);
+		$str = preg_replace("/\s+/", "-", $str);
+		
+		if ($maxLength > 0) {
+			$str = $this->truncate($str, $maxLength);
+		}
+		
+		return strtolower(trim($str, "-"));
+	}
+	
+	public function truncate(string $str, int $length, string $append = null) : string
+	{
+		if (strlen($str) > $length) {
+			$str = substr($str, 0, $length);
+			$str .= $append;
+		}
+		
+		return $str;
+	}
 }

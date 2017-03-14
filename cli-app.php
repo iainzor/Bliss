@@ -1,7 +1,9 @@
 <?php
 include "bliss-app.php";
 
-use Response\Format\CLIFormat;
+use Response\Format\CLIFormat,
+	Acl\Acl,
+	Acl\Permission\RegexPermission;
 
 class BlissCLIApp extends BlissApp
 {
@@ -29,7 +31,9 @@ class BlissCLIApp extends BlissApp
 				parse_str($matches[2], $requestParams);
 			}
 			
-			$this->call($this, "preExecute");
+			$this->call($this, "preExecute", [
+				"uri" => $requestPath
+			]);
 			
 			$options = getopt("s:");
 			$route = $this->router()->find($requestPath);
@@ -59,11 +63,21 @@ class BlissCLIApp extends BlissApp
 			
 			echo "ERROR\r\n";
 			echo $e->getMessage() ."\r\n";
+			echo $e->getTraceAsString() ."\r\n";
 		}
 	}
 	
-	public function preExecute(\Response\Module $response)
+	public function preExecute($uri, \Response\Module $response, \Request\Module $request, \User\Module $users)
 	{
+		$users->user()->role()->addPermission(
+			new RegexPermission("^.*$", [
+				Acl::CREATE => true,
+				Acl::READ => true,
+				Acl::UPDATE => true,
+				Acl::DELETE => true
+			])
+		);
+		$request->setUri($uri);
 		$response->format("cli", new CLIFormat());
 		$response->sendHeaders(false);
 		

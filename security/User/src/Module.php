@@ -26,11 +26,6 @@ class Module extends AbstractModule implements
 	private $sessionManager;
 	
 	/**
-	 * @var array
-	 */
-	private $cookieConfig = [];
-	
-	/**
 	 * @var RoleRegistry
 	 */
 	private $roleRegistry;

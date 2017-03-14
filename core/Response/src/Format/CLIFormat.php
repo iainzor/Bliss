@@ -1,8 +1,6 @@
 <?php
 namespace Response\Format;
 
-use Bliss\Component;
-
 class CLIFormat implements FormatInterface
 {
 	public function mime() { return null; }
@@ -10,6 +8,14 @@ class CLIFormat implements FormatInterface
 	public function requiresView() { return false; }
 
 	public function transform(\Response\Module $response) 
-	{}
+	{
+		$data = "";
+		foreach ($response->params() as $name => $value) {
+			if (is_string($value)) {
+				$data .= $name .":". $value ."\r\n";
+			}
+		}
+		return $data;
+	}
 
 }

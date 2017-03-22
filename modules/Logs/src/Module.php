@@ -1,12 +1,11 @@
 <?php
 namespace Logs;
 
-use Core\BootableModuleInterface,
-	Core\DI;
+use Core\BootableModuleInterface;
 
 class Module implements BootableModuleInterface
 {
-	public static function bootstrap(\Core\AbstractApplication $app) 
+	public function bootstrap(\Core\AbstractApplication $app) 
 	{
 		$app->di()->register(new Logger());
 	}

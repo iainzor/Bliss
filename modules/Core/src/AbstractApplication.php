@@ -26,9 +26,17 @@ abstract class AbstractApplication
 	private $config;
 	
 	/**
+	 * @var boolean
+	 */
+	protected $started = false;
+	
+	abstract protected function onStart();
+	abstract protected function onStop();
+	
+	/**
 	 * Constructor
 	 */
-	final public function __construct()
+	public function __construct()
 	{
 		$this->autoLoader = new AutoLoader(DIRECTORY_SEPARATOR . "src");
 		$this->autoLoader->registerNamespace("Core", dirname(__DIR__));
@@ -40,12 +48,31 @@ abstract class AbstractApplication
 		$this->config = new Config($this);
 		$this->di()->register($this->config);
 		
-		$this->bootstrap();
 	}
 	
-	abstract protected function bootstrap();
+	final public function start()
+	{
+		if ($this->started === true) {
+			throw new \Exception("Application has already been started");
+		}
+		
+		$this->started = true;
+		$this->onStart();
+		
+		$this->moduleRegistry->each(function(ModuleDefinition $moduleDef) {
+			$module = $moduleDef->instance($this);
+			
+			if ($module instanceof BootableModuleInterface) {
+				$module->bootstrap($this);
+			}
+		});
+	}
 	
-	abstract public function run();
+	final public function stop()
+	{
+		$this->started = false;
+		$this->onStop();
+	}
 	
 	/**
 	 * Gets the application's autoloader instance.  
@@ -98,6 +125,10 @@ abstract class AbstractApplication
 	 */
 	final public function execute(string $moduleName, string $controllerName, string $actionName, array $params = [])
 	{
+		if (!$this->started) {
+			throw new \Exception("Application has not been started, call start() before executing a command");
+		}
+		
 		$module = $this->moduleRegistry()->module($moduleName);
 		$controller = $module->controller($controllerName);
 		$action = $controller->action($actionName);

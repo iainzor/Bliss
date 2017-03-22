@@ -5,7 +5,7 @@ use Core\BootableModuleInterface;
 
 class Module implements BootableModuleInterface
 {
-	public static function bootstrap(\Core\AbstractApplication $app) 
+	public function bootstrap(\Core\AbstractApplication $app) 
 	{
 		$app->router()->when("/^users\/([0-9]+)\/?([a-z0-9-]+)?$/i")
 			->module("mockmodule")

@@ -8,6 +8,7 @@ class ApplicationTest extends TestCase
 	{
 		$app = new Application();
 		$app->moduleRegistry()->registerDirectory(__DIR__ . DIRECTORY_SEPARATOR . "MockModule");
+		$app->start();
 		
 		$route = $app->router()->find("users/123/profile");
 		

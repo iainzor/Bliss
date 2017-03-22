@@ -5,13 +5,19 @@ require_once dirname(dirname(__DIR__)) ."/Core/src/AbstractApplication.php";
 
 class Application extends \Core\AbstractApplication
 {
-	protected function bootstrap() 
+	protected function onStart() 
 	{
 		$this->di()->register($this);
 	}
 	
+	protected function onStop() {}
+	
 	public function run()
 	{
+		if (!$this->started) {
+			$this->start();
+		}
+		
 		$options = getopt("m:c:a:p::");
 		$moduleName = isset($options["m"]) ? $options["m"] : null;
 		$controllerName = isset($options["c"]) ? $options["c"] : null;

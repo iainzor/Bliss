@@ -46,16 +46,6 @@ class ModuleRegistry
 			$this->modules[strtolower($namespace)] = $def;
 			$this->app->autoLoader()->registerNamespace($namespace, $path);
 			
-			if (is_file($filename)) {
-				require_once $filename;
-				
-				$classRef = new \ReflectionClass($className);
-				$interfaces = $classRef->getInterfaceNames();
-				if (in_array(BootableModuleInterface::class, $interfaces)) {
-					call_user_func([$className, "bootstrap"], $this->app);
-				}
-			}
-			
 			return $def;
 		}
 		

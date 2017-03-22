@@ -3,5 +3,5 @@ namespace Core;
 
 interface BootableModuleInterface
 {
-	public static function bootstrap(AbstractApplication $app);
+	public function bootstrap(AbstractApplication $app);
 }

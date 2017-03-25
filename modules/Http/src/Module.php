@@ -9,6 +9,5 @@ class Module implements Format\FormatProviderInterface
 			new Format\JsonFormat(),
 			new Format\ImageFormat()
 		]);
-		
 	}
 }

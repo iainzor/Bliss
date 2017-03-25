@@ -21,12 +21,13 @@ class Request
 	/**
 	 * Initialize the request
 	 * 
+	 * @param string $uri
 	 * @param \Http\Application $app
 	 */
-	public function init(Application $app)
+	public function init(string $uri, Application $app)
 	{
-		$this->uri = $this->_findUri();
-		$this->format = $this->_findFormat($app, $this->uri);
+		$this->uri = $uri;
+		$this->format = $this->_findFormat($app, $uri);
 	}
 	
 	/**
@@ -58,6 +59,16 @@ class Request
 	}
 	
 	/**
+	 * Set the request URI
+	 * 
+	 * @param string $uri
+	 */
+	public function setUri(string $uri)
+	{
+		$this->uri = $uri;
+	}
+	
+	/**
 	 * Get the requested format
 	 * 
 	 * @return \Http\Format\FormatInterface
@@ -65,11 +76,6 @@ class Request
 	public function format() : Format\FormatInterface
 	{
 		return $this->format;
-	}
-	
-	public function header($header)
-	{
-		return filter_input(INPUT_SERVER, "HTTP-". $header);
 	}
 	
 	/**
@@ -97,21 +103,6 @@ class Request
 	public function inputGetAll($definition = null, bool $addEmpty = true) : array
 	{
 		return filter_input_array(INPUT_GET, $definition, $addEmpty) ?: [];
-	}
-	
-	/**
-	 * Find the requested URI that was requested
-	 * 
-	 * @return string
-	 */
-	private function _findUri() : string
-	{
-		$scriptName = filter_input(INPUT_SERVER, "SCRIPT_NAME");
-		$requestUri = preg_replace("/^\/?([^\?]+)?.*$/i", "\\1", filter_input(INPUT_SERVER, "REQUEST_URI"));
-		$quoted = preg_quote($scriptName, "/");
-		$uri = preg_replace("/^". $quoted ."\/?(.*)$/i", "\\1", $requestUri);
-		
-		return trim($uri, "/");
 	}
 	
 	/**

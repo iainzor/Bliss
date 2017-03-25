@@ -9,6 +9,23 @@ class Router
 	private $routes = [];
 	
 	/**
+	 * Initialize the router
+	 * Loops through all registered modules and collects routes from route providers
+	 * 
+	 * @param \Http\Application $app
+	 */
+	public function init(Application $app)
+	{
+		$app->moduleRegistry()->each(function(\Core\ModuleDefinition $moduleDef) use ($app) {
+			$module = $moduleDef->instance($app);
+			
+			if ($module instanceof RouteProviderInterface) {
+				$module->registerRoutes($this);
+			}
+		});
+	}
+	
+	/**
 	 * Create an return a new route
 	 * 
 	 * @param string $test A regex string used to match paths

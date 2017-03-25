@@ -59,15 +59,17 @@ class Application extends \Core\AbstractApplication
 	
 	/**
 	 * Run the application and output the result
+	 * 
+	 * @param string $uri
 	 */
-	public function run() 
+	public function run(string $uri) 
 	{
 		if (!$this->started) {
 			parent::start();
-			//die("NOT STARTED");
 		}
 		
-		$this->request->init($this);
+		$this->router->init($this);
+		$this->request->init($uri, $this);
 		
 		$format = $this->request->format();
 		try {

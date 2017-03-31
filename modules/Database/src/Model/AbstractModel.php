@@ -1,7 +1,9 @@
 <?php
 namespace Database\Model;
 
-abstract class AbstractModel
+use Common\StringOperations;
+
+abstract class AbstractModel implements \JsonSerializable
 {
 	/**
 	 * @var static
@@ -29,5 +31,24 @@ abstract class AbstractModel
 		}
 		
 		$this->_cleanModel = clone $this;
+	}
+	
+	public function jsonSerialize()
+	{
+		$strOps = new StringOperations();
+		$ref = new \ReflectionClass($this);
+		$data = [];
+		
+		foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+			$name = $property->getName();
+			$value = $this->{$name};
+			
+			if (is_string($value)) {
+				$value = $strOps->convertValueType($value);
+			}
+			$data[$name] = $value;
+		}
+		
+		return $data;
 	}
 }

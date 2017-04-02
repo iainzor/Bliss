@@ -19,6 +19,11 @@ class Request
 	private $defaultFormat;
 	
 	/**
+	 * @var string
+	 */
+	private $body;
+	
+	/**
 	 * Initialize the request
 	 * 
 	 * @param string $uri
@@ -28,6 +33,7 @@ class Request
 	{
 		$this->uri = $uri;
 		$this->format = $this->_findFormat($app, $uri);
+		$this->body = file_get_contents("php://input");
 	}
 	
 	/**
@@ -79,6 +85,17 @@ class Request
 	}
 	
 	/**
+	 * Get the data from the body of the request.  This is useful for reading
+	 * raw data from POST requests.
+	 * 
+	 * @return string
+	 */
+	public function body() : string
+	{
+		return $this->body;
+	}
+	
+	/**
 	 * Return the value of a GET input variable
 	 * 
 	 * @see filter_input()
@@ -93,7 +110,7 @@ class Request
 	}
 	
 	/**
-	 * Return all GET variables
+	 * Return all GET values
 	 * 
 	 * @see filter_input_array()
 	 * @param mixed $definition
@@ -103,6 +120,42 @@ class Request
 	public function inputGetAll($definition = null, bool $addEmpty = true) : array
 	{
 		return filter_input_array(INPUT_GET, $definition, $addEmpty) ?: [];
+	}
+	
+	/**
+	 * Return the value of a POST input variable
+	 * 
+	 * @param string $name
+	 * @param int $filter
+	 * @param array $options
+	 * @return mixed
+	 */
+	public function inputPost(string $name, int $filter = FILTER_DEFAULT, array $options = [])
+	{
+		return filter_input(INPUT_POST, $name, $filter, $options);
+	}
+	
+	/**
+	 * Return all POST values
+	 * 
+	 * @see filter_input_array()
+	 * @param mixed $definition
+	 * @param bool $addEmpty
+	 * @return array
+	 */
+	public function inputPostAll($definition = null, bool $addEmpty = true) : array
+	{
+		return filter_input_array(INPUT_POST, $definition, $addEmpty) ?: [];
+	}
+	
+	/**
+	 * Generate a new JsonRequest instance for the request
+	 * 
+	 * @return \Http\JsonRequest
+	 */
+	public function json() : JsonRequest
+	{
+		return new JsonRequest($this);
 	}
 	
 	/**

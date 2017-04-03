@@ -59,7 +59,13 @@ class ActionDefinition
 				ActionParams::class => $params
 			]);
 		} catch (\Exception $e) {
-			throw new \Exception("Exception encountered while executing action: ". $e->getMessage(), $e);
+			echo "<pre>";
+			echo $e->getMessage();
+			echo "\n";
+			echo $e->getTraceAsString();
+			exit;
+			
+			throw new \Exception("Exception encountered while executing action: ". $e->getMessage(), $e->getCode(), $e);
 		}
 	}
 }

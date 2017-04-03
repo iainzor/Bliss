@@ -25,7 +25,7 @@ abstract class AbstractTable implements TableInterface
 	 * Insert a record into the table and return the last inserted ID
 	 * 
 	 * @param array $data
-	 * @return mixed
+	 * @return mixed Returns the last insert ID
 	 */
 	public function insert(array $data)
 	{
@@ -40,5 +40,31 @@ abstract class AbstractTable implements TableInterface
 		$statement->execute();
 		
 		return $this->db->lastInsertId();
+	}
+	
+	/**
+	 * Update the data in the table matching $params
+	 * 
+	 * @param array $data
+	 * @param array $params
+	 * @return int Number of rows affected
+	 */
+	public function update(array $data, array $params = [])
+	{
+		$pairs = [];
+		foreach ($data as $name => $value) {
+			$pairs[] = "`{$name}` = ". $this->db->quote($value);
+		}
+		
+		$where = ["1"];
+		foreach ($params as $name => $value) {
+			$where[] = "`{$name}` = ". $this->db->quote($value);
+		}
+		
+		return $this->db->exec("
+			UPDATE	`". $this->getName() ."`
+			SET		". implode(", ", $pairs) ."
+			WHERE	". implode(" AND ", $where) ."
+		");
 	}
 }

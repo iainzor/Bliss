@@ -18,9 +18,19 @@ class ModuleConfig
 	 * 
 	 * @param array $data
 	 */
-	public function __construct(ModuleDefinition $module, array $data)
+	public function __construct(ModuleDefinition $module, array $data = [])
 	{
 		$this->module = $module;
+		$this->data = $data;
+	}
+	
+	/**
+	 * Populate the configuration data
+	 * 
+	 * @param array $data
+	 */
+	public function populate(array $data)
+	{
 		$this->data = $data;
 	}
 	

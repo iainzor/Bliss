@@ -43,9 +43,9 @@ class ControllerDefinition
 	}
 	
 	/**
-	 * @return object
+	 * @return ModuleDefinition
 	 */
-	public function module()
+	public function module() : ModuleDefinition
 	{
 		return $this->module;
 	}

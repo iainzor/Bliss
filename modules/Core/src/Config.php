@@ -46,12 +46,12 @@ class Config
 		
 		$this->app->moduleRegistry()->each(function(ModuleDefinition $def) {
 			$instance = $def->instance($this->app);
+			$section = get_class($instance);
+			$data = isset($this->data[$section]) ? $this->data[$section] : [];
+			$def->config()->populate($data);
 			
 			if ($instance instanceof ConfigurableModuleInterface) {
-				$section = get_class($instance);
-				$data = isset($this->data[$section]) ? $this->data[$section] : [];
-				
-				$instance->configure($this->app, new ModuleConfig($def, $data));
+				$instance->configure($this->app, $def->config()); //new ModuleConfig($def, $data));
 			}
 		});
 	}

@@ -56,7 +56,8 @@ class ActionDefinition
 		
 		try {
 			return $app->di()->call([$classInstance, $method], [
-				ActionParams::class => $params
+				ActionParams::class => $params,
+				ModuleConfig::class => $this->controller->module()->config()
 			]);
 		} catch (\Exception $e) {
 			echo "<pre>";

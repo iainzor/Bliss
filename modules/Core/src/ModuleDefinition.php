@@ -21,10 +21,14 @@ class ModuleDefinition
 	private $rootDir;
 	
 	/**
-	 *
 	 * @var AbstractModule
 	 */
 	private $instance;
+	
+	/**
+	 * @var ModuleConfig
+	 */
+	private $config;
 	
 	/**
 	 * @var ControllerRegistry[]
@@ -47,6 +51,7 @@ class ModuleDefinition
 		$this->namespace = $namespace;
 		$this->rootDir = $rootDir;
 		$this->name = strtolower($namespace);
+		$this->config = new ModuleConfig($this);
 	}
 	
 	/**
@@ -75,6 +80,16 @@ class ModuleDefinition
 	public function name() : string 
 	{
 		return $this->name;
+	}
+	
+	/**
+	 * Get the module's configuration instance
+	 * 
+	 * @return \Core\ModuleConfig
+	 */
+	public function config() : ModuleConfig
+	{
+		return $this->config;
 	}
 	
 	/**

@@ -3,6 +3,8 @@ namespace Core;
 
 class Config
 {
+	const DEFAULT_TIMEZONE = "core.defaultTimezone";
+	
 	/**
 	 * @var AbstractApplication
 	 */

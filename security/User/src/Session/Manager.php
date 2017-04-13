@@ -128,8 +128,6 @@ class Manager
 	 */
 	public function saveSession(Session $session)
 	{
-		$_SESSION[$session->name()] = $session->id();
-		
 		if ($session->lifetime() > 0) {
 			setcookie(
 				$session->name(), 
@@ -140,6 +138,8 @@ class Manager
 				$this->config->secure(),
 				$this->config->httpOnly()
 			);
+		} else {
+			$_SESSION[$session->name()] = $session->id();
 		}
 		
 		$sessionTable = new UserSessionsTable();

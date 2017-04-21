@@ -2,7 +2,7 @@
 namespace Docs;
 
 use Bliss\App\Container as App,
-	Bliss\String,
+	Bliss\StringUtil,
 	Bliss\Module\ModuleInterface;
 
 class Generator
@@ -37,7 +37,7 @@ class Generator
 		$pages = self::_generatePages($module->resolvePath("docs"), $module->name(), $actionName);
 		$module = [
 			"id" => $module->name(),
-			"label" => String::toCamelCase($module->name()),
+			"label" => StringUtil::toCamelCase($module->name()),
 			"path" => $pages[0]["path"],
 			"pages" => $pages
 		];
@@ -70,7 +70,7 @@ class Generator
 					$label = "Overview";
 					$order = 0;
 				} else {
-					$label = String::unhyphenate($basename);
+					$label = StringUtil::unhyphenate($basename);
 				}
 				
 				$action = $path ."/". $fullname;

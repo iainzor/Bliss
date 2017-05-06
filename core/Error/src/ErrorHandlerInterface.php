@@ -5,5 +5,5 @@ interface ErrorHandlerInterface
 {
 	public function handleError($number, $string, $file, $line);
 	
-	public function handleException(\Exception $e);
+	public function handleException(\Error $e);
 }

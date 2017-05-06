@@ -1,6 +1,11 @@
 <?php
 include "bliss-app.php";
 
+
+if (!class_exists("Error")) {	
+	class Error extends Exception {}
+}
+
 /**
  * # Core modules
  * @method \Assets\Module assets() Assets module

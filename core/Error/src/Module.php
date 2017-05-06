@@ -22,7 +22,7 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 		die("Error '{$string}' in file '{$file}' on line '{$line}'");
 	}
 
-	public function handleException(\Exception $e) 
+	public function handleException(\Error $e) 
 	{
 		$response = $this->app->response();
 		$request = $this->app->request();
@@ -56,7 +56,7 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 				"format" => $ext,
 				"exception" => $e
 			]);
-		} catch (\Exception $e) {
+		} catch (\Error $e) {
 			if ($this->prevExceptionHandler) {
 				call_user_func($this->prevExceptionHandler, $e);
 			} else {

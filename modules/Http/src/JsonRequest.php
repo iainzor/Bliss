@@ -24,6 +24,16 @@ class JsonRequest
 	}
 	
 	/**
+	 * Get all data passed to the request
+	 * 
+	 * @return array
+	 */
+	public function data() : array
+	{
+		return $this->data;
+	}
+	
+	/**
 	 * Attempt to get a value from the JSON data.  If the name cannot be found,
 	 * the $defaultValue will be returned
 	 * 

@@ -1,17 +1,17 @@
 <?php
 namespace Acl;
 
-class Action
+class Action 
 {
 	/**
 	 * @var string
 	 */
-	private $name;
+	protected $name;
 	
 	/**
 	 * @var boolean
 	 */
-	private $isAllowed = true;
+	protected $isAllowed = true;
 	
 	/**
 	 * Constructor
@@ -52,4 +52,6 @@ class Action
 		}
 		return $this->isAllowed;
 	}
+	
+	
 }

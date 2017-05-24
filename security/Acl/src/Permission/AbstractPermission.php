@@ -101,4 +101,23 @@ abstract class AbstractPermission implements PermissionInterface
 			? $this->actions[$action]->isAllowed()
 			: false;
 	}
+	
+	public function toArray() 
+	{
+		$actions = [];
+		foreach ($this->actions() as $action) {
+			$actions[$action->name()] = $action->isAllowed();
+		}
+		
+		$className = get_class($this);
+		$parts = explode("\\", $className);
+		$type = array_pop($parts);
+		
+		return [
+			"path" => $this->path(),
+			"type" => $type,
+			"priority" => $this->priority(),
+			"actions" => $actions
+		];
+	}
 }

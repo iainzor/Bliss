@@ -14,13 +14,6 @@ class UsersController extends AbstractController
 		$query->orderBy("displayName");
 		
 		$results = $query->fetchAll();
-		foreach ($results as $i => $user) {
-			unset($user["password"]);
-			
-			$user["path"] = "users/". $user["id"];
-			
-			$results[$i] = $user;
-		}
 		
 		return $results;
 	}

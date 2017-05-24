@@ -22,7 +22,7 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 		die("Error '{$string}' in file '{$file}' on line '{$line}'");
 	}
 
-	public function handleException(\Error $e) 
+	public function handleException($e) 
 	{
 		$response = $this->app->response();
 		$request = $this->app->request();

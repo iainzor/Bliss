@@ -14,4 +14,9 @@ interface PermissionInterface
 	 * @return boolean
 	 */
 	public function isAllowed($action);
+	
+	/**
+	 * @return array
+	 */
+	public function toArray();
 }

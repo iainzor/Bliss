@@ -24,8 +24,6 @@ class JsonFormat implements FormatInterface
 		} else if (is_object($data)) {
 			if ($data instanceof \JsonSerializable) {
 				$data = $data->jsonSerialize();
-			} else {
-				throw new \Exception("Class '". get_class($data) ."' must implement \JsonSerializable");
 			}
 		}
 		

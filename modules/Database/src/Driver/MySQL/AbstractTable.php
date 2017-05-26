@@ -25,10 +25,27 @@ abstract class AbstractTable implements TableInterface
 	 * Insert a record into the table and return the last inserted ID
 	 * 
 	 * @param array $data
+	 * @param array $updateOnDuplicate
 	 * @return mixed Returns the last insert ID
 	 */
-	public function insert(array $data)
+	public function insert(array $data, array $updateOnDuplicate = null)
 	{
+		$update = null;
+		if (!empty($updateOnDuplicate)) {
+			$pairs = [];
+			foreach ($updateOnDuplicate as $key => $value) {
+				if (is_numeric($key)) {
+					$pairs[] = "`{$value}` = VALUES(`{$value}`)";
+				} else { 
+					$pairs[] = "`{$key}` = ". $this->db->quote($value);
+				}
+			}
+			
+			if (!empty($pairs)) {
+				$update = "ON DUPLICATE KEY UPDATE ". implode(",", $pairs);
+			}
+		}
+		
 		$columnNames = array_keys($data);
 		$columnValues = array_values($data);
 		$statement = $this->db->prepare("
@@ -36,6 +53,7 @@ abstract class AbstractTable implements TableInterface
 				(`". implode("`,`", $columnNames) ."`)
 			VALUES
 				(". implode(",", array_map([$this->db, "quote"], $columnValues)) .")
+			{$update}
 		");
 		$statement->execute();
 		

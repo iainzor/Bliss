@@ -11,16 +11,13 @@ trait ToArrayTrait
 	public function toArray() : array
 	{
 		$classRef = new \ReflectionClass($this);
-		$properties = $classRef->getProperties();
+		$properties = $classRef->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED);
 		$data = [];
 		
 		foreach ($properties as $property) {
 			$value = $property->getValue($this);
 			$name = $property->getName();
-			
-			if (!empty($value) || $value === null) {
-				$data[$name] = $value;
-			}
+			$data[$name] = $value;
 		}
 		
 		return $data;

@@ -159,6 +159,36 @@ class Request
 	}
 	
 	/**
+	 * Get the request method
+	 * 
+	 * @return string
+	 */
+	public function method() : string
+	{
+		return filter_input(INPUT_SERVER, "REQUEST_METHOD");
+	}
+	
+	/**
+	 * Check if the request method is GET
+	 * 
+	 * @return bool
+	 */
+	public function methodIsGet() : bool
+	{
+		return $this->method() === "GET";
+	}
+	
+	/**
+	 * Check if the request method is POST
+	 * 
+	 * @return bool
+	 */
+	public function methodIsPost() : bool
+	{
+		return $this->method() === "POST";
+	}
+	
+	/**
 	 * Find the format for a specified uri
 	 * 
 	 * @param \Http\Application $app

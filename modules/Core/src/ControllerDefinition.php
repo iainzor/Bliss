@@ -71,7 +71,9 @@ class ControllerDefinition
 			if (!class_exists($this->className)) {
 				throw new \Exception("Controller class '{$this->className}' could not be found");
 			}
-			$this->instance = $app->di()->create($this->className);
+			$this->instance = $app->di()->create($this->className, [
+				ModuleConfig::class => $this->module->config()
+			]);
 		}
 		return $this->instance;
 	}

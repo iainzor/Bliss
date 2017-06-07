@@ -83,6 +83,24 @@ class Mailbox
 	}
 	
 	/**
+	 * @return Message[]
+	 */
+	public function threads() 
+	{
+		$threads = imap_thread($this->stream());
+		$factory = new MessageFactory($this);
+		$messages = [];
+		
+		foreach ($threads as $key => $value) {
+			if (preg_match("/^([0-9]+)\.num$/i", $key)) {
+				$messages[] = $factory->create($value);
+			}
+		}
+		
+		return $messages;
+	}
+	
+	/**
 	 * Search the mailbox and return an array of messages found
 	 * 
 	 * @param string $query

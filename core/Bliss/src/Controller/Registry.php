@@ -1,7 +1,7 @@
 <?php
 namespace Bliss\Controller;
 
-use Bliss\String,
+use Bliss\StringUtil,
 	Bliss\Module\ModuleInterface;
 
 class Registry
@@ -37,7 +37,7 @@ class Registry
 	{
 		if (!isset($this->controllers[$controllerName])) {
 			$namespace = preg_replace("/^(.*)\\Module$/i", "\\1", get_class($this->module));
-			$className = $namespace ."Controller\\". String::toCamelCase($controllerName) ."Controller";
+			$className = $namespace ."Controller\\". StringUtil::toCamelCase($controllerName) ."Controller";
 			
 			if (!class_exists($className)) {
 				throw new \Exception("Invalid controller: {$controllerName}", 404);

@@ -1,7 +1,7 @@
 <?php
 namespace Bliss;
 
-class String
+class StringUtil
 {
 	/**
 	 * Convert a string to camel case

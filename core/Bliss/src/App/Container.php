@@ -4,14 +4,13 @@ namespace Bliss\App;
 use Bliss\AutoLoader,
 	Bliss\Module\Registry as ModuleRegistry,
 	Bliss\Module\ModuleInterface,
-	Bliss\String,
+	Bliss\StringUtil,
 	Bliss\Config,
 	Bliss\BeforeModuleExecuteInterface;
 
 require_once dirname(__DIR__) ."/AutoLoader.php";
 require_once dirname(__DIR__) ."/Module/Registry.php";
 require_once dirname(__DIR__) ."/Component.php";
-require_once dirname(__DIR__) ."/String.php";
 require_once dirname(__DIR__) ."/Config.php";
 require_once dirname(__DIR__) ."/FileSystem/File.php";
 require_once dirname(__DIR__) ."/FileSystem/Exception.php";
@@ -410,7 +409,7 @@ class Container extends \Bliss\Component
 	 */
 	public function __call($name, array $args = []) 
 	{
-		$moduleName = String::hyphenate($name);
+		$moduleName = StringUtil::hyphenate($name);
 		$module = $this->module($moduleName);
 		
 		if (method_exists($module, $name)) {

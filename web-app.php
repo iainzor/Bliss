@@ -113,7 +113,7 @@ class BlissWebApp extends BlissApp
 	 * 
 	 * @param \Exception $e
 	 */
-	public function startupExceptionHandler(\Exception $e)
+	public function startupExceptionHandler($e)
 	{
 		ob_end_clean();
 			

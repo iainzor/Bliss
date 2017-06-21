@@ -8,7 +8,7 @@ abstract class BlissApp extends Bliss\App\Container
 	 */
 	protected $startTime;
 	
-	public abstract function startupExceptionHandler(Exception $e);
+	public abstract function startupExceptionHandler($e);
 	public abstract function run();
 	
 	/**

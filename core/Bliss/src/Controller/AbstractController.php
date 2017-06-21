@@ -2,7 +2,7 @@
 namespace Bliss\Controller;
 
 use Bliss\Module\ModuleInterface,
-	Bliss\String;
+	Bliss\StringUtil;
 
 abstract class AbstractController implements ControllerInterface
 {
@@ -50,7 +50,7 @@ abstract class AbstractController implements ControllerInterface
 	public function execute(\Request\Module $request)
 	{
 		$actionName = $request->getAction();
-		$methodName = String::toCamelCase($actionName) ."Action";
+		$methodName = StringUtil::toCamelCase($actionName) ."Action";
 		
 		$this->app->log("Executing action: {$actionName}");
 		

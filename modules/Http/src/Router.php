@@ -46,16 +46,25 @@ class Router
 	 */
 	public function find(string $path) : Route
 	{
-		$routeDef = null;
+		$found = [];
 		foreach ($this->routes as $def) {
 			if ($def->isMatch($path)) {
-				$routeDef = $def;
+				$found[] = $def;
 			}
 		}
 		
-		if ($routeDef === null) {
+		usort($found, function($a, $b) {
+			if ($a->getWeight() === $b->getWeight()) {
+				return 0;
+			}
+			return $a->getWeight() > $b->getWeight() ? -1 : 1; 
+		});
+		
+		if (empty($found)) {
 			throw new RouteNotFoundException("Could not find a route matching '{$path}'");
 		}
+		
+		$routeDef = array_shift($found);
 		
 		return $routeDef->generateRoute($path);
 	}

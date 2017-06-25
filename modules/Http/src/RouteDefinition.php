@@ -11,22 +11,27 @@ class RouteDefinition
 	/**
 	 * @var mixed
 	 */
-	private $module;
+	private $module = "";
 	
 	/**
 	 * @var mixed
 	 */
-	private $controller;
+	private $controller = "";
 	
 	/**
 	 * @var mixed
 	 */
-	private $action;
+	private $action = "";
 	
 	/**
 	 * @var mixed
 	 */
 	private $params = [];
+	
+	/**
+	 * @var int
+	 */
+	private $weight = -1;
 	
 	/**
 	 * Constructor
@@ -93,6 +98,28 @@ class RouteDefinition
 	}
 	
 	/**
+	 * Set the weight of the route.  The heavier the weight, the more likely it will be
+	 * selected
+	 * 
+	 * @param int $weight
+	 * @return \self
+	 */
+	public function weight(int $weight) : self
+	{
+		$this->weight = $weight;
+		
+		return $this;
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getWeight() : int
+	{
+		return $this->weight;
+	}
+	
+	/**
 	 * Check if the route matches the provided path
 	 * 
 	 * @param string $path
@@ -116,10 +143,20 @@ class RouteDefinition
 	{
 		preg_match($this->test, $path, $matches);
 		
-		$moduleName = is_callable($this->module) ? call_user_func($this->module, $matches) : $this->module;
-		$controllerName = is_callable($this->controller) ? call_user_func($this->controller, $matches) : $this->controller;
-		$actionName = is_callable($this->action) ? call_user_func($this->action, $matches) : $this->action;
+		$moduleName = $this->_get("module", $matches);
+		$controllerName = $this->_get("controller", $matches);
+		$actionName = $this->_get("action", $matches);
 		$params = is_callable($this->params) ? call_user_func($this->params, $matches) : $this->_generateParams($matches, $this->params);
+		
+		if (isset($params["module"])) {
+			$moduleName = $params["module"];
+			unset($params["module"]);
+		}
+		
+		if (isset($params["controller"])) {
+			$controllerName = $params["controller"];
+			unset($params["controller"]);
+		}
 		
 		if (isset($params["action"])) {
 			$actionName = $params["action"];
@@ -132,6 +169,27 @@ class RouteDefinition
 			$actionName,
 			$params
 		);
+	}
+	
+	/**
+	 * @param string $partName
+	 * @param array $matches
+	 * @return string
+	 * @throws \UnexpectedValueException
+	 */
+	private function _get(string $partName, array $matches) : string
+	{
+		$current = $this->{$partName};
+		
+		if ($current instanceof \Closure) {
+			$current = call_user_func($current, $matches);
+		}
+		
+		if (!is_string($current)) {
+			throw new \UnexpectedValueException("Route part '{$partName}' must be a closure or a string");
+		}
+		
+		return $current;
 	}
 	
 	/**

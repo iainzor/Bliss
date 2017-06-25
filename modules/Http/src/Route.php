@@ -32,9 +32,9 @@ class Route
 	 * @param array $params
 	 */
 	public function __construct(
-		string $moduleName, 
-		string $controllName,
-		string $actionName,
+		string $moduleName = "", 
+		string $controllName = "",
+		string $actionName = "",
 		array $params = []
 	) {
 		$this->module = $moduleName;

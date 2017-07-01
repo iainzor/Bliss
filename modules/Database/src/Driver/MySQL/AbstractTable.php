@@ -47,12 +47,19 @@ abstract class AbstractTable implements TableInterface
 		}
 		
 		$columnNames = array_keys($data);
-		$columnValues = array_values($data);
+		$columnValues = array_map(function($value) {
+			if ($value === null) {
+				return "NULL";
+			} else {
+				return $this->db->quote($value);
+			}
+		}, array_values($data));
+		
 		$statement = $this->db->prepare("
 			INSERT INTO `". $this->getName() ."`
 				(`". implode("`,`", $columnNames) ."`)
 			VALUES
-				(". implode(",", array_map([$this->db, "quote"], $columnValues)) .")
+				(". implode(",", $columnValues) .")
 			{$update}
 		");
 		$statement->execute();

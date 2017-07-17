@@ -61,7 +61,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * @param array $params
 	 * @return int Number of rows affected
 	 */
-	public function update(array $data, array $params = [])
+	public function update(array $data, array $params = []) : int
 	{
 		$pairs = [];
 		foreach ($data as $name => $value) {

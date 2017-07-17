@@ -1,11 +1,15 @@
 <?php
 namespace Database\Model;
 
-use Database\Table\TableInterface;
+use Database\Table\WritableTableInterface;
 
 interface TableLinkedModelInterface
 {
-	public function setTable(TableInterface $table);
+	public function getPrimaryKeys() : array;
 	
-	public function save();
+	public function setTable(WritableTableInterface $table);
+	
+	public function getTable() : WritableTableInterface;
+	
+	public function save() : bool;
 }

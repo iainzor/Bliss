@@ -194,7 +194,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 */
 	private function _generateLimitClause(int $maxResults, int $resultOffset) : string
 	{
-		if (!$maxResults < 1) {
+		if ($maxResults < 1) {
 			return "";
 		}
 		

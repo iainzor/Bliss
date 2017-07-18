@@ -2,7 +2,7 @@
 namespace Database\Model;
 
 use Common\StringOperations,
-	Database\Table\TableInterface;
+	Database\Table\WritableTableInterface;
 
 abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInterface
 {
@@ -12,9 +12,9 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	protected $_cleanModel;
 	
 	/**
-	 * @var \Database\Table\TableInterface
+	 * @var \Database\Table\WritableTableInterface
 	 */
-	protected $_table; 
+	private $_table; 
 	
 	/**
 	 * Constructor
@@ -42,18 +42,47 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	/**
 	 * Set the table where this model was retrieved from.
 	 * 
-	 * @param \Database\Table\TableInterface $table
+	 * @param \Database\Table\WritableTableInterface $table
 	 */
-	public function setTable(TableInterface $table) 
+	public function setTable(WritableTableInterface $table) 
 	{
 		$this->_table = $table;
 	}
 	
-	public function save()
+	/**
+	 * Get the table instance where the model is stored
+	 * 
+	 * @return WritableTableInterface
+	 */
+	public function getTable() : WritableTableInterface 
+	{
+		return $this->_table;
+	}
+	
+	/**
+	 * Save any changes made to the model
+	 * 
+	 * @return bool
+	 */
+	public function save() : bool
 	{
 		$classRef = new \ReflectionClass($this);
 		$properties = $classRef->getProperties(\ReflectionProperty::IS_PUBLIC);
 		$toUpdate = [];
+		$primaryKeys = $this->getPrimaryKeys();
+		$params = [];
+		
+		if (empty($primaryKeys)) {
+			throw new \Exception("Cannot update model record without one or more primary keys");
+		}
+		
+		foreach ($primaryKeys as $key) {
+			if (!isset($this->{$key}) || empty($this->{$key})) {
+				throw new \Exception("Could not find a value for primary key '{$key}'");
+			}
+			
+			$params[$key] = $this->{$key};
+		}
 		
 		foreach ($properties as $property) {
 			$name = $property->getName();
@@ -65,8 +94,11 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 			}
 		}
 		
-		print_r($toUpdate);
-		exit;
+		if (!empty($toUpdate)) {
+			$this->getTable()->update($toUpdate, $params);
+			return true;
+		}
+		return false;
 	}
 	
 	/**

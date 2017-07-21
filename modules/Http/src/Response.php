@@ -40,6 +40,16 @@ class Response
 	}
 	
 	/**
+	 * Set the HTTP response code
+	 * 
+	 * @param int $code
+	 */
+	public function code(int $code)
+	{
+		http_response_code($code);
+	}
+	
+	/**
 	 * Get or set the response's body
 	 * 
 	 * @param string $body

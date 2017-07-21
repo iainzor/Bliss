@@ -3,9 +3,11 @@ namespace Http;
 
 $coreDir = dirname(dirname(__DIR__)) ."/Core";
 require_once $coreDir ."/src/AbstractApplication.php";
-require_once __DIR__ ."/Router.php";
+require_once __DIR__ ."/ErrorHandler.php";
 require_once __DIR__ ."/Request.php";
 require_once __DIR__ ."/Response.php";
+require_once __DIR__ ."/Router.php";
+require_once __DIR__ ."/RouteProviderInterface.php";
 
 
 class Application extends \Core\AbstractApplication
@@ -26,6 +28,11 @@ class Application extends \Core\AbstractApplication
 	 */
 	private $response;
 	
+	/**
+	 * @var ErrorHandler
+	 */
+	private $errorHandler;
+	
 	public function __construct() 
 	{
 		parent::__construct();
@@ -33,6 +40,7 @@ class Application extends \Core\AbstractApplication
 		$this->router = new Router();
 		$this->request = new Request();
 		$this->response = new Response();
+		$this->errorHandler = new ErrorHandler($this->request, $this->response);
 	}
 	
 	protected function onStart() 
@@ -41,11 +49,15 @@ class Application extends \Core\AbstractApplication
 		
 		$this->di()->register($this);
 		$this->di()->register($this->router);
-		$this->di()->register($this->request);		
+		$this->di()->register($this->request);
+		
+		$this->errorHandler->attach();
 	}
 	
 	protected function onStop()
-	{}
+	{
+		$this->errorHandler->detach();
+	}
 	
 	/**
 	 * Get the application's router instance

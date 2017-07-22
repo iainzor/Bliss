@@ -47,6 +47,7 @@ class ErrorHandler
 	{
 		$this->handle([
 			"result" => "error",
+			"code" => 500,
 			"message" => $message
 		]);
 	}
@@ -55,6 +56,7 @@ class ErrorHandler
 	{
 		$this->handle([
 			"result" => "error",
+			"code" => $exception->getCode() ?: 500,
 			"message" => $exception->getMessage()
 		]);
 	}
@@ -63,9 +65,10 @@ class ErrorHandler
 	{
 		$format = $this->request->format();
 		$body = $format->parse($responseData);
+		$code = isset($responseData["code"]) ? $responseData["code"] : 500;
 		
 		$this->response->header("Content-Type: ". $format->mimeType());
-		$this->response->code(500);
+		$this->response->code($code);
 		$this->response->body($body);
 		$this->response->output();
 	}

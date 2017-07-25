@@ -6,6 +6,9 @@ use Common\StringOperations,
 
 abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInterface
 {
+	use \Common\ToArrayTrait,
+		\Common\PopulatePropertiesTrait;
+	
 	/**
 	 * @var static
 	 */
@@ -26,16 +29,7 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	 */
 	public function __construct(array $properties = [], array $map = [])
 	{
-		foreach ($properties as $name => $value) {
-			if (isset($map[$name])) {
-				$name = $map[$name];
-			}
-			
-			if (property_exists($this, $name)) {
-				$this->{$name} = $value;
-			}
-		}
-		
+		$this->populateProperties($properties, $map);
 		$this->_cleanModel = clone $this;
 	}
 	
@@ -108,20 +102,6 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	 */
 	public function jsonSerialize() : array
 	{
-		$strOps = new StringOperations();
-		$ref = new \ReflectionClass($this);
-		$data = [];
-		
-		foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-			$name = $property->getName();
-			$value = $this->{$name};
-			
-			if (is_string($value)) {
-				$value = $strOps->convertValueType($value);
-			}
-			$data[$name] = $value;
-		}
-		
-		return $data;
+		return $this->toArray();
 	}
 }

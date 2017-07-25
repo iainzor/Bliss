@@ -9,14 +9,9 @@ class Request
 	private $uri = "";
 	
 	/**
-	 * @var Format\FormatInterface
+	 * @var Format\FormatRegistry
 	 */
-	private $format;
-	
-	/**
-	 * @var Format\FormatInterface
-	 */
-	private $defaultFormat;
+	private $formatRegistry;
 	
 	/**
 	 * @var string
@@ -24,34 +19,24 @@ class Request
 	private $body;
 	
 	/**
-	 * Initialize the request
+	 * Constructor
 	 * 
 	 * @param string $uri
-	 * @param \Http\Application $app
 	 */
-	public function init(string $uri, Application $app)
+	public function __construct(string $uri)
 	{
 		$this->uri = trim($uri, "/");
-		$this->format = $this->_findFormat($app, $uri);
 		$this->body = file_get_contents("php://input");
 	}
 	
 	/**
-	 * Get or set the request's default format.  If no default format is specified,
-	 * an instance of \Http\Format\PlainTextFormat is used.
+	 * Set the format registry to be used by the request
 	 * 
-	 * @param \Http\Format\FormatInterface $format
-	 * @return \Http\Format\FormatInterface
+	 * @param \Http\Format\FormatRegistry $formatRegistry
 	 */
-	public function defaultFormat(Format\FormatInterface $format = null) : Format\FormatInterface
+	public function setFormatRegistry(Format\FormatRegistry $formatRegistry)
 	{
-		if ($format !== null) {
-			$this->defaultFormat = $format;
-		}
-		if (!$this->defaultFormat) {
-			$this->defaultFormat = new Format\PlainTextFormat();
-		}
-		return $this->defaultFormat;
+		$this->formatRegistry = $formatRegistry;
 	}
 	
 	/**
@@ -81,7 +66,7 @@ class Request
 	 */
 	public function format() : Format\FormatInterface
 	{
-		return isset($this->format) ? $this->format : $this->defaultFormat();
+		return $this->formatRegistry->determine($this->uri);
 	}
 	
 	/**
@@ -186,18 +171,5 @@ class Request
 	public function methodIsPost() : bool
 	{
 		return $this->method() === "POST";
-	}
-	
-	/**
-	 * Find the format for a specified uri
-	 * 
-	 * @param \Http\Application $app
-	 * @param string $uri
-	 * @return \Http\Format\FormatInterface
-	 */
-	private function _findFormat(Application $app, string $uri) : Format\FormatInterface
-	{
-		$registry = Format\FormatRegistry::generate($app, $this->defaultFormat());
-		return $registry->determine($uri);
 	}
 }

@@ -3,7 +3,8 @@ namespace Http;
 
 use Core\ConfigurableModuleInterface,
 	Core\AbstractApplication,
-	Core\ModuleConfig;
+	Core\ModuleConfig,
+	Core\ModuleDefinition;
 
 class Module implements Format\FormatProviderInterface, ConfigurableModuleInterface
 {
@@ -17,6 +18,15 @@ class Module implements Format\FormatProviderInterface, ConfigurableModuleInterf
 			
 			return $handler;
 		});
+		
+		$formats = new Format\FormatRegistry(new Format\HtmlFormat());
+		$app->moduleRegistry()->each(function(ModuleDefinition $moduleDef) use ($app, $formats) {
+			$module = $moduleDef->instance($app);
+			if ($module instanceof Format\FormatProviderInterface) {
+				$module->registerResponseFormats($formats);
+			}
+		});
+		$app->di()->register($formats);
 	}
 	
 	public function registerResponseFormats(Format\FormatRegistry $formatRegistry) 

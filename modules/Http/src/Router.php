@@ -10,6 +10,7 @@ class Router
 	
 	/**
 	 * Initialize the router
+	 * 
 	 * Loops through all registered modules and collects routes from route providers
 	 * 
 	 * @param \Http\Application $app

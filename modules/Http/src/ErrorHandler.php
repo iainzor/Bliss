@@ -83,9 +83,10 @@ class ErrorHandler
 	 */
 	public function handleException(\Throwable $exception)
 	{
+		$code = $exception->getCode() ?: 500;
 		$data = [
 			"result" => "error",
-			"code" => $exception->getCode() ?: 500,
+			"code" => is_numeric($code) ? $code : 500,
 			"message" => $exception->getMessage()
 		];
 		

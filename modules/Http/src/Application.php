@@ -33,14 +33,20 @@ class Application extends \Core\AbstractApplication
 	 */
 	private $errorHandler;
 	
-	public function __construct() 
+	/**
+	 * Constructor
+	 * 
+	 * @param string $uri
+	 */
+	public function __construct(string $uri) 
 	{
 		parent::__construct();
 		
-		$this->router = new Router();
-		$this->request = new Request();
+		$this->moduleRegistry()->registerDirectory(dirname(__DIR__));
+		
+		$this->router = new Router($this);
+		$this->request = new Request($uri);
 		$this->response = new Response();
-		//$this->errorHandler = new ErrorHandler($this->request, $this->response);
 	}
 	
 	protected function onStart() 
@@ -53,6 +59,10 @@ class Application extends \Core\AbstractApplication
 		
 		$this->errorHandler = $this->di()->get(ErrorHandler::class);
 		$this->errorHandler->attach();
+		
+		$this->request->setFormatRegistry(
+			$this->di()->get(Format\FormatRegistry::class)
+		);
 	}
 	
 	protected function onStop()
@@ -75,14 +85,13 @@ class Application extends \Core\AbstractApplication
 	 * 
 	 * @param string $uri
 	 */
-	public function run(string $uri) 
+	public function run() 
 	{
 		if (!$this->started) {
 			parent::start();
 		}
 		
 		$this->router->init($this);
-		$this->request->init($uri, $this);
 		
 		$format = $this->request->format();
 		try {

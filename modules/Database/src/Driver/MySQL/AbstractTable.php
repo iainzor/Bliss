@@ -4,7 +4,8 @@ namespace Database\Driver\MySQL;
 use Database\Table,
 	Database\Model\AbstractModel,
 	Database\Model\TableLinkedModelInterface,
-	Database\Query\QueryParams;
+	Database\Query\QueryParams,
+	Database\Query\QueryExpr;
 
 abstract class AbstractTable extends Table\AbstractTable implements Table\ReadableTableInterface, Table\WritableTableInterface, Table\ModelProviderInterface
 {
@@ -155,7 +156,11 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 		
 		$pairs = [];
 		foreach ($conditions as $key => $value) {
-			$pairs[] = "`{$key}` = ". $this->db->quote($value);
+			if ($value instanceof QueryExpr) {
+				$pairs[] = $value->toString();
+			} else {
+				$pairs[] = "`{$key}` = ". $this->db->quote($value);
+			}
 		}
 		
 		return "WHERE ". implode(" AND ", $pairs);

@@ -40,7 +40,7 @@ class Application extends \Core\AbstractApplication
 		$this->router = new Router();
 		$this->request = new Request();
 		$this->response = new Response();
-		$this->errorHandler = new ErrorHandler($this->request, $this->response);
+		//$this->errorHandler = new ErrorHandler($this->request, $this->response);
 	}
 	
 	protected function onStart() 
@@ -51,6 +51,7 @@ class Application extends \Core\AbstractApplication
 		$this->di()->register($this->router);
 		$this->di()->register($this->request);
 		
+		$this->errorHandler = $this->di()->get(ErrorHandler::class);
 		$this->errorHandler->attach();
 	}
 	

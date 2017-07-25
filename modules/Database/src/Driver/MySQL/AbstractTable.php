@@ -83,8 +83,12 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * @param QueryParams $params
 	 * @return AbstractModel|boolean
 	 */
-	public function fetch(QueryParams $params) 
+	public function fetch(QueryParams $params = null) 
 	{
+		if ($params === null) {
+			$params = new QueryParams();
+		}
+		
 		$params->maxResults = 1;
 		$all = $this->fetchAll($params);
 		
@@ -100,8 +104,12 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * @param QueryParams $params
 	 * @return AbstractModel[]
 	 */
-	public function fetchAll(QueryParams $params) : array 
+	public function fetchAll(QueryParams $params = null) : array 
 	{
+		if ($params === null) {
+			$params = new QueryParams();
+		}
+		
 		$whereClause = $this->_generateWhereClause($params->conditions);
 		$orderClause = $this->_generateOrderClause($params->orderings);
 		$limitClause = $this->_generateLimitClause($params->maxResults, $params->resultOffset);
@@ -130,8 +138,12 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * @param QueryParams $params
 	 * @return mixed
 	 */
-	public function fetchColumn(string $columnName, QueryParams $params) 
+	public function fetchColumn(string $columnName, QueryParams $params = null) 
 	{
+		if ($params === null) {
+			$params = new QueryParams();
+		}
+		
 		$row = $this->fetch($params);
 		
 		if ($row && property_exists($row, $columnName)) {

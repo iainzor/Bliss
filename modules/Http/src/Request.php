@@ -31,7 +31,7 @@ class Request
 	 */
 	public function init(string $uri, Application $app)
 	{
-		$this->uri = $uri;
+		$this->uri = trim($uri, "/");
 		$this->format = $this->_findFormat($app, $uri);
 		$this->body = file_get_contents("php://input");
 	}
@@ -81,7 +81,7 @@ class Request
 	 */
 	public function format() : Format\FormatInterface
 	{
-		return $this->format;
+		return isset($this->format) ? $this->format : $this->defaultFormat();
 	}
 	
 	/**

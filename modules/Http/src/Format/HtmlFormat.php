@@ -7,5 +7,12 @@ class HtmlFormat implements FormatInterface
 
 	public function mimeType(): string { return "text/html"; }
 
-	public function parse($data) : string { return $data; }
+	public function parse($data) : string
+	{ 
+		if (!is_string($data)) {
+			$data = print_r($data, true);
+		}
+		
+		return $data; 
+	}
 }

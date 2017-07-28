@@ -72,6 +72,7 @@ abstract class AbstractApplication
 	{
 		$this->started = false;
 		$this->onStop();
+		exit;
 	}
 	
 	/**

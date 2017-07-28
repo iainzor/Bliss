@@ -69,11 +69,18 @@ class ErrorHandler
 	 */
 	public function handleError(int $number, string $message, string $file, int $line, array $context)
 	{
-		$this->handle([
+		$data = [
 			"result" => "error",
+			"type" => "error",
 			"code" => 500,
 			"message" => $message
-		]);
+		];
+		
+		if ($this->showTrace) {
+			$data["trace"] = debug_backtrace();
+		}
+		
+		$this->handle($data);
 	}
 	
 	/**
@@ -86,6 +93,7 @@ class ErrorHandler
 		$code = $exception->getCode() ?: 500;
 		$data = [
 			"result" => "error",
+			"type" => "exception",
 			"code" => is_numeric($code) ? $code : 500,
 			"message" => $exception->getMessage()
 		];

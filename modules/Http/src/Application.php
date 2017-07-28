@@ -46,7 +46,7 @@ class Application extends \Core\AbstractApplication
 		
 		$this->router = new Router($this);
 		$this->request = new Request($uri);
-		$this->response = new Response();
+		$this->response = new Response($this);
 	}
 	
 	protected function onStart() 

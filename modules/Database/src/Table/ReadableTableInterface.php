@@ -1,10 +1,9 @@
 <?php
 namespace Database\Table;
 
-use Database\Model\AbstractModel,
-	Database\Query\QueryParams;
+use Database\Query\QueryParams;
 
-interface ReadableTableInterface
+interface ReadableTableInterface extends TableInterface
 {
 	public function fetch(QueryParams $params);
 	

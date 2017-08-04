@@ -17,7 +17,7 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	/**
 	 * @var \Database\Table\WritableTableInterface
 	 */
-	private $_table; 
+	protected $_table; 
 	
 	/**
 	 * Constructor
@@ -65,16 +65,6 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	}
 	
 	/**
-	 * Get the table instance where the model is stored
-	 * 
-	 * @return WritableTableInterface
-	 */
-	public function getTable() : WritableTableInterface 
-	{
-		return $this->_table;
-	}
-	
-	/**
 	 * Save any changes made to the model
 	 * 
 	 * @return bool
@@ -84,7 +74,7 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 		$classRef = new \ReflectionClass($this);
 		$properties = $classRef->getProperties(\ReflectionProperty::IS_PUBLIC);
 		$toUpdate = [];
-		$primaryKeys = $this->getPrimaryKeys();
+		$primaryKeys = $this->_table->getPrimaryKeys();
 		$params = [];
 		
 		if (empty($primaryKeys)) {
@@ -110,7 +100,7 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 		}
 		
 		if (!empty($toUpdate)) {
-			$this->getTable()->update($toUpdate, $params);
+			$this->_table->update($toUpdate, $params);
 			return true;
 		}
 		return false;

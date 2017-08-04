@@ -1,7 +1,7 @@
 <?php
 namespace Database\Table;
 
-interface WritableTableInterface
+interface WritableTableInterface extends TableInterface
 {
 	/**
 	 * @param array $data

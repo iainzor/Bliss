@@ -57,7 +57,6 @@ abstract class AbstractApplication
 		}
 		
 		$this->started = true;
-		$this->onStart();
 		
 		$this->moduleRegistry->each(function(ModuleDefinition $moduleDef) {
 			$module = $moduleDef->instance($this);
@@ -66,6 +65,9 @@ abstract class AbstractApplication
 				$module->bootstrap($this);
 			}
 		});
+		$this->config->configure($this);
+		
+		$this->onStart();
 	}
 	
 	final public function stop()

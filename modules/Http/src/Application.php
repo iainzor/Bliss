@@ -38,7 +38,7 @@ class Application extends \Core\AbstractApplication
 	 * 
 	 * @param string $uri
 	 */
-	public function __construct(string $uri) 
+	public function __construct(string $uri = "") 
 	{
 		parent::__construct();
 		

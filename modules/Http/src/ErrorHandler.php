@@ -77,7 +77,11 @@ class ErrorHandler
 		];
 		
 		if ($this->showTrace) {
-			$data["trace"] = debug_backtrace();
+			ob_start();
+			debug_print_backtrace();
+			$trace = ob_get_clean();
+			
+			$data["trace"] = $trace;
 		}
 		
 		$this->handle($data);
@@ -99,7 +103,7 @@ class ErrorHandler
 		];
 		
 		if ($this->showTrace) {
-			$data["trace"] = $exception->getTrace();
+			$data["trace"] = $exception->getTraceAsString();
 		}
 		
 		$this->handle($data);

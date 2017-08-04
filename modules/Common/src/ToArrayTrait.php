@@ -13,16 +13,10 @@ trait ToArrayTrait
 		$classRef = new \ReflectionClass($this);
 		$properties = $classRef->getProperties(\ReflectionProperty::IS_PUBLIC);
 		$data = [];
-		$stringOps = new StringOperations();
 		
 		foreach ($properties as $property) {
 			$value = $property->getValue($this);
 			$name = $property->getName();
-			
-			if (is_string($value)) {
-				$value = $stringOps->convertValueType($value);
-			}
-			
 			$data[$name] = $value;
 		}
 		

@@ -156,6 +156,8 @@ class Registry
 	 */
 	private function _initCache()
 	{
+		return;
+		
 		if ($this->cache->exists()) {
 			$this->cache->delete();
 			
@@ -179,6 +181,8 @@ class Registry
 	 */
 	private function _saveCache()
 	{
+		return;
+		
 		$data = [
 			"dirs" => $this->dirs
 		];

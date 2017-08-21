@@ -79,6 +79,22 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	}
 	
 	/**
+	 * Delete rows from the table
+	 * 
+	 * @param QueryParams $queryParams
+	 * @return int The number of rows deleted
+	 */
+	public function delete(QueryParams $queryParams) : int
+	{
+		$whereClause = $this->_generateWhereClause($queryParams->conditions);
+		
+		return $this->db->exec("
+			DELETE FROM	`". $this->getName() ."`
+			{$whereClause}
+		");
+	}
+	
+	/**
 	 * Attempt to fetch a single row from the table
 	 * 
 	 * @param QueryParams $params
@@ -170,6 +186,11 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 		foreach ($conditions as $key => $value) {
 			if ($value instanceof QueryExpr) {
 				$pairs[] = $value->toString();
+			} else if (is_array($value)) {
+				$values = implode(",", array_map([$this->db, "quote"], $value));
+				if (!empty($values)) {
+					$pairs[] = "`{$key}` IN ({$values})";
+				}
 			} else {
 				$pairs[] = "`{$key}` = ". $this->db->quote($value);
 			}

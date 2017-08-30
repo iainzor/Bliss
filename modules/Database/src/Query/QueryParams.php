@@ -40,6 +40,6 @@ class QueryParams
 		$this->conditions = $conditions;
 		$this->orderings = $orderings;
 		$this->maxResults = $maxResults;
-		$this->resultOffset = 0;
+		$this->resultOffset = $resultOffset;
 	}
 }

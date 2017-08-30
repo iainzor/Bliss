@@ -4,7 +4,8 @@ namespace Database\Driver\MySQL;
 use Database\Table,
 	Database\Model\AbstractModel,
 	Database\Model\TableLinkedModelInterface,
-	Database\Query\QueryParams;
+	Database\Query\QueryParams,
+	Database\Query\QueryExpr;
 
 abstract class AbstractTable extends Table\AbstractTable implements Table\ReadableTableInterface, Table\WritableTableInterface, Table\ModelProviderInterface
 {
@@ -78,13 +79,33 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	}
 	
 	/**
+	 * Delete rows from the table
+	 * 
+	 * @param QueryParams $queryParams
+	 * @return int The number of rows deleted
+	 */
+	public function delete(QueryParams $queryParams) : int
+	{
+		$whereClause = $this->_generateWhereClause($queryParams->conditions);
+		
+		return $this->db->exec("
+			DELETE FROM	`". $this->getName() ."`
+			{$whereClause}
+		");
+	}
+	
+	/**
 	 * Attempt to fetch a single row from the table
 	 * 
 	 * @param QueryParams $params
 	 * @return AbstractModel|boolean
 	 */
-	public function fetch(QueryParams $params) 
+	public function fetch(QueryParams $params = null) 
 	{
+		if ($params === null) {
+			$params = new QueryParams();
+		}
+		
 		$params->maxResults = 1;
 		$all = $this->fetchAll($params);
 		
@@ -100,8 +121,12 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * @param QueryParams $params
 	 * @return AbstractModel[]
 	 */
-	public function fetchAll(QueryParams $params) : array 
+	public function fetchAll(QueryParams $params = null) : array 
 	{
+		if ($params === null) {
+			$params = new QueryParams();
+		}
+		
 		$whereClause = $this->_generateWhereClause($params->conditions);
 		$orderClause = $this->_generateOrderClause($params->orderings);
 		$limitClause = $this->_generateLimitClause($params->maxResults, $params->resultOffset);
@@ -130,8 +155,12 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * @param QueryParams $params
 	 * @return mixed
 	 */
-	public function fetchColumn(string $columnName, QueryParams $params) 
+	public function fetchColumn(string $columnName, QueryParams $params = null) 
 	{
+		if ($params === null) {
+			$params = new QueryParams();
+		}
+		
 		$row = $this->fetch($params);
 		
 		if ($row && property_exists($row, $columnName)) {
@@ -155,7 +184,16 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 		
 		$pairs = [];
 		foreach ($conditions as $key => $value) {
-			$pairs[] = "`{$key}` = ". $this->db->quote($value);
+			if ($value instanceof QueryExpr) {
+				$pairs[] = $value->toString();
+			} else if (is_array($value)) {
+				$values = implode(",", array_map([$this->db, "quote"], $value));
+				if (!empty($values)) {
+					$pairs[] = "`{$key}` IN ({$values})";
+				}
+			} else {
+				$pairs[] = "`{$key}` = ". $this->db->quote($value);
+			}
 		}
 		
 		return "WHERE ". implode(" AND ", $pairs);

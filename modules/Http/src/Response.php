@@ -4,6 +4,11 @@ namespace Http;
 class Response
 {
 	/**
+	 * @var Application
+	 */
+	private $app;
+	
+	/**
 	 * @var string[]
 	 */
 	private $headers = [];
@@ -12,6 +17,16 @@ class Response
 	 * @var string
 	 */
 	private $body;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param \Http\Application $app
+	 */
+	public function __construct(Application $app)
+	{
+		$this->app = $app;
+	}
 	
 	/**
 	 * Add a header string to the response
@@ -40,6 +55,16 @@ class Response
 	}
 	
 	/**
+	 * Set the HTTP response code
+	 * 
+	 * @param int $code
+	 */
+	public function code(int $code)
+	{
+		http_response_code($code);
+	}
+	
+	/**
 	 * Get or set the response's body
 	 * 
 	 * @param string $body
@@ -62,5 +87,7 @@ class Response
 			header($header);
 		}
 		echo $this->body;
+		
+		$this->app->stop();
 	}
 }

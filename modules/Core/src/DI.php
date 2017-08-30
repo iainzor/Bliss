@@ -160,7 +160,7 @@ class DI
 				$value = null;
 			}
 
-			if ($class) {	
+			if ($class) {
 				$className = $class->getName();
 				$classRef = new \ReflectionClass($className);
 
@@ -169,7 +169,7 @@ class DI
 				} else if (isset($this->instances[$className])) {
 					$value = $this->instances[$className];
 					if (is_callable($value)) {
-						$value = $this->instances[$className] = call_user_func($value);
+						$value = $this->instances[$className] = $this->call($value, $injectables);
 					}
 				} else if (!$classRef->isInstantiable()) {
 					throw new \Exception("{$className} cannot be instantiated and must be provided to the injector");

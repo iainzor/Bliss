@@ -33,6 +33,6 @@ class PlainTextFormat implements FormatInterface
 	
 	private function _array(array $data) : string
 	{
-		return var_export($data, true);
+		return print_r($data, true);
 	}
 }

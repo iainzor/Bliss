@@ -6,6 +6,9 @@ use Common\StringOperations,
 
 abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInterface
 {
+	use \Common\ToArrayTrait,
+		\Common\PopulatePropertiesTrait;
+	
 	/**
 	 * @var static
 	 */
@@ -14,7 +17,7 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	/**
 	 * @var \Database\Table\WritableTableInterface
 	 */
-	private $_table; 
+	protected $_table; 
 	
 	/**
 	 * Constructor
@@ -26,17 +29,29 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	 */
 	public function __construct(array $properties = [], array $map = [])
 	{
-		foreach ($properties as $name => $value) {
-			if (isset($map[$name])) {
-				$name = $map[$name];
+		$this->populateProperties($properties, $map);
+		$this->parseProperties();
+		$this->_cleanModel = clone $this;
+	}
+	
+	/**
+	 * Parse all current properties in the object to cast them to their correct types
+	 */
+	private function parseProperties()
+	{
+		$classRef = new \ReflectionClass($this);
+		$strOps = new StringOperations();
+		
+		foreach ($classRef->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
+			$name = $prop->getName();
+			$value = $prop->getValue($this);
+			
+			if (is_string($value)) {
+				$value = $strOps->convertValueType($value);
 			}
 			
-			if (property_exists($this, $name)) {
-				$this->{$name} = $value;
-			}
+			$this->{$name} = $value;
 		}
-		
-		$this->_cleanModel = clone $this;
 	}
 	
 	/**
@@ -50,16 +65,6 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	}
 	
 	/**
-	 * Get the table instance where the model is stored
-	 * 
-	 * @return WritableTableInterface
-	 */
-	public function getTable() : WritableTableInterface 
-	{
-		return $this->_table;
-	}
-	
-	/**
 	 * Save any changes made to the model
 	 * 
 	 * @return bool
@@ -69,7 +74,7 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 		$classRef = new \ReflectionClass($this);
 		$properties = $classRef->getProperties(\ReflectionProperty::IS_PUBLIC);
 		$toUpdate = [];
-		$primaryKeys = $this->getPrimaryKeys();
+		$primaryKeys = $this->_table->getPrimaryKeys();
 		$params = [];
 		
 		if (empty($primaryKeys)) {
@@ -95,7 +100,7 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 		}
 		
 		if (!empty($toUpdate)) {
-			$this->getTable()->update($toUpdate, $params);
+			$this->_table->update($toUpdate, $params);
 			return true;
 		}
 		return false;
@@ -108,20 +113,6 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	 */
 	public function jsonSerialize() : array
 	{
-		$strOps = new StringOperations();
-		$ref = new \ReflectionClass($this);
-		$data = [];
-		
-		foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-			$name = $property->getName();
-			$value = $this->{$name};
-			
-			if (is_string($value)) {
-				$value = $strOps->convertValueType($value);
-			}
-			$data[$name] = $value;
-		}
-		
-		return $data;
+		return $this->toArray();
 	}
 }

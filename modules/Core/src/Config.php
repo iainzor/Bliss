@@ -6,19 +6,9 @@ class Config
 	const DEFAULT_TIMEZONE = "core.defaultTimezone";
 	
 	/**
-	 * @var AbstractApplication
+	 * @var array
 	 */
-	private $app;
-	
-	/**
-	 * Constructor
-	 * 
-	 * @param \Core\AbstractApplication $app
-	 */
-	public function __construct(AbstractApplication $app)
-	{
-		$this->app = $app;
-	}
+	private $data = [];
 	
 	/**
 	 * Load configuration data from one or more files.  Subsequent files will
@@ -45,15 +35,23 @@ class Config
 				$this->data = array_merge_recursive($this->data, $fileData);
 			}
 		}
-		
-		$this->app->moduleRegistry()->each(function(ModuleDefinition $def) {
-			$instance = $def->instance($this->app);
+	}
+	
+	/**
+	 * Configure an application with the data loaded into the config
+	 * 
+	 * @param \Core\AbstractApplication $app
+	 */
+	public function configure(AbstractApplication $app)
+	{
+		$app->moduleRegistry()->each(function(ModuleDefinition $def) use ($app) {
+			$instance = $def->instance($app);
 			$section = get_class($instance);
 			$data = isset($this->data[$section]) ? $this->data[$section] : [];
 			$def->config()->populate($data);
 			
 			if ($instance instanceof ConfigurableModuleInterface) {
-				$instance->configure($this->app, $def->config()); //new ModuleConfig($def, $data));
+				$instance->configure($app, $def->config()); //new ModuleConfig($def, $data));
 			}
 		});
 	}

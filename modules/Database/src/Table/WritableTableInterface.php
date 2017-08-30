@@ -1,7 +1,9 @@
 <?php
 namespace Database\Table;
 
-interface WritableTableInterface
+use Database\Query\QueryParams;
+
+interface WritableTableInterface extends TableInterface
 {
 	/**
 	 * @param array $data
@@ -16,4 +18,10 @@ interface WritableTableInterface
 	 * @return int Number of rows affected by the update
 	 */
 	public function update(array $data, array $params = []) : int;
+	
+	/**
+	 * @param QueryParams $queryParams
+	 * @return int
+	 */
+	public function delete(QueryParams $queryParams) : int;
 }

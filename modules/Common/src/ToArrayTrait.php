@@ -11,7 +11,7 @@ trait ToArrayTrait
 	public function toArray() : array
 	{
 		$classRef = new \ReflectionClass($this);
-		$properties = $classRef->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED);
+		$properties = $classRef->getProperties(\ReflectionProperty::IS_PUBLIC);
 		$data = [];
 		
 		foreach ($properties as $property) {

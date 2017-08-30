@@ -9,11 +9,15 @@ trait PopulatePropertiesTrait
 	 * 
 	 * @param array $properties
 	 */
-	public function populateProperties(array $properties)
+	public function populateProperties(array $properties, array $map = [])
 	{
 		$classRef = new \ReflectionClass($this);
 		foreach ($classRef->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PUBLIC) as $property) {
 			$name = $property->name;
+			
+			if (isset($map[$name])) {
+				$name = $map[$name];
+			}
 			
 			if (isset($properties[$name])) {
 				$this->{$name} = $properties[$name];

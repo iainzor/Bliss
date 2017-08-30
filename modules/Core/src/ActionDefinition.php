@@ -60,13 +60,9 @@ class ActionDefinition
 				ModuleConfig::class => $this->controller->module()->config()
 			]);
 		} catch (\Exception $e) {
-			echo "<pre>";
-			echo $e->getMessage();
-			echo "\n";
-			echo $e->getTraceAsString();
-			exit;
+			$methodPath = get_class($classInstance) ."::". $method ."()";
 			
-			throw new \Exception("Exception encountered while executing action: ". $e->getMessage(), $e->getCode(), $e);
+			throw new \Exception("Exception encountered while executing action '{$methodPath}': ". $e->getMessage(), $e->getCode(), $e);
 		}
 	}
 }

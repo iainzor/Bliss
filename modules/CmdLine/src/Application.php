@@ -32,13 +32,8 @@ class Application extends \Core\AbstractApplication
 			);
 		}
 		
-		try {
-			$result = $this->execute($moduleName, $controllerName, $actionName, $params);
-			echo $result;
-		} catch (\Exception $e) {
-			echo "Exception Encountered: {$e->getMessage()}\n\n";
-			echo $e->getTraceAsString();
-		}
+		$result = $this->execute($moduleName, $controllerName, $actionName, $params);
+		echo $result;
 	}
 	
 	private function _parseQueryString(string $query) : array

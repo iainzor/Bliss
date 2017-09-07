@@ -30,7 +30,7 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	public function __construct(array $properties = [], array $map = [])
 	{
 		$this->populateProperties($properties, $map);
-		$this->parseProperties();
+		//$this->parseProperties();
 		$this->_cleanModel = clone $this;
 	}
 	

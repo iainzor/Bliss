@@ -54,15 +54,9 @@ class ActionDefinition
 			throw new \Exception("Controller '". $this->controller->className() ."' does not have the method '{$method}'");
 		}
 		
-		try {
-			return $app->di()->call([$classInstance, $method], [
-				ActionParams::class => $params,
-				ModuleConfig::class => $this->controller->module()->config()
-			]);
-		} catch (\Exception $e) {
-			$methodPath = get_class($classInstance) ."::". $method ."()";
-			
-			throw new \Exception("Exception encountered while executing action '{$methodPath}': ". $e->getMessage(), $e->getCode(), $e);
-		}
+		return $app->di()->call([$classInstance, $method], [
+			ActionParams::class => $params,
+			ModuleConfig::class => $this->controller->module()->config()
+		]);
 	}
 }

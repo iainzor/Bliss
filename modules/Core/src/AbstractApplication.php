@@ -46,8 +46,9 @@ abstract class AbstractApplication
 		$this->moduleRegistry->registerDirectory(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR ."Common");
 		
 		$this->config = new Config($this);
-		$this->di()->register($this->config);
 		
+		$this->di()->register($this->config);
+		$this->di()->register($this->moduleRegistry);
 	}
 	
 	final public function start()

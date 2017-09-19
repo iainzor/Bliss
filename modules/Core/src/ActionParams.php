@@ -30,4 +30,14 @@ class ActionParams
 	{
 		return isset($this->params[$name]) ? $this->params[$name] : $defaultValue;
 	}
+	
+	/**
+	 * Get all parameters accessible to the action
+	 * 
+	 * @return array
+	 */
+	public function getAll() : array
+	{
+		return $this->params;
+	}
 }

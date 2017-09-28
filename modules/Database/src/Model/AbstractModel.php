@@ -1,8 +1,7 @@
 <?php
 namespace Database\Model;
 
-use Common\StringOperations,
-	Database\Table\WritableTableInterface;
+use Database\Table\WritableTableInterface;
 
 abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInterface
 {
@@ -30,28 +29,7 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	public function __construct(array $properties = [], array $map = [])
 	{
 		$this->populateProperties($properties, $map);
-		//$this->parseProperties();
 		$this->_cleanModel = clone $this;
-	}
-	
-	/**
-	 * Parse all current properties in the object to cast them to their correct types
-	 */
-	private function parseProperties()
-	{
-		$classRef = new \ReflectionClass($this);
-		$strOps = new StringOperations();
-		
-		foreach ($classRef->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
-			$name = $prop->getName();
-			$value = $prop->getValue($this);
-			
-			if (is_string($value)) {
-				$value = $strOps->convertValueType($value);
-			}
-			
-			$this->{$name} = $value;
-		}
 	}
 	
 	/**

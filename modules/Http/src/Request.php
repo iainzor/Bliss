@@ -104,7 +104,15 @@ class Request
 	 */
 	public function inputGetAll($definition = null, bool $addEmpty = true) : array
 	{
-		return filter_input_array(INPUT_GET, $definition, $addEmpty) ?: [];
+		$data = $definition === null
+			? filter_input_array(INPUT_GET)
+			: filter_input_array(INPUT_GET, $definition, $addEmpty);
+		
+		if (!$data) {
+			$data = [];
+		}
+		
+		return $data;
 	}
 	
 	/**

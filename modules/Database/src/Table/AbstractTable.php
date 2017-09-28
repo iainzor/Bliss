@@ -19,4 +19,14 @@ abstract class AbstractTable implements TableInterface
 	{
 		$this->db = $db;
 	}
+	
+	/**
+	 * Get the table's PDO instance
+	 * 
+	 * @return PDO
+	 */
+	public function getDb() : PDO 
+	{
+		return $this->db;
+	}
 }

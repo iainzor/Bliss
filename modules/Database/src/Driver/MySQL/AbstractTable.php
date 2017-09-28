@@ -191,6 +191,8 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 				if (!empty($values)) {
 					$pairs[] = "`{$key}` IN ({$values})";
 				}
+			} else if ($value === null) {
+				$pairs[] = "`{$key}` IS NULL";
 			} else {
 				$pairs[] = "`{$key}` = ". $this->db->quote($value);
 			}

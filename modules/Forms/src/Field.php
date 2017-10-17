@@ -62,6 +62,7 @@ class Field
 		foreach ($this->validators as $validator) {
 			if (!$validator->validate($this, $this->form)) {
 				$this->isValid = false;
+				break;
 			}
 		}
 		

@@ -29,4 +29,17 @@ abstract class AbstractTable implements TableInterface
 	{
 		return $this->db;
 	}
+	
+	public function prepareRows(array $rows) : array
+	{
+		$metadata = new Metadata($this);
+		
+		if ($this instanceof MetadataProviderInterface) {
+			$this->populateMetadata($metadata);
+		}
+		
+		return array_map(function($row) use ($metadata) {
+			return $metadata->prepareRow($row);
+		}, $rows);
+	}
 }

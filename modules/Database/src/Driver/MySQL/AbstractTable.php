@@ -3,7 +3,6 @@ namespace Database\Driver\MySQL;
 
 use Database\Table,
 	Database\Model\AbstractModel,
-	Database\Model\TableLinkedModelInterface,
 	Database\Query\QueryParams,
 	Database\Query\QueryExpr;
 
@@ -139,13 +138,9 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 		");
 		$statement->execute();
 		
-		$results = $statement->fetchAll(\PDO::FETCH_CLASS, $this->getModelClass());
-		foreach ($results as $result) {
-			if ($result instanceof TableLinkedModelInterface) {
-				$result->setTable($this);
-			}
-		}
-		return $results;
+		return $this->prepareRows(
+			$statement->fetchAll(\PDO::FETCH_ASSOC)
+		);
 	}
 
 	/**

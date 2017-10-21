@@ -1,7 +1,8 @@
 <?php
 namespace Cache\Driver;
 
-use Cache\DriverConfig;
+use Cache\CacheItem,
+	Cache\DriverConfig;
 
 class FileSystem implements DriverInterface 
 {
@@ -29,24 +30,23 @@ class FileSystem implements DriverInterface
 	 * @param string $key
 	 * @return mixed
 	 */
-	public function get(string $key) 
+	public function get(string $key) : CacheItem
 	{
 		$path = $this->filepath($key);
-		$content = false;
+		$item = new CacheItem($key, null, new \DateTime("yesterday"));
 		
 		if (is_file($path)) {
 			$raw = file_get_contents($path);
-			$data = unserialize($raw);
-			$expires = $data["expires"];
+			$cached = unserialize($raw);
 			
-			if ($expires < time()) {
+			if (!($cached instanceof CacheItem) || $cached->isExpired()) {
 				unset($path);
 			} else {
-				$content = $data["content"];
+				$item = $cached;
 			}
 		}
 		
-		return $content;
+		return $item;
 	}
 
 	/**
@@ -54,14 +54,10 @@ class FileSystem implements DriverInterface
 	 * @param mixed $data
 	 * @param int $expires
 	 */
-	public function put(string $key, $content, int $expires) 
+	public function put(CacheItem $item) 
 	{
-		$path = $this->filepath($key);
-		$data = [
-			"expires" => $expires,
-			"content" => $content
-		];
-		$raw = serialize($data);
+		$path = $this->filepath($item->key);
+		$raw = serialize($item);
 		
 		file_put_contents($path, $raw);
 	}

@@ -33,7 +33,9 @@ class Cache
 	 */
 	public function get(string $key)
 	{
-		return $this->driver->get($key);
+		$item = $this->driver->get($key);
+		
+		return $item->isExpired() ? false : $item->contents;
 	}
 	
 	/**
@@ -41,14 +43,20 @@ class Cache
 	 * 
 	 * @param string $key
 	 * @param mixed $content
-	 * @param int $expires
+	 * @param int $lifetime Time in seconds until the item is considered expired
 	 */
-	public function put(string $key, $content, int $expires = null)
+	public function put(string $key, $content, int $lifetime = null)
 	{
-		if ($expires === null) {
-			$expires = time() + $this->config->defaultLifetime();
+		$item = new CacheItem($key, $content);
+		
+		if ($lifetime !== null) {
+			$expires = new \DateTime();
+			$expires->setTimestamp(
+				time() + $lifetime	
+			);
+			$item->setExpires($expires);
 		}
 		
-		$this->driver->put($key, $content, $expires);
+		$this->driver->put($item);
 	}
 }

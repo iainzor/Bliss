@@ -97,16 +97,17 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * Attempt to fetch a single row from the table
 	 * 
 	 * @param QueryParams $params
+	 * @params array $inputParams
 	 * @return AbstractModel|boolean
 	 */
-	public function fetch(QueryParams $params = null) 
+	public function fetch(QueryParams $params = null, array $inputParams = []) 
 	{
 		if ($params === null) {
 			$params = new QueryParams();
 		}
 		
 		$params->maxResults = 1;
-		$all = $this->fetchAll($params);
+		$all = $this->fetchAll($params, $inputParams);
 		
 		if (count($all)) {
 			return array_shift($all);
@@ -118,9 +119,10 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * Fetch all records matching the parameters passed
 	 * 
 	 * @param QueryParams $params
+	 * @params array $inputParams
 	 * @return AbstractModel[]
 	 */
-	public function fetchAll(QueryParams $params = null) : array 
+	public function fetchAll(QueryParams $params = null, array $inputParams = []) : array 
 	{
 		if ($params === null) {
 			$params = new QueryParams();
@@ -136,7 +138,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 			{$orderClause}
 			{$limitClause}
 		");
-		$statement->execute();
+		$statement->execute($inputParams);
 		
 		return $this->prepareRows(
 			$statement->fetchAll(\PDO::FETCH_ASSOC)
@@ -148,15 +150,16 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * 
 	 * @param string $columnName
 	 * @param QueryParams $params
+	 * @params array $inputParams
 	 * @return mixed
 	 */
-	public function fetchColumn(string $columnName, QueryParams $params = null) 
+	public function fetchColumn(string $columnName, QueryParams $params = null, array $inputParams = []) 
 	{
 		if ($params === null) {
 			$params = new QueryParams();
 		}
 		
-		$row = $this->fetch($params);
+		$row = $this->fetch($params, $inputParams);
 		
 		if ($row && property_exists($row, $columnName)) {
 			return $row->{$columnName};

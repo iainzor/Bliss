@@ -32,7 +32,7 @@ class Config
 					throw new \Exception("Config file must return an array of properties in '{$file}'");
 				}
 				
-				$this->data = array_merge_recursive($this->data, $fileData);
+				$this->data = array_replace($this->data, $fileData);
 			}
 		}
 	}

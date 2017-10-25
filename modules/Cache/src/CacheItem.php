@@ -6,7 +6,7 @@ class CacheItem
 	/**
 	 * @var \DateTime
 	 */
-	private $expires;
+	public $expires;
 	
 	/**
 	 * @var string

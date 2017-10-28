@@ -103,7 +103,11 @@ class ErrorHandler
 		];
 		
 		if ($this->showTrace) {
-			$data["trace"] = $exception->getTraceAsString();
+			$data["trace"] = array_map(function($trace) { 
+				unset($trace["args"]);
+				
+				return $trace;
+			}, $exception->getTrace());
 		}
 		
 		$this->handle($data);

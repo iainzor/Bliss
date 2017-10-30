@@ -5,6 +5,7 @@ use Core\ModuleConfig;
 
 class Config
 {
+	const CACHE_NAMESPACE = "cache.namespace";
 	const DRIVER_CLASS = "cache.driver.class";
 	const DRIVER_OPTIONS = "cache.driver.options";
 	const DEFAULT_LIFETIME = "cache.defaultLifetime";
@@ -32,5 +33,15 @@ class Config
 	public function defaultLifetime() : int 
 	{
 		return $this->config->get(self::DEFAULT_LIFETIME, 0);
+	}
+	
+	/**
+	 * Get the namespace where all cache is saved under
+	 * 
+	 * @return string
+	 */
+	public function cacheNamespace() : string
+	{
+		return $this->config->get(self::CACHE_NAMESPACE, "cache");
 	}
 }

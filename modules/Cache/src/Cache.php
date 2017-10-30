@@ -33,7 +33,9 @@ class Cache
 	 */
 	public function get(string $key)
 	{
-		$item = $this->driver->get($key);
+		$item = $this->driver->get(
+			$this->generateKey($key)
+		);
 		
 		return $item->isExpired() ? false : $item->contents;
 	}
@@ -47,7 +49,10 @@ class Cache
 	 */
 	public function put(string $key, $content, int $lifetime = null)
 	{
-		$item = new CacheItem($key, $content);
+		$item = new CacheItem(
+			$this->generateKey($key), 
+			$content
+		);
 		
 		if ($lifetime !== null) {
 			$expires = new \DateTime();
@@ -58,5 +63,17 @@ class Cache
 		}
 		
 		$this->driver->put($item);
+	}
+	
+	/**
+	 * Generate a new hashed key using a provided key string and the cache's current
+	 * namespace
+	 * 
+	 * @param string $key
+	 * @return string
+	 */
+	public function generateKey(string $key) : string
+	{
+		return md5($this->config->cacheNamespace() ."--". $key);
 	}
 }

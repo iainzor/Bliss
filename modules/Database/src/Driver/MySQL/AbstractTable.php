@@ -128,16 +128,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 			$params = new QueryParams();
 		}
 		
-		$whereClause = $this->_generateWhereClause($params->conditions);
-		$orderClause = $this->_generateOrderClause($params->orderings);
-		$limitClause = $this->_generateLimitClause($params->maxResults, $params->resultOffset);
-		$statement = $this->db->prepare("
-			SELECT	*
-			FROM	`". $this->getName() ."`
-			{$whereClause}
-			{$orderClause}
-			{$limitClause}
-		");
+		$statement = $this->db->prepare($this->_generateSelectStatement($params));
 		$statement->execute($inputParams);
 		
 		return $this->prepareRows(
@@ -159,13 +150,37 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 			$params = new QueryParams();
 		}
 		
-		$row = $this->fetch($params, $inputParams);
+		$statement = $this->db->prepare($this->_generateSelectStatement($params));
+		$statement->execute($inputParams);
 		
-		if ($row && property_exists($row, $columnName)) {
-			return $row->{$columnName};
+		$row = $statement->fetch(\PDO::FETCH_ASSOC);
+		
+		if ($row && isset($row[$columnName])) {
+			return $row[$columnName];
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Generate a SELECT statement using a set of QueryParams
+	 * 
+	 * @param QueryParams $params
+	 * @return string
+	 */
+	private function _generateSelectStatement(QueryParams $params) : string
+	{
+		$whereClause = $this->_generateWhereClause($params->conditions);
+		$orderClause = $this->_generateOrderClause($params->orderings);
+		$limitClause = $this->_generateLimitClause($params->maxResults, $params->resultOffset);
+		
+		return "
+			SELECT	*
+			FROM	`". $this->getName() ."`
+			{$whereClause}
+			{$orderClause}
+			{$limitClause}
+		";
 	}
 
 	/**

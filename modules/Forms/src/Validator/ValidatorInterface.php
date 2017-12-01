@@ -6,5 +6,7 @@ use Forms\AbstractForm,
 
 interface ValidatorInterface
 {
-	public function validate(Field $field, AbstractForm $form) : bool;
+	public function isValid(Field $field, AbstractForm $form) : bool;
+	
+	public function getErrorMessage() : string;
 }

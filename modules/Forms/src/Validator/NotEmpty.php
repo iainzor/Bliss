@@ -10,14 +10,13 @@ class NotEmpty implements ValidatorInterface
 		$this->message = $message;
 	}
 	
-	public function validate(\Forms\Field $field, \Forms\AbstractForm $form): bool 
+	public function isValid(\Forms\Field $field, \Forms\AbstractForm $form) : bool 
 	{
-		if (empty($field->value)) {
-			$field->setError(
-				$this->message ?: "Field must not be empty"
-			);
-			return false;
-		}
-		return true;
+		return !empty($field->value);
+	}
+	
+	public function getErrorMessage() : string 
+	{
+		return $this->message ?: "Field must not be empty";
 	}
 }

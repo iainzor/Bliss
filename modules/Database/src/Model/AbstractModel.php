@@ -91,6 +91,14 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 	 */
 	public function jsonSerialize() : array
 	{
-		return $this->toArray();
+		$data = $this->toArray();
+		
+		if ($this instanceof ProtectedDataInterface) {
+			foreach ($this->getProtectedFields() as $field) {
+				unset($data[$field]);
+			}
+		}
+		
+		return $data;
 	}
 }

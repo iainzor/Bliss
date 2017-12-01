@@ -60,8 +60,9 @@ class Field
 		$this->isValid = true;
 		
 		foreach ($this->validators as $validator) {
-			if (!$validator->validate($this, $this->form)) {
+			if (!$validator->isValid($this, $this->form)) {
 				$this->isValid = false;
+				$this->error = $validator->getErrorMessage();
 				break;
 			}
 		}

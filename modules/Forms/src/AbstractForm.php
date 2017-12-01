@@ -18,6 +18,11 @@ abstract class AbstractForm implements \JsonSerializable
 	 */
 	public $isValid = true;
 	
+	/**
+	 * @var array
+	 */
+	public $errors = [];
+	
 	abstract public function onValidated();
 	
 	abstract public function getFieldNames() : array;
@@ -85,7 +90,7 @@ abstract class AbstractForm implements \JsonSerializable
 	 * @param string $fieldName
 	 * @param array $validators
 	 */
-	public function validate(string $fieldName, array $validators)
+	public function addValidators(string $fieldName, array $validators)
 	{
 		$field = $this->getField($fieldName);
 		foreach ($validators as $validator) {
@@ -114,6 +119,7 @@ abstract class AbstractForm implements \JsonSerializable
 		foreach ($this->fields as $field) {
 			if (!$field->isValid()) {
 				$this->isValid = false;
+				$this->errors[$field->name] = $field->error;
 			}
 		}
 		
@@ -125,6 +131,7 @@ abstract class AbstractForm implements \JsonSerializable
 		return [
 			"fields" => $this->fields,
 			"isValid" => $this->isValid,
+			"errors" => $this->errors,
 			"data" => $this->data
 		];
 	}

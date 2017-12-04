@@ -90,7 +90,7 @@ class DI
 		}
 		$const = $ref->getConstructor();
 		$params = $const ? $this->_generateParams($const->getParameters(), $injectables) : [];
-		
+
 		return call_user_func_array([$ref, "newInstance"], $params);
 	}
 	

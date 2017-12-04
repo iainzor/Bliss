@@ -77,11 +77,15 @@ class ErrorHandler
 		];
 		
 		if ($this->showTrace) {
-			ob_start();
-			debug_print_backtrace();
-			$trace = ob_get_clean();
-			
-			$data["trace"] = $trace;
+			$data["trace"] = array_map(function($item) {
+				return [
+					"file" => isset($item["file"]) ? $item["file"] : null,
+					"line" => isset($item["line"]) ? $item["line"] : null,
+					"function" => isset($item["function"]) ? $item["function"] : null,
+					"class" => isset($item["class"]) ? $item["class"] : null,
+					"type" => isset($item["type"]) ? $item["type"] : null
+				];
+			}, debug_backtrace());
 		}
 		
 		$this->handle($data);

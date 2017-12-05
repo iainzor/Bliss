@@ -17,7 +17,7 @@ interface WritableTableInterface extends TableInterface
 	 * @param array $params
 	 * @return int Number of rows affected by the update
 	 */
-	public function update(array $data, array $params = []) : int;
+	public function update(array $data, QueryParams $params = null) : int;
 	
 	/**
 	 * @param QueryParams $queryParams

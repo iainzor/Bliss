@@ -180,4 +180,14 @@ class Request
 	{
 		return $this->method() === "POST";
 	}
+	
+	/**
+	 * Check if the request method is DELETE
+	 * 
+	 * @return bool
+	 */
+	public function methodIsDelete() : bool
+	{
+		return $this->method() === "DELETE";
+	}
 }

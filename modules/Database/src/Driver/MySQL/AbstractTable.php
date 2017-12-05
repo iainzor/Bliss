@@ -58,17 +58,21 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * Update the data in the table matching $params
 	 * 
 	 * @param array $data
-	 * @param array $params
+	 * @param QueryParams $params
 	 * @return int Number of rows affected
 	 */
-	public function update(array $data, array $params = []) : int
+	public function update(array $data, QueryParams $params = null) : int
 	{
+		if (!$params) {
+			$params = new QueryParams();
+		}
+		
 		$pairs = [];
 		foreach ($data as $name => $value) {
 			$pairs[] = "`{$name}` = ". $this->db->quote($value);
 		}
 		
-		$whereClause = $this->_generateWhereClause($params);
+		$whereClause = $this->_generateWhereClause($params->conditions);
 		
 		return $this->db->exec("
 			UPDATE	`". $this->getName() ."`

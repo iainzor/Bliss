@@ -99,6 +99,10 @@ abstract class AbstractModel implements \JsonSerializable, TableLinkedModelInter
 			}
 		}
 		
+		if ($this instanceof AdditionalDataInterface) {
+			$data = array_merge($data, $this->getAdditionalData());
+		}
+		
 		return $data;
 	}
 }

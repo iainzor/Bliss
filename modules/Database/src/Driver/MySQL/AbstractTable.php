@@ -72,7 +72,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 			$pairs[] = "`{$name}` = ". $this->db->quote($value);
 		}
 		
-		$whereClause = $this->_generateWhereClause($params->conditions);
+		$whereClause = $this->generateWhereClause($params->conditions);
 		
 		return $this->db->exec("
 			UPDATE	`". $this->getName() ."`
@@ -89,7 +89,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 */
 	public function delete(QueryParams $queryParams) : int
 	{
-		$whereClause = $this->_generateWhereClause($queryParams->conditions);
+		$whereClause = $this->generateWhereClause($queryParams->conditions);
 		
 		return $this->db->exec("
 			DELETE FROM	`". $this->getName() ."`
@@ -132,7 +132,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 			$params = new QueryParams();
 		}
 		
-		$statement = $this->db->prepare($this->_generateSelectStatement($params));
+		$statement = $this->db->prepare($this->generateSelectStatement($params));
 		$statement->execute($inputParams);
 		
 		return $this->prepareRows(
@@ -154,7 +154,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 			$params = new QueryParams();
 		}
 		
-		$statement = $this->db->prepare($this->_generateSelectStatement($params));
+		$statement = $this->db->prepare($this->generateSelectStatement($params));
 		$statement->execute($inputParams);
 		
 		$row = $statement->fetch(\PDO::FETCH_ASSOC);
@@ -172,11 +172,11 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * @param QueryParams $params
 	 * @return string
 	 */
-	private function _generateSelectStatement(QueryParams $params) : string
+	public function generateSelectStatement(QueryParams $params) : string
 	{
-		$whereClause = $this->_generateWhereClause($params->conditions);
-		$orderClause = $this->_generateOrderClause($params->orderings);
-		$limitClause = $this->_generateLimitClause($params->maxResults, $params->resultOffset);
+		$whereClause = $this->generateWhereClause($params->conditions);
+		$orderClause = $this->generateOrderClause($params->orderings);
+		$limitClause = $this->generateLimitClause($params->maxResults, $params->resultOffset);
 		
 		return "
 			SELECT	*
@@ -193,7 +193,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * @param array $conditions
 	 * @return string
 	 */
-	private function _generateWhereClause(array $conditions) : string
+	public function generateWhereClause(array $conditions) : string
 	{
 		if (empty($conditions)) {
 			return "";
@@ -224,7 +224,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * @param array $orderings
 	 * @return string
 	 */
-	private function _generateOrderClause(array $orderings) : string
+	public function generateOrderClause(array $orderings) : string
 	{
 		if (empty($orderings)) {
 			return "";
@@ -249,7 +249,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 	 * @param int $resultOffset
 	 * @return string
 	 */
-	private function _generateLimitClause(int $maxResults, int $resultOffset) : string
+	public function generateLimitClause(int $maxResults, int $resultOffset) : string
 	{
 		if ($maxResults < 1) {
 			return "";

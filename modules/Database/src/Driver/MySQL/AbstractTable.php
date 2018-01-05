@@ -37,6 +37,8 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 		$columnValues = array_map(function($value) {
 			if ($value === null) {
 				return "NULL";
+			} else if ($value instanceof QueryExpr) {
+				return $value->toString();
 			} else {
 				return $this->db->quote($value);
 			}
@@ -69,7 +71,17 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 		
 		$pairs = [];
 		foreach ($data as $name => $value) {
-			$pairs[] = "`{$name}` = ". $this->db->quote($value);
+			$cleanValue = null;
+			
+			if ($value === null) {
+				$cleanValue = "NULL";
+			} else if ($value instanceof QueryExpr) {
+				$cleanValue = $value->toString();
+			} else {
+				$cleanValue = $this->db->quote($value);
+			}
+			
+			$pairs[] = "`{$name}` = ". $cleanValue;
 		}
 		
 		$whereClause = $this->generateWhereClause($params->conditions);

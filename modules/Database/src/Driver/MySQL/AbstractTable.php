@@ -34,16 +34,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 		}
 		
 		$columnNames = array_keys($data);
-		$columnValues = array_map(function($value) {
-			if ($value === null) {
-				return "NULL";
-			} else if ($value instanceof QueryExpr) {
-				return $value->toString();
-			} else {
-				return $this->db->quote($value);
-			}
-		}, array_values($data));
-		
+		$columnValues = array_map([$this, "parseValue"], array_values($data));
 		$statement = $this->db->prepare("
 			INSERT INTO `". $this->getName() ."`
 				(`". implode("`,`", $columnNames) ."`)
@@ -71,17 +62,7 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 		
 		$pairs = [];
 		foreach ($data as $name => $value) {
-			$cleanValue = null;
-			
-			if ($value === null) {
-				$cleanValue = "NULL";
-			} else if ($value instanceof QueryExpr) {
-				$cleanValue = $value->toString();
-			} else {
-				$cleanValue = $this->db->quote($value);
-			}
-			
-			$pairs[] = "`{$name}` = ". $cleanValue;
+			$pairs[] = "`{$name}` = ". $this->parseValue($value);
 		}
 		
 		$whereClause = $this->generateWhereClause($params->conditions);
@@ -268,5 +249,24 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 		}
 		
 		return "LIMIT {$maxResults} OFFSET {$resultOffset}";
+	}
+	
+	/**
+	 * Parse a value before updating or inserting into the database
+	 * 
+	 * @param QueryExpr $value
+	 * @return mixed
+	 */
+	public function parseValue($value)
+	{
+		if ($value === null) {
+			return "NULL";
+		} else if ($value instanceof QueryExpr) {
+			return $value->toString();
+		} else if (is_bool($value)) {
+			return $value === false ? 0 : 1;
+		} else {
+			return $this->db->quote($value);
+		}
 	}
 }

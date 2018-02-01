@@ -190,4 +190,17 @@ class Request
 	{
 		return $this->method() === "DELETE";
 	}
+	
+	/**
+	 * Get a header value from the request
+	 * 
+	 * @param string $string
+	 * @return string
+	 */
+	public function getHeader(string $key)
+	{
+		$name = strtoupper("HTTP_". str_replace("-", "_", $key));
+		
+		return filter_input(INPUT_SERVER, $name);
+	}
 }

@@ -46,10 +46,15 @@ class Config
 	{
 		$app->moduleRegistry()->each(function(ModuleDefinition $def) use ($app) {
 			$instance = $def->instance($app);
+			
+			if (!$instance) {
+				return;
+			}
+			
 			$section = get_class($instance);
 			$data = isset($this->data[$section]) ? $this->data[$section] : [];
 			$def->config()->populate($data);
-			
+
 			if ($instance instanceof ConfigurableModuleInterface) {
 				$instance->configure($app, $def->config()); //new ModuleConfig($def, $data));
 			}

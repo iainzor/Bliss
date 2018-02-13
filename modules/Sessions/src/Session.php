@@ -38,8 +38,8 @@ class Session
 	private function init()
 	{
 		if (!session_id()) {
-			session_start();
 			session_set_save_handler($this->handler);
+			session_start();
 		}
 	}
 	

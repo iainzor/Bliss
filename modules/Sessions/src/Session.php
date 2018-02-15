@@ -44,16 +44,6 @@ class Session
 	}
 	
 	/**
-	 * Destructor
-	 * 
-	 * Saves the session to the handler
-	 */
-	public function __destruct() 
-	{
-		$this->save();
-	}
-	
-	/**
 	 * Load all data from the session namespace
 	 * 
 	 * @return array
@@ -103,6 +93,7 @@ class Session
 	public function set(string $key, $value)
 	{
 		$this->data[$key] = $value;
+		$this->save();
 	}
 	
 	/**

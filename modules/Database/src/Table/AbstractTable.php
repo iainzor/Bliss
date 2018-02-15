@@ -30,6 +30,12 @@ abstract class AbstractTable implements TableInterface
 		return $this->db;
 	}
 	
+	/**
+	 * Prepare rows returned from a query
+	 * 
+	 * @param array $rows
+	 * @return array
+	 */
 	public function prepareRows(array $rows) : array
 	{
 		$metadata = new Metadata($this);

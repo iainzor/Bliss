@@ -200,6 +200,8 @@ abstract class AbstractTable extends Table\AbstractTable implements Table\Readab
 				$values = implode(",", array_map([$this->db, "quote"], $value));
 				if (!empty($values)) {
 					$pairs[] = "`{$key}` IN ({$values})";
+				} else {
+					$pairs[] = "`{$key}` IS NULL";
 				}
 			} else if ($value === null) {
 				$pairs[] = "`{$key}` IS NULL";

@@ -1,0 +1,75 @@
+#menu {
+	position: fixed;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 250px;
+	background-color: #fff;
+	transition: all .3s ease-in-out;
+	z-index: 1000;
+	font-size: 16px;
+	overflow: auto;
+}
+
+#menu:not(.open) {	
+	transform: translateX(-100%);
+	-webkit-transform: translateX(-100%);
+}
+	#menu a { text-decoration: none; transition: all .2s ease-in-out; }
+	#menu li { transition: all .2s ease-in-out; }
+	
+	#menu ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+		#menu > ul > li {
+			border-bottom: 1px solid rgba(0,0,0,.075);
+			margin: 0;
+		}
+		#menu > ul > li:last-child { border-bottom: none; }
+		
+			#menu > ul > li > a {
+				display: block;
+				padding: 10px 20px;
+				line-height: 30px;
+				color: #444;
+				background-color: transparent;
+			}
+			
+			#menu > ul > li.active {
+				background-color: rgba(0,0,0,.05);
+			}
+			#menu > ul > li.active > a { color: #000 }
+			
+		#menu > ul > li > ul {
+			font-size: 12px;
+			padding-bottom: 10px;
+		}
+		#menu > ul > li:not(.active) > ul {
+			display: none;
+		}
+		#menu > ul > li.active {
+		}
+			#menu > ul ul > li > a { 
+				display: block; 
+				padding: 10px 20px; 
+			}
+			#menu > ul ul > li.active > a {
+				background-color: rgba(0,0,0,.05);
+			}
+			
+
+#menu.disabled {
+	transform: translateX(-100%);
+	visibility: hidden;
+}
+			
+@media (min-width: 1480px) {
+	html:not(.thin) #menu {
+		transform: translateX(-100%);
+	}
+	html:not(.thin) body.ready #menu:not(.open) {
+		transform: translateX(0);
+	}
+}

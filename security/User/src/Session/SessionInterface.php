@@ -7,11 +7,13 @@ interface SessionInterface
 {
 	public function id($id = null);
 	
-	public function name($name = null);
-	
 	public function isValid($isValid = null);
 	
 	public function user(User $user = null);
 	
-	public function lifetime($lifetime = null);
+	public function load();
+	
+	public function save();
+	
+	public function delete();
 }

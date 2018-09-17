@@ -134,7 +134,7 @@ class Registry
 			return $instance;
 		}
 		
-		throw new ModuleNotFoundException("Module '{$moduleName}' could not be found", 404);
+		throw new \Exception("Module '{$moduleName}' could not be found", 404);
 	}
 	
 	/**
@@ -156,8 +156,6 @@ class Registry
 	 */
 	private function _initCache()
 	{
-		return;
-		
 		if ($this->cache->exists()) {
 			$this->cache->delete();
 			
@@ -181,8 +179,6 @@ class Registry
 	 */
 	private function _saveCache()
 	{
-		return;
-		
 		$data = [
 			"dirs" => $this->dirs
 		];

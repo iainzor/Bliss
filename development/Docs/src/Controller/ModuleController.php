@@ -1,7 +1,7 @@
 <?php
 namespace Docs\Controller;
 
-use Bliss\StringUtil,
+use Bliss\String,
 	Docs\Generator;
 
 class ModuleController extends \Bliss\Controller\AbstractController
@@ -79,7 +79,7 @@ class ModuleController extends \Bliss\Controller\AbstractController
 					$label = "Overview";
 					$order = 0;
 				} else {
-					$label = StringUtil::unhyphenate($basename);
+					$label = String::unhyphenate($basename);
 				}
 				
 				$uri = "docs/". $path ."/". $fullname;

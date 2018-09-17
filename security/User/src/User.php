@@ -1,10 +1,10 @@
 <?php
 namespace User;
 
-use Database\Model,
-	Acl\Role as BaseRole;
+use Bliss\ResourceComponent,
+	Acl\Acl;
 
-class User extends Model\AbstractResourceModel
+class User extends ResourceComponent
 {
 	const RESOURCE_NAME = "user";
 	
@@ -16,22 +16,7 @@ class User extends Model\AbstractResourceModel
 	/**
 	 * @var string
 	 */
-	protected $username;
-	
-	/**
-	 * @var string
-	 */
-	protected $password;
-	
-	/**
-	 * @var boolean 
-	 */
-	private $preservePassword = false;
-	
-	/**
-	 * @var string
-	 */
-	protected $roleId = Role::BASE_ROLE;
+	private $password;
 	
 	/**
 	 * @var string
@@ -44,14 +29,9 @@ class User extends Model\AbstractResourceModel
 	protected $isActive = true;
 	
 	/**
-	 * @var Role 
+	 * @var \Acl\Acl
 	 */
-	protected $role;
-	
-	/**
-	 * @var Settings\Container
-	 */
-	protected $settings;
+	protected $acl;
 	
 	/**
 	 * @var \User\Hasher\HasherInterface
@@ -78,47 +58,17 @@ class User extends Model\AbstractResourceModel
 	}
 	
 	/**
-	 * Get or set the user's unique username
-	 * 
-	 * @param string $username
-	 * @return string
-	 */
-	public function username($username = null)
-	{
-		return $this->getSet("username", $username);
-	}
-	
-	/**
 	 * Get or set the user's hashed password
 	 * 
 	 * @param string $password
-	 * @param boolean $hash Whether to hash the password before setting it
 	 * @return string
 	 */
-	public function password($password = null, $hash = false)
+	public function password($password = null)
 	{
 		if ($password !== null) {
-			if ($hash === true) {
-				$password = self::passwordHasher()->hash($password);
-			}
 			$this->password = $password;
 		}
 		return $this->password;
-	}
-	
-	/**
-	 * Get or set whether to preserve the password hash in 
-	 * the exported array
-	 * 
-	 * @param boolean $flag
-	 * @return boolean
-	 */
-	public function preservePassword($flag = null)
-	{
-		if ($flag !== null) {
-			$this->preservePassword = (boolean) $flag;
-		}
-		return $this->preservePassword;
 	}
 	
 	/**
@@ -150,29 +100,21 @@ class User extends Model\AbstractResourceModel
 	}
 	
 	/**
-	 * Get or set the user's role Id
+	 * Get or set the user's ACL.  If one has not been set, an empty ACL instance will be created
 	 * 
-	 * @param int $id
-	 * @return int
+	 * @param Acl $acl
+	 * @return Acl
 	 */
-	public function roleId($id = null)
+	public function acl(Acl $acl = null)
 	{
-		return $this->getSet("roleId", $id, "intval");
-	}
-	
-	/**
-	 * Get or set the user's ACL Role
-	 * 
-	 * @param BaseRole $role
-	 * @return BaseRole
-	 */
-	public function role(BaseRole $role = null)
-	{
-		if ($role !== null) {
-			$this->role = $role;
+		if ($acl !== null) {
+			$this->acl = $acl;
+		}
+		if (!$this->acl) {
+			$this->acl = new Acl();
 		}
 		
-		return $this->role;
+		return $this->acl;
 	}
 	
 	/**
@@ -185,57 +127,7 @@ class User extends Model\AbstractResourceModel
 	 */
 	public function isAllowed($resourceName, $action = null, array $params = [])
 	{
-		return $this->role()->isAllowed($resourceName, $action, $params);
-	}
-	
-	/**
-	 * Get or set the user's settings container.  If the user does not have
-	 * a settings container, a new blank container will be created.
-	 * 
-	 * @param \User\Settings\Container $settings
-	 * @return \User\Settings\Container
-	 */
-	public function settings(Settings\Container $settings = null)
-	{
-		if ($settings !== null) {
-			$this->settings = $settings;
-		}
-		if (!$this->settings) {
-			$this->settings = new Settings\Container($this);
-		}
-		return $this->settings;
-	}
-	
-	/**
-	 * Set the user's last updated time
-	 */
-	public function touch()
-	{
-		if ($this->id()) {
-			$usersTable = new Db\UsersTable();
-			$query = $usersTable->update();
-			$query->values([
-				"updated" => time()
-			]);
-			$query->where(["id" => $this->id()]);
-			$query->execute();
-		}
-	}
-	
-	/**
-	 * Make alterations to the exported array
-	 * 
-	 * @return array
-	 */
-	public function toArray() 
-	{
-		$data = parent::toArray();
-		
-		if ($this->preservePassword !== true) {
-			unset($data["password"]);
-		}
-		
-		return $data;
+		return $this->acl()->isAllowed($resourceName, $action, $params);
 	}
 	
 	/**
@@ -255,4 +147,5 @@ class User extends Model\AbstractResourceModel
 		
 		return self::$passwordHasher;
 	}
+			
 }

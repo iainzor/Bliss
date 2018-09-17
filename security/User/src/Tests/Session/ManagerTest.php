@@ -2,45 +2,17 @@
 namespace User\Tests\Session;
 
 use User\Session\Manager,
-	User\Db\UsersTable as UserDbTable,
-	User\Db\UserSessionsTable as SessionDbTable,
+	User\DbTable as UserDbTable,
+	User\Session\DbTable as SessionDbTable,
 	User\User,
-	Database\Registry,
-	Database\Table\AbstractTable;
-
-class PDO extends \Database\PDO
-{
-	public function describe($table) 
-	{
-		$tableInstance = \Database\Table\AbstractTable::factory($table, $this);
-		$tableName = $tableInstance->name();
-		$columns = $this->fetchAll("PRAGMA table_info(`". $tableName ."`)");
-		$struct = new \Database\Table\Structure();
-		
-		foreach ($columns as $column) {
-			$struct->column($column["name"], [
-				"type" => "varchar"
-			]);
-		}
-		
-		return $struct;
-	}
-}
+	Database\PDO;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {
-	const EMAIL = "someone@something.com";
-	const PASSWORD = "123abc";
-	
 	/**
 	 * @var Manager
 	 */
 	private static $manager;
-	
-	/**
-	 * @var PDO
-	 */
-	private static $db;
 	
 	public static function setUpBeforeClass()
 	{
@@ -48,15 +20,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 		//session_start();
 		//ob_end_flush();
 		
-		self::$db = $db = new PDO("sqlite::memory:", null, null, [
+		$db = new PDO("sqlite::memory:", null, null, [
 			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
 		]);
-		$registry = new Registry();
-		$registry->defaultConnection($db);
-		AbstractTable::dbRegistry($registry);
-		
-		$db->driver("mysql");
-		$db->schemaName("");
 		$db->exec("
 			CREATE TABLE `users` (
 				`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -69,16 +35,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 		$sessionDbTable = new SessionDbTable($db);
 		$hasher = User::passwordHasher();
 		
-		$password = $hasher->hash(self::PASSWORD);
+		$password = $hasher->hash("123abc");
 		
-		$statement = $db->prepare("INSERT INTO `users` VALUES (null, :email, :password, :displayName)");
-		$statement->execute([
-			":email" => self::EMAIL,
-			":password" => $password,
-			":displayName" => "Johny Doughburg"
-		]);
+		$db->exec("INSERT INTO `users` VALUES (null, 'iainedminster@gmail.com', '{$password}', 'iain.zor')");
 		
-		self::$manager = new Manager($hasher);
+		self::$manager = new Manager($sessionDbTable, $userDbTable, $hasher);
 	}
 	
 	public function testBadCredentials()
@@ -87,23 +48,16 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse($valid);
 	}
 	
-	/*
 	public function testGoodCredentials()
 	{
-		try {
-			$valid = self::$manager->isValid(self::EMAIL, self::PASSWORD);
-		} catch (\Exception $e) {
-			echo "<pre>";
-			print_r(self::$db->logs());
-			exit;
-		}
+		$valid = self::$manager->isValid("iainedminster@gmail.com", "123abc");
+		
 		$this->assertTrue($valid);
 	}
-	*/
 	
 	public function testCreateSession()
 	{
-		$session = self::$manager->createSession("foo@bar.com", "bazzlyboo");
+		$session = self::$manager->createSession("iainedminster@gmail.com", "123abc");
 		
 		$this->assertInstanceOf("\\User\\Session\\Session", $session);
 	}

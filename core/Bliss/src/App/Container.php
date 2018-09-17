@@ -4,14 +4,13 @@ namespace Bliss\App;
 use Bliss\AutoLoader,
 	Bliss\Module\Registry as ModuleRegistry,
 	Bliss\Module\ModuleInterface,
-	Bliss\StringUtil,
-	Bliss\Config,
-	Bliss\BeforeModuleExecuteInterface;
+	Bliss\String,
+	Bliss\Config;
 
 require_once dirname(__DIR__) ."/AutoLoader.php";
 require_once dirname(__DIR__) ."/Module/Registry.php";
 require_once dirname(__DIR__) ."/Component.php";
-require_once dirname(__DIR__) ."/StringUtil.php";
+require_once dirname(__DIR__) ."/String.php";
 require_once dirname(__DIR__) ."/Config.php";
 require_once dirname(__DIR__) ."/FileSystem/File.php";
 require_once dirname(__DIR__) ."/FileSystem/Exception.php";
@@ -69,11 +68,6 @@ class Container extends \Bliss\Component
 	private $hasQuit = false;
 	
 	/**
-	 * @var boolean
-	 */
-	private $firstExecution = true;
-	
-	/**
 	 * Constructor
 	 * 
 	 * @param string $name The name of the application
@@ -88,9 +82,7 @@ class Container extends \Bliss\Component
 		$this->autoloader = new AutoLoader();
 		$this->moduleRegistry = new ModuleRegistry($this);
 		
-		# ToDo - Create FileSysytem module
-		$filesDir = $this->resolvePath("files");
-		if (!is_dir($filesDir) && !mkdir($filesDir, 0777, true)) {
+		if (!is_dir($this->resolvePath("files"))) {
 			throw new \Exception("Directory could not be found: ". $this->resolvePath("files"));
 		}
 	}
@@ -240,10 +232,12 @@ class Container extends \Bliss\Component
 	 * Attempt to execute a Route
 	 * 
 	 * @param array $params
-	 * @return \Response\Module
+	 * @return string
 	 */
 	public function execute(array $params = [])
 	{
+		$this->initConfig();
+		
 		$this->log("Executing parameters: ". json_encode($params));
 		
 		$response = $this->response();
@@ -253,18 +247,6 @@ class Container extends \Bliss\Component
 		
 		$moduleName = $request->getModule();
 		$module = $this->module($moduleName);
-		
-		if ($this->firstExecution) {
-			$this->firstExecution = false;
-			$this->initConfig();
-			
-			foreach ($this->modules() as $m) {
-				if ($m instanceof BeforeModuleExecuteInterface) {
-					$m->beforeModuleExecute($module);
-				}
-			}
-		}
-		
 		$this->log("Executing module: {$moduleName}");
 		$result = $module->execute($request);
 		
@@ -279,9 +261,8 @@ class Container extends \Bliss\Component
 		} elseif ($result !== null) {
 			throw new \Exception("Action must either return a string or array");
 		}
-		
+
 		$response->send($request, $this->view());
-		return $response;
 	}
 	
 	/**
@@ -350,9 +331,8 @@ class Container extends \Bliss\Component
 	 * 
 	 * @param object|callable $object
 	 * @param string $method
-	 * @param array $params Optional; a [key=>value] pair used to inject into the function being called
 	 */
-	public function call($object, $method = null, array $params = null)
+	public function call($object, $method = null)
 	{
 		if (is_callable($object)) {
 			$func = $object;
@@ -366,16 +346,11 @@ class Container extends \Bliss\Component
 		$args = [];
 		
 		foreach ($refParams as $refParam) {
-			$paramName = $refParam->getName();
-			$class = $refParam->getClass();
-			$className = $class ? $class->getName() : null;
-			
-			if ($className && preg_match("/^([a-z0-9]+).module$/i", $className, $matches)) {
+			$className = $refParam->getClass()->getName();
+			if (preg_match("/^([a-z0-9]+).module$/i", $className, $matches)) {
 				$args[] = $this->module($matches[1]);
-			} else if (isset($params[$paramName])) {
-				$args[] = $params[$paramName];
-			} else if (!$refParam->isDefaultValueAvailable()) {
-				throw new \InvalidArgumentException("Could not inject required parameter '\${$paramName}' into '{$method}'");
+			} else {
+				throw new \InvalidArgumentException("Could not inject parameter '\${$refParam->getName()}' into '{$method}'");
 			}
 		}
 		
@@ -408,9 +383,9 @@ class Container extends \Bliss\Component
 	 * @param array $arguments
 	 * @return \Bliss\Module\ModuleInterface
 	 */
-	public function __call($name, array $args = []) 
+	public function __call($name, array $arguments) 
 	{
-		$moduleName = StringUtil::hyphenate($name);
+		$moduleName = String::hyphenate($name);
 		$module = $this->module($moduleName);
 		
 		if (method_exists($module, $name)) {
@@ -437,11 +412,8 @@ class Container extends \Bliss\Component
 			if ($module instanceof \Config\PublicConfigInterface) {
 				$config = new \Config\Config();
 				$module->populatePublicConfig($config);
-				$moduleConfig = $config->toArray();
 				
-				if (!empty($moduleConfig)) {
-					$data[$module->name()] = $moduleConfig;
-				}
+				$data[$module->name()] = $config->toArray();
 			}
 		}
 		

@@ -1,9 +1,8 @@
 <?php
 namespace User\Form;
 
-use User\Db\UsersTable,
-	User\User,
-	Database\Query\InsertQuery;
+use User\DbTable as UserDbTable,
+	User\User;
 
 class SignUpForm
 {
@@ -20,9 +19,9 @@ class SignUpForm
 	/**
 	 * Constructor
 	 * 
-	 * @param UsersTable $userDbTable
+	 * @param \User\DbTable $userDbTable
 	 */
-	public function __construct(UsersTable $userDbTable)
+	public function __construct(UserDbTable $userDbTable)
 	{
 		$this->userDbTable = $userDbTable;
 	}
@@ -42,7 +41,7 @@ class SignUpForm
 	 * Returns a User instance on success and FALSE on failure
 	 * 
 	 * @param array $data
-	 * @return \User\User
+	 * @return \User\User|boolean
 	 */
 	public function create(array $data)
 	{
@@ -50,23 +49,16 @@ class SignUpForm
 			return false;
 		}
 		
-		$user = User::factory([
-			"email" => $data["email"],
-			"username" => $data["username"],
-			"displayName" => $data["username"],
-			"password" => User::passwordHasher()->hash($data["password"]),
-			"isActive" => true
-		]);
-		$user->preservePassword(true);
+		$user = new User();
+		$user->email($data["email"]);
+		$user->displayName($data["displayName"]);
+		$user->isActive(true);
 		
-		try {
-			$this->userDbTable->insert($user);
-		} catch (\PDOException $e) {
-			throw new \Exception("Could not create user", 500, $e);
-		}
+		$insertData = $user->toBasicArray();
+		$insertData["password"] = User::passwordHasher()->hash($data["password"]);
+		$id = $this->userDbTable->insert($insertData);
 		
-			
-		$user->preservePassword(false);
+		$user->id($id);
 		
 		return $user;
 	}
@@ -83,11 +75,11 @@ class SignUpForm
 		
 		array_walk($data, "trim");
 		
-		$fields = ["email", "username", "password"];
+		$fields = ["email", "displayName", "password", "passwordConfirm"];
 		
 		foreach ($fields as $name) {
 			if (empty($data[$name])) {
-				$this->errors[$name] = "Field is required";
+				$this->errors[] = "Field '{$name}' is required";
 			}
 		}
 		
@@ -96,13 +88,13 @@ class SignUpForm
 		}
 		
 		if (!preg_match("/.+@.+\..+/i", $data["email"])) {
-			$this->errors["email"] = "Email address is invalid";
+			$this->errors[] = "Email address is invalid";
 		} else if ($this->userDbTable->emailExists($data["email"])) {
-			$this->errors["email"] = "Email address has already been registered";
+			$this->errors[] = "Email address is already registered";
 		}
 		
-		if ($this->userDbTable->usernameExists($data["username"])) {
-			$this->errors["username"] = "Username has already been registered";
+		if ($data["password"] !== $data["passwordConfirm"]) {
+			$this->errors[] = "Password confirmation does not match";
 		}
 		
 		return !count($this->errors);

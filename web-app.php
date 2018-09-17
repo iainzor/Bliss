@@ -1,10 +1,5 @@
 <?php
-include "bliss-app.php";
-
-
-if (!class_exists("Error")) {	
-	class Error extends Exception {}
-}
+require_once "core/Bliss/src/App/Container.php";
 
 /**
  * # Core modules
@@ -25,92 +20,65 @@ if (!class_exists("Error")) {
  * # Authentication Modules
  * @method \Acl\Module acl() ACL module
  */
-class BlissWebApp extends BlissApp
+class BlissWebApp extends \Bliss\App\Container
 {
+	private $startTime;
 	
-	/**
-	 * @var string
-	 */
-	protected $url;
-	
-	/**
-	 * Get or set the application's URL
-	 * 
-	 * @param string $url
-	 * @return string
-	 */
-	public function url($url = null)
+	public function __construct($name, $rootPath) 
 	{
-		return $this->getSet("url", $url);
+		parent::__construct($name, $rootPath);
+		
+		$this->startTime = microtime(true);
+		
+		set_exception_handler([$this, "startupExceptionHandler"]);
 	}
-	
 	/**
 	 * @param string $name
 	 * @param string $rootPath
-	 * @param string $environment
 	 * @return BlissWebApp
 	 */
-	public static function create($name, $rootPath, $environment = self::ENV_PRODUCTION) 
+	public static function create($name, $rootPath, $environment = self::ENV_PRODUCTION)
 	{
-		$instance = parent::create($name, $rootPath, $environment);
+		date_default_timezone_set("UTC");
+		error_reporting(-1);
+		ini_set("display_errors", true);
+		ini_set("display_startup_errors", true);
+		
+		if (session_id() === "") {
+			session_start();
+		}
+		
+		// Create the application container
+		$instance = new self($name, $rootPath);
+		$instance->environment($environment);
+		$instance->autoloader()->registerNamespace("Bliss", __DIR__ ."/core/Bliss/src");
+		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/core");
 		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/web");
 		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/security");
 		$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/vendors");
+		
+		if ($environment !== self::ENV_PRODUCTION) {
+			$instance->moduleRegistry()->registerModulesDirectory(__DIR__ ."/development");
+		}
 		
 		return $instance;
 	}
 	
 	public function run()
 	{
-		$baseUrl = "/";
-		$baseMatch = preg_match("/^(.*)\/((.+)\.php)$/i", filter_input(INPUT_SERVER, "SCRIPT_NAME"), $baseMatches);
-		if (isset($baseMatches[1])) {
-			$baseUrl = $baseMatches[1] ."/";
-		}
-		
-		$_uri = $this->_server("REQUEST_URI");
-		$_httpHost = $this->_server("HTTP_HOST");
-		$_https = $this->_server("HTTPS");
-		
-		$requestUri = preg_replace("/^([^\?]+).*/i", "$1", substr($_uri, strlen($baseUrl)));
-		
-		if (!$this->url) {
-			$this->url = ($_https ? "https" : "http") ."://". $_httpHost . $baseUrl;
-		}
-		/*
-		echo "<pre>";
-		var_dump($baseMatch);
-		print_r($baseMatches);
-		
-		
-		var_dump($baseUrl);
-		var_dump($requestUri);
-		exit;
-		//*/
-		
+		// Setup the request
+		$baseUrl = preg_replace("/^(.*)\/.*\.php$/i", "\\1/", filter_input(INPUT_SERVER, "SCRIPT_NAME"));
+		$requestUri = preg_replace("/([^\?]*)\?(.*)$/i", "\\1", 
+			substr(filter_input(INPUT_SERVER, "REQUEST_URI"), strlen($baseUrl))
+		);
 		$request = $this->request();
 		$request->setUri($requestUri);
 		$request->baseUrl($baseUrl);
 
 		$router = $this->router();
 		$route = $router->find($requestUri);
-		
+
 		$this->execute($route->params());
-	}
-	
-	/**
-	 * Get a value from the server input
-	 * 
-	 * @param string $field
-	 * @return string
-	 */
-	private function _server($field)
-	{
-		$value = filter_input(INPUT_SERVER, $field);
-		if (!$value) {
-			$value = isset($_SERVER[$field])? $_SERVER[$field] : null;
-		}
-		return $value;
 	}
 	
 	/**
@@ -118,7 +86,7 @@ class BlissWebApp extends BlissApp
 	 * 
 	 * @param \Exception $e
 	 */
-	public function startupExceptionHandler($e)
+	public function startupExceptionHandler(\Exception $e)
 	{
 		ob_end_clean();
 			
@@ -126,19 +94,11 @@ class BlissWebApp extends BlissApp
 
 		echo "<h1>Startup Error!</h1>";
 		echo "<h3>". $e->getMessage() ."</h3>";
-		
-		$showConsole = $this->error()->showConsole();
-		$showTrace = $this->error()->showTrace();
-		if ($this->debugMode()) {
-			$showConsole = $showTrace = true;
-		}
 
-		if ($showTrace) {
+		if ($this->debugMode()) {
 			echo "<h4>Error Trace</h4>";
 			echo "<pre>". $e->getTraceAsString() ."</pre>";
-		}
-		
-		if ($showConsole) {
+
 			echo "<h4>Execution Log</h4>";
 			echo "<pre>";
 			foreach ($this->logs() as $i => $log) {

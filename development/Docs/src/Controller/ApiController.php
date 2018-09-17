@@ -1,6 +1,8 @@
 <?php
 namespace Docs\Controller;
 
+use Bliss\String;
+
 class ApiController extends \Bliss\Controller\AbstractController
 {
 	public function reflectAction()

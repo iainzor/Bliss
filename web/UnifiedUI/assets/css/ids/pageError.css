@@ -1,0 +1,30 @@
+#pageError {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	padding: 20px;
+	border-radius: 3px;
+	margin: -50px 20px 0 -200px;
+	z-index: 1100;
+	transition: all .3s ease-in-out;
+	transform: scale(0);
+	opacity: 0;
+	overflow: hidden;
+	text-align: center;
+}
+body.ready #pageError.visible {
+	opacity: 1;
+	transform: scale(1);
+}
+
+	#pageError > paper-icon-button {
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
+	
+	#pageError  > .container {
+		width: auto;
+	}
+	

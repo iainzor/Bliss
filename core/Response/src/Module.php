@@ -1,9 +1,8 @@
 <?php
 namespace Response;
 
-use Cache\Registry as CacheRegistry,
-	Cache\Driver\File\StorageFactory as CacheStorageFactory,
-	Cache\Driver\File\Config as CacheConfig;
+use Cache\Storage\StorageInterface as CacheStorage,
+	Cache\Storage\FileStorage;
 
 class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInterface
 {
@@ -43,19 +42,9 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	private $cache = false;
 	
 	/**
-	 * @var \Cache\Registry
+	 * @var \Cache\Storage\StorageInterface
 	 */
-	private $cacheRegistry;
-	
-	/**
-	 * @var array
-	 */
-	private $headers = [];
-	
-	/**
-	 * @var boolean
-	 */
-	private $sendHeaders = true;
+	private $cacheStorage;
 	
 	public function init()
 	{}
@@ -78,14 +67,10 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	 * @param string $extension
 	 * @return \Response\Format\FormatInterface
 	 */
-	public function format($extension, Format\FormatInterface $format = null)
+	public function format($extension = null)
 	{
 		if (!isset($this->formats)) {
 			$this->_compileFormats();
-		}
-		
-		if ($format !== null) {
-			$this->formats->set($extension, $format);
 		}
 		
 		return $this->formats->get($extension);
@@ -156,21 +141,7 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	 */
 	public function header($string)
 	{
-		$this->headers[] = $string;
-	}
-	
-	/**
-	 * Get or set whether the response should send headers along with the response body
-	 * 
-	 * @param boolean $flag
-	 * @return boolean
-	 */
-	public function sendHeaders($flag = null)
-	{
-		if ($flag !== null) {
-			$this->sendHeaders = (boolean) $flag;
-		}
-		return $this->sendHeaders;
+		header($string);
 	}
 	
 	/**
@@ -207,11 +178,12 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	private function checkCache(\Request\Module $request)
 	{
 		if ($this->cache === true && isset($this->expires)) {
-			$registry = $this->cacheRegistry();
-			$cached = $registry->get("response", "cache", $request->params());
+			$storage = $this->cacheStorage();
+			$hash = $this->cacheId($request->params());
+			$cache = $storage->get($hash, $this->expires);
 			
-			if ($cached && !$cached->isExpired()) {
-				$this->_send($cached->contents(), $request);
+			if ($cache) {
+				$this->_send($cache, $request);
 				exit;
 			}
 		}
@@ -227,9 +199,9 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	private function saveCache($contents, \Request\Module $request)
 	{
 		if ($this->cache === true) {
-			$registry = $this->cacheRegistry();
-			$resource = $registry->create("response", "cache", $request->params(), $contents);
-			$registry->put($resource);
+			$storage = $this->cacheStorage();
+			$hash = $this->cacheId($request->params());
+			$storage->put($hash, $contents);
 		}
 	}
 	
@@ -245,26 +217,20 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 	}
 	
 	/**
-	 * Get or set the registry used for caching requests
+	 * Get or set the storage used for caching requests
 	 * 
-	 * @param CacheRegistry $registry
-	 * @return CacheRegistry
+	 * @param CacheStorage $storage
+	 * @return CacheStorage
 	 */
-	public function cacheRegistry(CacheRegistry $registry = null)
+	public function cacheStorage(CacheStorage $storage = null)
 	{
-		if ($registry !== null) {
-			$this->cacheRegistry = $registry;
+		if ($storage !== null) {
+			$this->cacheStorage = $storage;
 		}
-		if (!isset($this->cacheRegistry)) {
-			$factory = new CacheStorageFactory();
-			$storage = $factory->create($this->app, [
-				CacheConfig::DIRECTORY => "response"
-			]);
-			$registry = new CacheRegistry($storage);
-			
-			$this->cacheRegistry = $registry;
+		if (!isset($this->cacheStorage)) {
+			$this->cacheStorage = new FileStorage($this->app->resolvePath("files/response"));
 		}
-		return $this->cacheRegistry;
+		return $this->cacheStorage;
 	}
 	
 	/**
@@ -301,11 +267,6 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 			$modified = strtotime($modifiedHeader) !== $this->lastModified;
 			
 			return $modified;
-		}
-		
-		if ($this->expires) {
-			$now = new \DateTime();
-			return $now > $this->expires;
 		}
 		
 		return true;
@@ -359,17 +320,14 @@ class Module extends \Bliss\Module\AbstractModule implements Format\ProviderInte
 		$this->app->log("Sending response");
 		$this->saveCache($contents, $request);
 		
+		$protocol = filter_input(INPUT_SERVER, "SERVER_PROTOCOL");
 		$format = $this->format($request->getFormat());
 		
-		if ($this->sendHeaders === true) {
-			foreach ($this->headers as $header) {
-				header($header);
-			}
-			header("Content-type: ". $format->mime());
-			http_response_code($this->code);
-		}
+		header("Content-type: ". $format->mime());
+		header("{$protocol} {$this->code}");
 		
 		echo $contents;
+		exit;
 	}
 	
 	/**

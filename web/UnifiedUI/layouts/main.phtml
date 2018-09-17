@@ -1,0 +1,129 @@
+<?php
+use UnifiedUI\Module as UI,
+	View\Partial\Partial;
+
+/* @var $app \Bliss\App\Container */
+$app = $this->app;
+
+/* @var $ui \UnifiedUI\Module */
+$ui = $this->app->unifiedUI();
+
+/* @var $request \Request\Module */
+$request = $this->app->request();
+
+/* @var $router \Router\Module */
+$router = $this->app->router();
+
+/* @var $exception \Exception */
+$exception = $this->get("exception");
+?>
+<!DOCTYPE html>
+<html ng-app="bliss" ng-controller="bliss.AppCtrl" class="{{layout.mode}}">
+	<head>
+		<base href="<?=$request->baseUrl()?>">
+		<meta charset="utf-8">
+		<meta name="fragment" content="!">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+		<meta name="mobile-web-app-capable" content="yes">
+		<title ng-bind="pageTitle()"><?=$app->getTitle()?></title>
+		
+		<?=$ui->renderInjectables(UI::AREA_HEAD)?>
+		<?=$ui->renderInjectables(UI::AREA_CSS)?>
+	</head>
+	<body ng-controller="unifiedUI.LayoutCtrl" ng-class="{ready:app.config().ready, 'header-hidden':!layout.header.isVisible()}">
+		<header id="header" class="shadow" ng-class="{hidden:!layout.header.isVisible()}">
+			<div class="container">
+				<paper-icon-button icon="menu" class="menuToggle" ng-click="toggleMenu()" ng-class="{active:menuOpen, disabled:!layout.menu.enabled}"></paper-icon-button>
+
+				<h1 class="brand" title="{{app.config().name}}">
+					<a href="./" ng-bind="app.config().name"></a>
+				</h1>
+				
+				<nav class="page">
+					<h4 class="title" ng-class="{dropdown:page.pages.length}" ng-if="page" dropdown>
+						<a href="./{{page.path}}" ng-bind="page.title"></a>
+						<i class="arrow bottom left north"></i>
+						<ul class="dropdown-menu shadow pull-left" ng-if="page.pages.length">
+							<li ng-repeat="p in page.pages" ng-class="{active:p.active}">
+								<a href="./{{p.path}}">{{p.title}}</a>
+							</li>
+						</ul>
+					</h4>
+				</nav>
+				
+				<aside class="widgets">
+					<?=$ui->renderInjectables(UI::AREA_HEADER_WIDGETS)?>
+				</aside>
+			</div>
+		</header>
+		
+		<nav id="menu" class="shadow z2" ng-class="{open:menuOpen, disabled:!layout.menu.enabled}">
+			<?=$ui->renderInjectables(UI::AREA_MENU)?>
+		</nav>
+		<div id="menuOverlay" ng-click="toggleMenu()" ng-class="{visible:menuOpen}" ng-if="layout.menu.enabled"></div>
+		
+		<div id="pageError" class="alert alert-danger shadow" ng-class="{visible:pageError}">
+			<paper-icon-button icon="close" ng-click="clearPageError()"></paper-icon-button>
+			<div class="container">
+				{{pageError.message}}
+			</div>
+		</div>
+		
+<?php if (!$exception): ?>
+		<div id="pageLoading" ng-class="{'visible':app.loading()}">
+			<paper-spinner class="indicator spinner shadow z2" active></paper-spinner>
+		</div>
+		
+		<div id="content">
+			<div class="container" ng-view></div>
+		</div>
+<?php else: ?>
+		<div id="exception">
+			<div class="container">
+				<article class="block shadow">
+					<section class="section body">
+						<?=$this->contents()?>
+					</section>
+				</article>
+			</div>
+		</div>
+<?php endif; ?>
+		
+		<footer id="footer">
+			<?=$ui->renderInjectables(UI::AREA_FOOTER)?>
+		</footer>
+<?php
+// Attempt to pre-load the view
+try {
+	$uri = $request->uri();
+	if (!strlen($uri)) {
+		$uri = "index";
+	}
+	$route = $router->find("{$uri}.html");
+	$module = $this->app->module($route->module());
+	$viewPath = $route->module() ."/". $route->controller() ."/". $route->action() .".html";
+	$filename = $module->resolvePath("views/". $route->controller() ."/". $route->action() .".html.phtml");
+	$partial = new Partial($filename);
+	$contents = $partial->render();
+?>
+		<script type="text/ng-template" id="./<?=$viewPath?>"><?=$contents;?></script>
+<?php
+} catch (\Exception $e) {
+	echo "\n<!--\n";
+	echo "Could not pre-load template for '{$uri}.html'\n";
+	echo "Message: ". $e->getMessage() ."\n";
+	echo "-->\n";
+}
+?>
+	
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-route.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-resource.min.js"></script>
+		<script src="./assets/all.js"></script>
+		<?=$ui->renderInjectables(UI::AREA_JS)?>
+		<script>
+			bliss.app = <?=json_encode($this->app->toArray())?>;
+		</script>
+	</body>
+</html>

@@ -22,8 +22,10 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 		die("Error '{$string}' in file '{$file}' on line '{$line}'");
 	}
 
-	public function handleException($e) 
+	public function handleException(\Exception $e) 
 	{
+		
+		
 		$response = $this->app->response();
 		$request = $this->app->request();
 		$code = $e->getCode();
@@ -36,14 +38,12 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 				break;
 		}
 		
-		$ext = $request->getFormat();
-		
-		try {
-			$format = $response->format($ext);
-		} catch (InvalidFormatException $e) {
-			$format = $response->defaultFormat();
+		if ($e instanceof InvalidFormatException) {
+			$request->setFormat(null);
 		}
 		
+		$ext = $request->getFormat();
+		$format = $response->format($ext);
 		if ($format instanceof GenericFormat) {
 			$ext = null;
 		}
@@ -56,7 +56,7 @@ class Module extends \Bliss\Module\AbstractModule implements ErrorHandlerInterfa
 				"format" => $ext,
 				"exception" => $e
 			]);
-		} catch (\Error $e) {
+		} catch (\Exception $e) {
 			if ($this->prevExceptionHandler) {
 				call_user_func($this->prevExceptionHandler, $e);
 			} else {

@@ -4,7 +4,7 @@ namespace Bliss;
 abstract class ResourceComponent extends Component implements Resource\ResourceInterface
 {
 	/**
-	 * @var mixed
+	 * @var int
 	 */
 	protected $id;
 	
@@ -31,17 +31,13 @@ abstract class ResourceComponent extends Component implements Resource\ResourceI
 	/**
 	 * Get or set the resource component's ID
 	 * 
-	 * @param mixed $id
-	 * @return mixed
+	 * @param int $id
+	 * @return int
 	 */
 	public function id($id = null)
 	{
 		if ($id !== null) {
-			if (preg_match("/^[0-9]+$/", $id)) {
-				$this->id = (int) $id;
-			} else {
-				$this->id = $id;
-			}
+			$this->id = (int) $id;
 		}
 		return $this->id;
 	}
@@ -105,8 +101,7 @@ abstract class ResourceComponent extends Component implements Resource\ResourceI
 	{
 		if ($updated !== null) {
 			$this->updated = (int) $updated;
-		}
-		if (!$this->updated) {
+		} else if (!isset($this->updated)) {
 			$this->updated = $this->created();
 		}
 		return $this->updated;

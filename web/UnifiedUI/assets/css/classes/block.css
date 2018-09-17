@@ -1,0 +1,56 @@
+.block {
+	border-radius: 2px;
+	margin-bottom: 20px;
+	color: #333;
+	transition: all .2s ease-in-out;
+	position: relative;
+}
+.block.plain {
+	color: inherit;
+}
+
+	.block > .section {
+		padding: 20px; 
+		margin: 0;
+		border-bottom: 1px solid rgba(0,0,0,.05);
+		background-color: #fff;
+	}
+	
+	.block.plain > .section { background-color: transparent; }
+	.block > .section.alternate { background-color: whitesmoke; }
+	.block > .section.compact { padding: 10px; }
+	.block > .section.short { padding-top: 10px; padding-bottom: 10px; }
+	
+	.block > .section.media { 
+		padding: 0;
+		background-color: transparent;
+	}
+		.block > .section.media.loading::before {
+			content: "";
+			display: block;
+			position: absolute;
+			background-color: rgba(255,255,255,.5);
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
+	
+	.block > .section:first-child,
+	.block > .section.media:first-child img { border-top-left-radius: 2px; border-top-right-radius: 2px; }
+	
+	.block > .section:last-child,
+	.block > .section.media:last-child img { border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; border-bottom: none; }
+	
+	.block > .alert { padding: 20px; margin-bottom: 0; }
+	.block > .alert:first-child { border-top-left-radius: 2px; border-top-right-radius: 2px; }
+	.block > .alert:last-child { border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; }
+	
+		.block > .alert :last-child,
+		.block > .section > :last-child { margin-bottom: 0; }
+			
+@media (min-width: 1480px) {
+	.block {
+		margin-bottom: 30px;
+	}
+}

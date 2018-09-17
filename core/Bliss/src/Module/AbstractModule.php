@@ -51,11 +51,12 @@ abstract class AbstractModule extends Component implements ModuleInterface
 		$this->controllers = new ControllerRegistry($this);
 		$this->config = $app->config()->get($name);
 		
+		$this->init();
+		
 		if ($this->config) {
 			$this->applyConfig($this->config);
 		}
 		
-		$this->init();
 	}
 	
 	/**
@@ -103,22 +104,6 @@ abstract class AbstractModule extends Component implements ModuleInterface
 			$this->enabled = (boolean) $flag;
 		}
 		return $this->enabled;
-	}
-	
-	/**
-	 * Enable the module
-	 */
-	public function enable()
-	{
-		$this->enabled(true);
-	}
-	
-	/**
-	 * Disable the module
-	 */
-	public function disable()
-	{
-		$this->enabled(false);
 	}
 	
 	/**

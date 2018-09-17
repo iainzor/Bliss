@@ -1,9 +1,7 @@
 <?php
 namespace Acl;
 
-use Bliss\Component;
-
-class Acl extends Component
+class Acl extends Component implements AclInterface
 {
 	const CREATE = "create";
 	const READ = "read";
@@ -11,66 +9,200 @@ class Acl extends Component
 	const DELETE = "delete";
 	
 	/**
-	 * @var Permission\PermissionInterface[]
+	 * @var boolean
+	 */
+	protected $allowByDefault = false;
+	
+	/**
+	 * @var \Acl\Permission\Permission[]
 	 */
 	protected $permissions = [];
 	
 	/**
-	 * Get or set the ACL's permissions
+	 * Get or set whether permissions are allowed by default for the ACL
+	 * This will only affect permissions that are not explicitly set
 	 * 
-	 * @param Permission\PermissionInterface[] $permissions
-	 * @return Permission\PermissionInterface[]
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function allowByDefault($flag = null) 
+	{
+		if ($flag !== null) {
+			$this->allowByDefault = (boolean) $flag;
+		}
+		return $this->allowByDefault;
+	}
+	
+	/**
+	 * Set a permission for a resource
+	 * 
+	 * The only required parameter is $resourceName
+	 * If no $resourceId is provided, all resources will be affected
+	 * If no $action is set, all actions for a resource will be affected
+	 * 
+	 * @param string $resourceName
+	 * @param string $action
+	 * @param array $params
+	 * @param boolean $isAllowed
+	 */
+	public function set($resourceName, $action = null, array $params = [], $isAllowed = true)
+	{
+		$permission = Permission\Permission::factory([
+			"resourceName" => $resourceName,
+			"action" => $action,
+			"params" => $params,
+			"isAllowed" => (boolean) $isAllowed
+		]);
+		
+		$this->permissions[$resourceName][] = $permission;
+	}
+	
+	/**
+	 * Allow a resource
+	 * Short hand for set()
+	 * 
+	 * @param string $resourceName
+	 * @param string $action
+	 * @param array $params
+	 */
+	public function allow($resourceName, $action = null, array $params = [])
+	{
+		$this->set($resourceName, $action, $params, true);
+	}
+	
+	/**
+	 * Deny access to a resource
+	 * 
+	 * Short hand for set()
+	 * 
+	 * @param string $resourceName
+	 * @param string $action
+	 * @param array $params
+	 */
+	public function deny($resourceName, $action = null, array $params = [])
+	{
+		$this->set($resourceName, $action, $params, false);
+	}
+	
+	/**
+	 * Check if the ACL has access to a resource
+	 * 
+	 * @param string $resourceName
+	 * @param string $action
+	 * @param array $params
+	 * @return boolean
+	 */
+	public function isAllowed($resourceName, $action = null, array $params = [])
+	{
+		if (is_array($action)) {
+			$action = empty($action) ? null : array_shift($action);
+		}
+		
+		$allowed = $this->allowByDefault;
+		
+		if (isset($this->permissions[$resourceName])) {
+			$perms = array_filter($this->permissions[$resourceName], function(Permission\Permission $perm) use ($action) {
+				return $perm->action() === $action || $perm->action() === null;
+			});
+			
+			foreach ($perms as $perm) {
+				if ($perm->matches($params)) {
+					if ($perm->isAllowed()) {
+						$allowed = true;
+					} else if ($allowed && !$perm->isAllowed()) {
+						$allowed = false;
+					}
+				}
+			}
+		}
+		
+		return $allowed;
+	}
+	
+	/**
+	 * Assert that a permission is allowed
+	 * 
+	 * @param string $resourceName
+	 * @param string $action
+	 * @param array $params
+	 * @throws PermissionDeniedException
+	 */
+	public function assertIsAllowed($resourceName, $action = null, array $params = []) 
+	{
+		if (!$this->isAllowed($resourceName, $action, $params)) {
+			if ($action !== null) {
+				$message = "Permission for action '{$action}' denied for resource: {$resourceName}";
+			} else {
+				$message = "Permission denied for resource: {$resourceName}";
+			}
+			
+			if (count($params)) {
+				$message .= ", using params: ". json_encode($params);
+			}
+			
+			throw new PermissionDeniedException($message);
+		}
+	}
+	
+	/**
+	 * Get all permissions in the ACL
+	 * 
+	 * @return \Acl\Permission\Permission[]
 	 */
 	public function permissions(array $permissions = null)
 	{
 		if ($permissions !== null) {
-			$this->permissions = [];
-			foreach ($permissions as $permission) {
-				$this->addPermission($permission);
+			foreach ($permissions as $config) {
+				$this->add(
+					Permission\Permission::factory($config)
+				);
 			}
 		}
-		return $this->permissions;
+		
+		$all = [];
+		foreach ($this->permissions as $resourcePerms) {
+			$all = array_merge($all, $resourcePerms);
+		}
+		return $all;
 	}
 	
 	/**
 	 * Add a permission to the ACL
 	 * 
-	 * @param \Acl\Permission\PermissionInterface $permission
+	 * @param \Acl\Permission\Permission $permission
 	 */
-	public function addPermission(Permission\PermissionInterface $permission)
+	public function add(Permission\Permission $permission)
 	{
-		$this->permissions[] = $permission;
+		$i = $permission->resourceName();
+		if (!isset($this->permissions[$i])) {
+			$this->permissions[$i] = [];
+		}
+		
+		$this->permissions[$i][] = $permission;
 	}
 	
 	/**
-	 * Check if an action is allowed on a path
+	 * Merge another ACL with this one
 	 * 
-	 * @param string $path
-	 * @param string $action
-	 * @return boolean
+	 * @param \Acl\AclInterface $acl
 	 */
-	public function isAllowed($path, $action)
+	public function merge(AclInterface $acl)
 	{
-		$isAllowed = false;
-		foreach ($this->permissions as $permission) {
-			if ($permission->matches($path)) {
-				$isAllowed = $permission->isAllowed($action);
-			}
+		foreach ($acl->permissions() as $permission) {
+			$this->add($permission);
 		}
-		return $isAllowed;
 	}
 	
 	/**
-	 * Assert that $action is allowed on $path
+	 * Add additional properties to the exported array
 	 * 
-	 * @param string $path
-	 * @param string $action
-	 * @throws PermissionDeniedException
+	 * @return array
 	 */
-	public function assertIsAllowed($path, $action)
-	{
-		if (!$this->isAllowed($path, $action)) {
-			throw new PermissionDeniedException("Action '{$action}' on '{$path}' is not allowed");
-		}
+	public function toArray() {
+		$data = array_merge(parent::toArray(), [
+			"permissions" => $this->_parse("permissions", $this->permissions())
+		]);
+		
+		return $data;
 	}
 }

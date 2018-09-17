@@ -9,7 +9,7 @@ class RunnerController extends \Bliss\Controller\AbstractController
 	
 	public function init()
 	{
-		$this->configPath = $this->app->resolvePath("files/tests/config.xml");
+		$this->configPath = $this->app->resolvePath("tests/config.xml");
 		
 		$dir = dirname($this->configPath);
 		if (!is_dir($dir)) {
@@ -19,18 +19,17 @@ class RunnerController extends \Bliss\Controller\AbstractController
 	
 	public function runAction()
 	{
-		$this->_generateConfig();
-
-		$command = "cd ". $this->app->resolvePath() ." && phpunit -c {$this->configPath} --bootstrap ". __DIR__ ."/autoload.php";
-		$response = shell_exec($command);
-		$result = new Result($command);
-		$result->parseResponse($response);
+		$request = $this->app->request();
 		
-		echo "<pre>";
-		echo $result->toArray()["response"];
-		exit;
-
-		return $result->toArray();
+		if ($request->param("format") === "json") {
+			$this->_generateConfig();
+			
+			$response = shell_exec("cd ". $this->app->resolvePath() ." && phpunit -c {$this->configPath} --bootstrap ". __DIR__ ."/autoload.php");
+			$result = new Result();
+			$result->parseResponse($response);
+			
+			return $result->toArray();
+		}
 	}
 	
 	private function _generateConfig()

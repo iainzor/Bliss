@@ -1,21 +1,8 @@
 <?php
 namespace Bliss;
 
-require_once "ArrayExportTrait.php";
-
 class Component
 {
-	use ArrayExportTrait {
-		ArrayExportTrait::toArray as private baseToArray;
-		ArrayExportTrait::toBasicArray as private baseToBasicArray;
-	}
-	
-	const VALUE_INT = "intval";
-	const VALUE_FLOAT = "floatval";
-	const VALUE_DOUBLE = "doubleval";
-	const VALUE_STRING = "strval";
-	const VALUE_BOOLEAN = "boolval";
-	
 	private $_properties = [];
 	
 	/**
@@ -25,9 +12,7 @@ class Component
 	 */
 	public function toArray()
 	{
-		return $this->_addCustomProperties(
-			$this->baseToArray()
-		);
+		return $this->_toArray();
 	}
 	
 	/**
@@ -37,45 +22,51 @@ class Component
 	 */
 	public function toBasicArray()
 	{
-		return $this->_addCustomProperties(
-			$this->baseToBasicArray()
-		);
+		return $this->_toArray(true);
 	}
 	
 	/**
-	 * Add custom properties to the exported array
-	 * 
-	 * @param array $data
+	 * @param boolean $basic
 	 * @return array
 	 */
-	private function _addCustomProperties(array $data)
+	private function _toArray($basic = false)
 	{
-		foreach ($this->_properties as $name => $value) {
-			if (!isset($data[$name])) {
-				$data[$name] = $this->_parse(null, $value);
+		$refClass = new \ReflectionClass($this);
+		$props = $refClass->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PUBLIC);
+		$data = [];
+
+		foreach ($props as $refProp) {
+			$name = $refProp->getName();
+			
+			if (method_exists($this, $name)) {
+				$value = call_user_func([$this, $name]);
+			} else {
+				$value = $this->{$name};
 			}
+			
+			if ($basic === true && $value instanceof Component) {
+				continue;
+			}
+			
+			$data[$name] = $this->_parse($name, $value);
 		}
-		return $data;
+		
+		$diff = array_diff_assoc($this->_properties, $data);
+		
+		return array_merge($data, $diff);
 	}
 	
 	/**
 	 * Get or set a property of the component
-	 * If the value is NULL the method acts as a getter and returns the current value
-	 * If the value is NOT NULL the method first sets the property and then returns the new value
-	 * 
-	 * Only properties that are part of the class or have been explicitly set in $this._properties are affected
+	 * If the value IS NULL is provided the method acts as a getter and returns the current value
+	 * If the value IS NOT NULL the method first sets the property and then returns the new value
 	 * 
 	 * @param string $property
 	 * @param mixed $value
-	 * @param callable $valueParser OPTIONAL Function used to parse the value
 	 */
-	public function getSet($property, $value = null, $valueParser = null)
+	protected function getSet($property, $value = null)
 	{
 		$exists = $property != "_properties" ? property_exists($this, $property) : false;
-		
-		if ($value !== null && is_callable($valueParser)) {
-			$value = call_user_func($valueParser, $value);
-		}
 		
 		if ($exists && $value !== null) {
 			$ref = new \ReflectionProperty($this, $property);
@@ -94,18 +85,31 @@ class Component
 	}
 	
 	/**
-	 * Set a custom property value
-	 *   
-	 * @param string $property
+	 * Parse a value based on its type
+	 * 
+	 * @param string $name
 	 * @param mixed $value
+	 * @return mixed
 	 */
-	public function set($property, $value = null)
+	protected function _parse($name, $value)
 	{
-		if (method_exists($this, $property)) {
-			call_user_func([$this, $property], $value);
+		if (is_object($value) && method_exists($value, "toArray") ) {
+			$newValue = $value->toArray();
+		} else if ($value instanceOf \DateTime) {
+			$newValue = $value->getTimestamp();
+		} else if (method_exists($this, $name)) {
+			$newValue = call_user_func(array($this, $name));
 		} else {
-			$this->_properties[$property] = $value;
+			$newValue = $value;
 		}
+		
+		if (is_array($newValue)) {
+			foreach ($newValue as $n => $v) {
+				$newValue[$n] = $this->_parse(null, $v);
+			}
+		}
+		
+		return $newValue;
 	}
 	
 	/**
@@ -119,16 +123,12 @@ class Component
 	public function __call($name, array $args = [])
 	{
 		$value = isset($args[0]) ? $args[0] : null;
-		$ref = new \ReflectionClass($this);
 		
-		if (!$ref->hasProperty($name)) {
+		if (!property_exists($this, $name) && isset($this->_properties[$name])) {
 			return $this->getSet($name, $value);
-		} else {
-			$prop = $ref->getProperty($name);
-			if (!$prop->isPrivate()) {
-				throw new \Exception("Unknown method: ". get_class($this) ."::". $name);
-			}
 		}
+		
+		throw new \Exception("Unknown method: ". get_class($this) ."::". $name);
 	}
 	
 	/**
@@ -148,43 +148,19 @@ class Component
 	 * Populate a component with a set of properties
 	 * 
 	 * @param \Bliss\Component $component
-	 * @param array|Component $properties
+	 * @param array $properties
 	 * @return \Bliss\Component
 	 */
-	final public static function populate(Component $component, $properties)
+	final public static function populate(Component $component, array $properties)
 	{
-		$properties = self::convertValueToArray($properties);
-		
 		foreach ($properties as $name => $value) {
-			call_user_func([$component, $name], $value);
+			if (method_exists($component, $name)) {
+				call_user_func([$component, $name], $value);
+			} else {
+				$component->getSet($name, $value);
+			}
 		}
 		
 		return $component;
-	}
-	
-	/**
-	 * Convert a mixed value to an array
-	 * 
-	 * @param mixed $value
-	 * @return array
-	 * @throws \UnexpectedValueException
-	 */
-	final public static function convertValueToArray($value)
-	{
-		if ($value instanceof \Bliss\Component) {
-			$parsed = $value->toArray();
-		} else if ($value instanceof \stdClass) {
-			$parsed = (array) $value;
-		} else {
-			$parsed = $value;
-		}
-		
-		if (!is_array($parsed)) {
-			$type = gettype($parsed) === "object" ? get_class($parsed) : gettype($parsed);
-			
-			throw new \UnexpectedValueException("\$value must be an array or an instance of \\Bliss\\Component, `{$type}` given");
-		}
-		
-		return $parsed;
 	}
 }

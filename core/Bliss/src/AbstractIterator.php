@@ -1,7 +1,7 @@
 <?php
 namespace Bliss;
 
-abstract class AbstractIterator implements \Iterator, \Countable
+abstract class AbstractIterator implements \Iterator
 {
 	/**
 	 * @var array
@@ -56,21 +56,15 @@ abstract class AbstractIterator implements \Iterator, \Countable
 	{
 		return $this->items;
 	}
-	
-	/**
-	 * Implementation of \Iterator
-	 */
+
 	public function current() { return current($this->items); }
+
 	public function key() { return key($this->items); }
+
 	public function next() { return next($this->items); }
+
 	public function rewind() { return reset($this->items); }
+
 	public function valid() { $key = key($this->items); return $key !== false && $key !== null; }
 
-	/**
-	 * Implementation of \Countable
-	 */
-	public function count($mode = COUNT_NORMAL) 
-	{
-		return count($this->items, $mode);
-	}
 }

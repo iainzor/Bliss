@@ -1,0 +1,22 @@
+.block.inverted {
+	color: #fff;
+}
+
+	.block.inverted > .section {
+		background-color: #212121;
+		border-color: rgba(255,255,255,.05);
+	}
+
+	.block.inverted > .section.alternate { background-color: #252525; }
+
+	.block.inverted > .section.clickable {}
+	.block.inverted > .section.clickable:hover { background-color: #282828; }
+
+	.block.inverted a { color: #4cf; }
+	.block.inverted a.btn { color: inherit; }
+
+	.block.inverted > .nav > li > a:hover,
+	.block.inverted > .nav > li > a:focus {
+		background-color: rgba(255,255,255,.1);
+		color: #fff;
+	}

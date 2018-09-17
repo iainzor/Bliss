@@ -3,20 +3,13 @@ namespace Acl\Permission;
 
 interface PermissionInterface
 {
-	/**
-	 * @param string $path
-	 * @return boolean
-	 */
-	public function matches($path);
+	public function resourceName($name = null);
 	
-	/**
-	 * @param string $action
-	 * @return boolean
-	 */
-	public function isAllowed($action);
+	public function action($action = null);
 	
-	/**
-	 * @return array
-	 */
-	public function toArray();
+	public function params(array $params = null);
+	
+	public function matches(array $params);
+	
+	public function isAllowed($flag = null);
 }

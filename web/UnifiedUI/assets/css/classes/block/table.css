@@ -1,0 +1,24 @@
+.block > table.table {
+		margin-bottom: 0;
+	}
+	.block > table.table:last-child:after {
+		content: "";
+		display: block;
+		height: 5px;
+	}
+	
+	.block > table.table td:first-child,
+	.block > table.table th:first-child { padding-left: 20px; }
+	
+	.block > table.table td:last-child,
+	.block > table.table th:last-child { padding-right: 20px; }
+	
+	.block > table.table th:first-child:last-child,
+	.block > table.table td:first-child:last-child { padding-right: 8px; }
+	
+	.block > table.table-bordered { border-left: none; border-right: none; }
+		.block > table.table-bordered th:first-child,
+		.block > table.table-bordered td:first-child { border-left: none; }
+
+		.block > table.table-bordered th:last-child,
+		.block > table.table-bordered td:last-child { border-right: none; }

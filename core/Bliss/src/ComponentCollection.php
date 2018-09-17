@@ -19,45 +19,6 @@ class ComponentCollection implements \ArrayAccess, \Iterator, \Countable
 	}
 	
 	/**
-	 * Push an item onto the end of the collection
-	 * 
-	 * @param Component $item
-	 */
-	protected function push(Component $item)
-	{
-		$this->items[] = $item;
-	}
-	
-	/**
-	 * Add an into into the beginning of the collection
-	 * 
-	 * @param Component $item
-	 */
-	protected function unshift(Component $item)
-	{
-		array_unshift($this->items, $item);
-	}
-	
-	/**
-	 * Clear all items from the collection
-	 * 
-	 */
-	public function clear()
-	{
-		$this->items = [];
-	}
-	
-	/**
-	 * Get all items in the collection
-	 * 
-	 * @return Component[]
-	 */
-	protected function all()
-	{
-		return $this->items;
-	}
-	
-	/**
 	 * Convert all items in the collection to an array
 	 * 
 	 * @return array

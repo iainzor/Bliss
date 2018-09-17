@@ -4,7 +4,7 @@ namespace Router;
 use Bliss\Module\AbstractModule,
 	Config\PublicConfigInterface;
 
-class Module extends AbstractModule implements ProviderInterface
+class Module extends AbstractModule implements ProviderInterface, PublicConfigInterface
 {
 	/**
 	 * @var \Router\Route[]

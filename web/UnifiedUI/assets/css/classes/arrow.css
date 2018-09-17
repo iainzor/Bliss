@@ -1,0 +1,72 @@
+.arrow {
+	display: block;
+	position: absolute;
+	width: 0;
+	height: 0;
+	border: 8px solid transparent;
+	z-index: 1;
+	transition: all .3s ease-in-out;
+}
+.arrow.small { border-width: 6px; }
+
+.arrow.top.left.north {
+	border-right-color: transparent !important;
+	border-top-color: transparent !important;
+	top: 0;
+	left: 0;
+}
+.arrow.top.left.east {
+	border-right-color: transparent !important;
+	border-bottom-color: transparent !important;
+	top: 0;
+	left: 0;
+}
+.arrow.top.left.west {
+	border-left-color: transparent !important;
+	border-bottom-color: transparent !important;
+	top: 0;
+	left: -16px;
+}
+.arrow.top.right.east {
+	border-right-color: transparent !important;
+	border-bottom-color: transparent !important;
+	top: 0;
+	right: 0;
+}
+.arrow.top.right.west {
+	border-left-color: transparent !important;
+	border-bottom-color: transparent !important;
+	top: 0;
+	right: 0;
+}
+
+.arrow.bottom.left.south {
+	border-right-color: transparent !important;
+	border-bottom-color: transparent !important;
+	bottom: 0;
+	left: 0;
+}
+.arrow.bottom.left.north {
+	border-right-color: transparent !important;
+	border-top-color: transparent !important;
+	bottom: 0;
+	left: 0;
+}
+.arrow.bottom.left.east {
+	border-right-color: transparent !important;
+	border-top-color: transparent !important;
+	bottom: 0;
+	left: 0;
+}
+.arrow.bottom.right.north {
+	border-left-color: transparent !important;
+	border-top-color: transparent !important;
+	bottom: 0;
+	right: 0;
+}
+.arrow.bottom.right.south {
+	border-left: transparent !important;
+	border-bottom-color: transparent !important;
+	bottom: 0;
+	right: 0;
+}

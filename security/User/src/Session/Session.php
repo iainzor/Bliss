@@ -1,23 +1,20 @@
 <?php
 namespace User\Session;
 
-use Database\Model\AbstractResourceModel,
+use Bliss\Component,
 	User\User,
 	User\GuestUser;
 
-class Session extends AbstractResourceModel implements SessionInterface
+class Session extends Component implements SessionInterface
 {
-	const RESOURCE_NAME = "user-session";
+	const KEY = "USER_SESSION";
+	
+	private $key = self::KEY;
 	
 	/**
 	 * @var string
 	 */
 	protected $id;
-	
-	/**
-	 * @var string
-	 */
-	protected $name;
 	
 	/**
 	 * @var int
@@ -30,29 +27,24 @@ class Session extends AbstractResourceModel implements SessionInterface
 	protected $isValid = false;
 	
 	/**
+	 * @var int
+	 */
+	protected $created;
+	
+	/**
 	 * @var \User\User
 	 */
 	protected $user;
 	
 	/**
-	 * @var int
-	 */
-	protected $lifetime;
-	
-	/**
-	 * Constructor
+	 * Set the key used when saving the session
 	 * 
-	 * @param string $name
+	 * @param string $key
 	 */
-	public function __construct($name) 
+	public function setKey($key)
 	{
-		$this->name = $name;
+		$this->key = $key;
 	}
-	
-	/**
-	 * @return string
-	 */
-	public function getResourceName() { return self::RESOURCE_NAME; }
 	
 	/**
 	 * Get or set the session's ID
@@ -67,20 +59,10 @@ class Session extends AbstractResourceModel implements SessionInterface
 		}
 		
 		if (!isset($this->id)) {
-			$this->id = md5(uniqid("SESSION_ID"));
+			$this->id = md5(uniqid($this->key));
 		}
 		
 		return $this->id;
-	}
-	
-	/**
-	 * Get or set the session's name
-	 * 
-	 * @param string $name
-	 */
-	public function name($name = null) 
-	{
-		return $this->getSet("name", $name);
 	}
 	
 	/**
@@ -130,14 +112,46 @@ class Session extends AbstractResourceModel implements SessionInterface
 	}
 	
 	/**
-	 * Get or set the lifetime of the session.  If the lifetime is
-	 * anything greater than 0, a cookie will be created.
+	 * Get or set the UNIX timestamp of when the session was created
 	 * 
-	 * @param int $lifetime
+	 * @param int $created
 	 * @return int
 	 */
-	public function lifetime($lifetime = null)
+	public function created($created = null)
 	{
-		return $this->getSet("lifetime", $lifetime);
+		if ($created !== null) {
+			$this->created = (int) $created;
+		}
+		if (!isset($this->created)) {
+			$this->created = time();
+		}
+		return $this->created;
+	}
+	
+	/**
+	 * Attempt to load the session
+	 */
+	public function load()
+	{
+		if (isset($_SESSION[$this->key])) {
+			$this->isValid(true);
+			$this->id($_SESSION[$this->key]);
+		}
+	}
+	
+	/**
+	 * Save the session data
+	 */
+	public function save() 
+	{
+		$_SESSION[$this->key] = $this->id();
+	}
+	
+	/**
+	 * Delete the session data
+	 */
+	public function delete() 
+	{
+		unset($_SESSION[$this->key]);
 	}
 }
